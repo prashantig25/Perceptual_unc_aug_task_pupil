@@ -1,4 +1,4 @@
-function [bord_pos,bord_text]= bord_pos_text(num_trials,con,state_mu,pos)
+function [bord_pos,bord_text]= bord_pos_text(num_trials, con, state_mu, pos)
     % BORD_POS_TEXT generates the position of red/green border and the word
     % LEFT/RIGHT for the question during slider phase
 
