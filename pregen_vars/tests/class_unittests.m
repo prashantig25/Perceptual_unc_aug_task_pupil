@@ -270,8 +270,12 @@ classdef class_unittests < matlab.unittest.TestCase
             lower_lim = 0.5; % lower limit of the jittered duration range
             upper_lim = 1; % upper limit of the jittered duration range
             num_trials = 20; % number of trials in a block
+            seed = 123; % seed value
+            rng(seed); % set the seed
+            rand_array = rand(num_trials,1); % pseudo-random array
 
-            [jitter_timing] = gen_jitters(num_trials,lower_lim,upper_lim);
+            [jitter_timing] = gen_jitters(num_trials,lower_lim,upper_lim,rand_array);
+            
 
             % CHECK THE LENGTH, RANGE OF JITTERED DURATIONS
             assert(length(jitter_timing) == num_trials,"Length of array with jittered duration exceeds number of trials in a block");
@@ -306,7 +310,11 @@ classdef class_unittests < matlab.unittest.TestCase
             pos = 0.15; % value of position on psychopy screen 
             s0_prob = 0.5; % probability of s = 0
             cong = 0; % congruence of a block
-            [state_mu,~,~,~,~] = gen_state_mu(s0_prob,num_trials);
+            seed = 123; % seed value
+            rng(seed) % set the seed
+            randperm_array = randperm(num_trials./2,num_trials./2); % pseudo random array
+
+            [state_mu,~,~,~,~] = gen_state_mu(s0_prob,num_trials,randperm_array);
             [bord_pos,bord_text]= bord_pos_text(num_trials,con,state_mu,pos,cong);
 
             % COMPARE EXPECTED AND ACTUAL BORDER POSITION AND TEXT
