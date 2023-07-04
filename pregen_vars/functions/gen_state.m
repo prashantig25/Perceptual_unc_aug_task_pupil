@@ -1,3 +1,5 @@
+%%%% check with non SPACE local version
+
 function [s0, s1, s] = gen_state(num_trials, s1_prob)
     % GEN_STATE generates trial states for a given number of trials in a
     % block.
