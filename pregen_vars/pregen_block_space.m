@@ -1,4 +1,5 @@
 % INITIALISE BLOCK VARS (don't change the combination)
+% explain these with examples and context to the task
 subj_state_crystal = [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]; % state 
 subj_cond = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2]; % condition
 subj_cong = [0,0,1,1,0,0,1,1,1,1,0,0,1,1,0,0]; % congruence
@@ -8,7 +9,7 @@ subj_state_prob = [0.3,0.1,0.3,0.1,0.3,0.1,0.3,0.1,0.7,0.9,0.7,0.9,0.7,0.9,0.7,0
 
 
 num_subjs = 1; % number of subjects
-blocks = 1:16; % number of blocks
+blocks = 1:16; % number of blocks (for training as well??)
 
 for n = 1:num_subjs
      
@@ -25,8 +26,8 @@ for n = 1:num_subjs
         num_trials = 20; % number of trials
         s1_prob = subj_state_prob(b); % proportion of trials with s = 1
         avg_vis = 0.5; % avg visibility
-        contrast_high = 0.1; % highest contrast level
-        contrast_low = 0; % lowest contrast level
+        contrast_high = 0.1; % highest level of contrast difference
+        contrast_low = 0; % lowest level of contrast difference
         state_crystal = subj_state_crystal(b); % more probable state of block
         cond = subj_cond(b); % condition of block
         cong = subj_cong(b); % congruence of block
