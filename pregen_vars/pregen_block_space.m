@@ -21,8 +21,8 @@ for n = 1:num_subjs
      for b = 1:length(blocks)
 
         choice_mu = repelem(0,length(subj_cong),1);
-        choice = repelem(1,length(subj_cong),1);
-        
+        choice = repelem(1,length(subj_cong),1); % what's going on here???
+      
         num_trials = 20; % number of trials
         s1_prob = subj_state_prob(b); % proportion of trials with s = 1
         avg_vis = 0.5; % avg visibility
