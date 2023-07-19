@@ -8,7 +8,8 @@ function [condiff, con_left, con_right]= gen_condiff(avg_vis, contrast_low, cont
         % num_trials = number of trials in a block
         % choice = whether the generated contrast differences are for the
         % choice or slider phase
-        % rand_condiff = array of random numbers between 0-1
+        % rand_condiff = array with random number between 0-1. Dimensions
+        % should be num_trials*1
     % OUTPUT:
         % condiff = contrast difference for trials in a block
         % con_left = contrast of left patch for trials in a block

@@ -9,6 +9,6 @@ function [vars, row_id] = repeat_vars(var, num_trials)
         % vars = array with repeated var
         % row_id = array containing row number used to index missed trials for end of block repetitions
     
-    vars = repelem(var, num_trials, 1);
+    vars = repelem(var,num_trials,1);
     row_id = [0:num_trials-1]';
 end

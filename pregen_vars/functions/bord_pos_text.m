@@ -1,21 +1,16 @@
-function [bord_pos, bord_text]= bord_pos_text(num_trials, con, state_mu, pos, cong)
+function [bord_pos,bord_text]= bord_pos_text(num_trials,con,state_mu,pos,cong)
     % BORD_POS_TEXT generates the position of red/green border and the word
     % LEFT/RIGHT for the question during slider phase
-    % INPUT:
-    	% num_trials = number of trials in a block
-    	% con = contrast of block
-    	% state_mu = state of trial during slider phase in a block
-    	% pos = position on PsychoPy screen
-     	% cong = congruence of a block
-     % OUTPUT:
-     	% bord_pos = position of red/green on the screen for PsychoPy
-      	% bord_text = string indicating which patch they need to report the mu
+
+    % num_trials = number of trials in a block
+    % con = contrast of block
+    % state_mu = state of trial during slider phase in a block
+    % pos = position on PsychoPy screen
 
     bord_pos = NaN(num_trials,1);
     bord_text = [];
-    
-	% BORDER POSITION DEPENDING ON CONTRAST OF A BLOCK
-	for i = 1:num_trials
+% red/green border position around patch
+    for i = 1:num_trials
         if con(1) == 1
             if state_mu(i) == 1
                 bord_pos(i) = -pos;
@@ -31,14 +26,13 @@ function [bord_pos, bord_text]= bord_pos_text(num_trials, con, state_mu, pos, co
         end
     end
 
-	% BORDER POSITION DEPENDING ON CONGRUENCE OF A BLOCK
     for i = 1:num_trials
         if cong(1) == 0
                 bord_pos(i) = -1*bord_pos(i);
         end
     end
     
-    % BORDER TEXT DEPENDING ON THE POSITION OF BORDER ON SCREEN
+    % red/green border text to indicate the patch for which participants should report the mu
     for i = 1:num_trials
         if bord_pos(i) < 0
             bord_text = [bord_text;"left"];
