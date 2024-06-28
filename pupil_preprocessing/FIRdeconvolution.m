@@ -1,4 +1,6 @@
 classdef FIRdeconvolution < FIRdeconvolution_vars
+   % todo: this need documentation and cleaning
+    
     properties
         design_matrix
         betas

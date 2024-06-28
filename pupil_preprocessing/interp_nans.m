@@ -1,4 +1,5 @@
 function [p_out,p_nans] = interp_nans(p_in,badsmps)
+% todo: document properly!
 
 % make the pupil NaN within all identified blink windows
 for b = 1:size(badsmps,1),
