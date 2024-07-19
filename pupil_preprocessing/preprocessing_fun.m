@@ -382,7 +382,7 @@ for s = num_subs
             mkdir(savedir)
         end
 
-        filename = strcat(savedir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
+        filename = strcat(savedir,filesep,subj_ids{s},'_main',num2str(ss),'.xlsx');
         writetable(data,filename);
         clear padblinksmp
     end
