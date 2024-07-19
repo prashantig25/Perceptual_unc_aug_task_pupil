@@ -51,49 +51,7 @@ for s = num_subs
         [asc] = read_eyelink_ascNK_AU(filename_asc); % read ASC file
         data_asc = asc2dat(asc); % convert asc to dat file
         events = data_asc.event; % get events information from the DAT file
-
-        % GET EVENT NAMES AND THEIR TIMESTAMPS
-        n = length(events); % length of events
-        event_list = cell(n,1); % create an empty cell array to add the events of the task
-        time_stamp = nan(n,1); % create empty array to add the time stamp of the events of the task
-        for i = 1:length(events)
-            eve_spl = events(i,1).value; % extract event values
-            eve = strsplit(eve_spl); % split the string to get the timestamp and event name separately
-            time_stamp(i) = str2double(eve(2)); % convert to double
-            event_list(i) = eve(3); % save the event name
-        end
-        events = table(time_stamp,event_list); % create table of time stamp and event name to access during pre-processing and baseline correction
-        events.Properties.VariableNames{1} = 'time_stamp';
-        events.Properties.VariableNames{2} = 'event';
-        str2double(events.event);
-
-        % Todo: This should be an input argument, since it is task specific
-        % ADD ALL THE EVENTS RELEVANT FOR THE TASK (task_events should all
-        % relevant events for that particular task version don't forget to update it)
-        task_events = ["trial_start","patches_start","instructed_delay_start",...
-            "response_start","delay_start","feedback_start","delay1_start","slider_start"];
-        event_per_trial = length(task_events); % number of events in a trial
-
-        % REMOVE ALL EVENT NAMES THAT DON'T MATCH THE ONES THAT ARE
-        % RELEVANT TO THE TASK (i.e. task_events)
-        h = height(events);
-        not_event = zeros(h,1);
-        for i = 1:h
-            k = 1;
-            if sum(strcmp(events.event(i),task_events)) > 0
-                not_event(i,:) = 1;
-            else
-                not_event(i,:) = 0;
-            end
-        end
-        events = events(not_event == 1,:); % only retain events which are part of task_events
-
-        % GET BEHAVIOURAL DATA FOR THE PARTICIPANT
-        %         filename_behv = strcat(subj_ids{s},'_','main',num2str(ss),'.xlsx');
-        %         behv_data = readtable(strcat(behv_dir,'\',filename_behv)); % import from participant's behavioural file
-        %         condition = behv_data.condition; % task conditions
-        %         num_trial = length(condition); % number of trials in one run of the main task
-
+       
         % CONVERT TO TABLE
         fprintf('converting to table...\n');
         [data_table] = conv2table(data);
@@ -410,38 +368,9 @@ for s = num_subs
         fprintf('zscore normalising...\n');
         data_matched.pupil_zsc = zscore(data_matched.pupil_cleaned);
 
-        % ADD EVENT NAMES TO SIGNAL ACCORDING TO EVENT TIME STAMP AND TRIAL NUMBER
-        %     fprintf('matching events and adding trial numbers...\n');
-        %     data = match_streams_el(data_matched, events,event_per_trial, num_trial);
-
         % DOWNSAMPLE
         fprintf('downsampling data...\n');
         data = down_sample(data_matched,sample_num);
-        %     data = down_sample(data,sample_num);
-
-        % todo: this should be based on some method that make the pipeline
-        % more independent of the GB task
-
-        % STORE EVENT NAMES AS NUMBERS
-        %     for i = 1:height(data)
-        %         if strcmp(data.events(i),'trial_start')
-        %             data.event_code(i) = 1;
-        %         elseif strcmp(data.events(i),'instructed_delay_start')
-        %                 data.event_code(i) = 3;
-        %         elseif strcmp(data.events(i),'patches_start')
-        %               data.event_code(i) = 2;
-        %         elseif strcmp(data.events(i),'response_start')
-        %             data.event_code(i) = 4;
-        %         elseif strcmp(data.events(i),'feedback_start')
-        %             data.event_code(i) = 6;
-        %         elseif strcmp(data.events(i),'slider_start')
-        %         data.event_code(i) = 8;
-        %         elseif strcmp(data.events(i),'delay_start')
-        %             data.event_code(i) = 5;
-        %         elseif strcmp(data.events(i),'delay1_start')
-        %             data.event_code(i) = 7;
-        %         end
-        %     end
 
         % Todo: implement safe_save function as suggested for behavioral
         % analyses
