@@ -29,7 +29,7 @@ preprocess_obj.add_vars(preprocess_obj.data.ru,'reward_unc');
 preprocess_obj.add_vars(preprocess_obj.data.confirm_rew,'pe_sign');
 
 % SAVE PREPROCESSED FILE
-writetable(preprocess_obj.data,'preprocessed_lr_pavlovian.xlsx');
+writetable(preprocess_obj.data,'preprocessed_lr_pupil.xlsx');
 writetable(preprocess_obj.data(preprocess_obj.data.pe ~= 0, :),'preprocessed_lr_pavlovian_no_zerope.xlsx');
 
 % SAVE FILES SEPARATELY FOR GROUPED REGRESSION
