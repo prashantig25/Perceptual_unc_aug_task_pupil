@@ -25,10 +25,6 @@ end
 
 % ADD VARIABLES TO THE DATA TABLE
 preprocess_obj.add_vars(norm_condiff,{'norm_condiff'});
-% preprocess_obj.add_vars(norm_patchphasic,{'norm_patchphasic'});
-% preprocess_obj.add_vars(norm_patchtonic,{'norm_patchtonic'});
-% preprocess_obj.add_vars(norm_fbphasic,{'norm_fbphasic'});
-% preprocess_obj.add_vars(norm_fbtonic,{'norm_fbtonic'});
 preprocess_obj.add_vars(preprocess_obj.data.ru,'reward_unc');
 preprocess_obj.add_vars(preprocess_obj.data.confirm_rew,'pe_sign');
 
@@ -46,9 +42,6 @@ if grouped == 1
     data.bins = bins;
     writetable(data(data.bins == 1,:),'preprocessed_subj_condiffbin1.xlsx');
     writetable(data(data.bins == 2,:),'preprocessed_subj_condiffbin2.xlsx');
-%     writetable(data(data.bins == 3,:),'preprocessed_subj_condiffbin3.xlsx');
-%     writetable(data(data.bins == 4,:),'preprocessed_subj_condiffbin4.xlsx');
-%     writetable(data(data.bins == 5,:),'preprocessed_subj_condiffbin5.xlsx');
 end
 % writetable(data(data.con_diff >= 0.02,:),'preprocessed_subj_no_condiffbin1.xlsx');
 %%
@@ -58,7 +51,7 @@ lr_analysis = lr_analysis_obj();
 % p_vals = lr_analysis.p_vals;
 
 % SAVE DATA 
-% save("betas_abs_condiff","betas_all"); % save betas
+save("betas_abs_condiff","betas_all"); % save betas
 save("residuals_signed","residuals_all"); % residuals
-% save("rsquared_abs.mat","rsquared_full"); % save r-squared values
-% save("post_signedUP_predict.mat","posterior_up_subjs"); %
+save("rsquared_abs.mat","rsquared_full"); % save r-squared values
+save("post_signedUP_predict.mat","posterior_up_subjs"); %
