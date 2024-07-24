@@ -91,6 +91,6 @@ for s = 1:num_subs
     if safesave_needed == 0
         save(subj_ids{s},'pupil') % save
     else
-        safe_save(subj_ids{s},pupil) % safe save
+        safe_save(strcat(subj_ids{s},".mat"),pupil) % safe save
     end
 end
