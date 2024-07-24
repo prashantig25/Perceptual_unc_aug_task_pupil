@@ -88,4 +88,4 @@ for n = 1:num_subjs
 end
 
 % SAVE BETAS
-save("betas_behvresidual_abs_pecondiff_nomain","betas_pupil")
+save("betas_behvresidual_abs_pecondiff_nomain.mat","betas_pupil")
