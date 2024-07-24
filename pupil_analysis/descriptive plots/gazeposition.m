@@ -26,7 +26,7 @@ save_ygaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript
 savesafe_needed = 1; % set to 1 if you want to use savesafe instead of save
 
 % LOOP OVER SUBJECTS
-for s = 2:num_subs
+for s = 1:num_subs
 
     % LOOP OVER SESSIONS
     for ss = 1:num_sess(s)
@@ -75,7 +75,7 @@ for s = 2:num_subs
         save(fullfile(save_xgaze,strcat(subj_ids{s})),'xgaze_event') % save
         save(fullfile(save_ygaze,strcat(subj_ids{s})),'ygaze_event') % save
     else
-        safe_save(fullfile(save_xgaze,strcat(subj_ids{s})),xgaze_event) % save
-        safe_save(fullfile(save_ygaze,strcat(subj_ids{s})),ygaze_event) % save
+        safe_save(fullfile(save_xgaze,strcat(subj_ids{s}),".mat"),xgaze_event) % save
+        safe_save(fullfile(save_ygaze,strcat(subj_ids{s}),".mat"),ygaze_event) % save
     end
 end
