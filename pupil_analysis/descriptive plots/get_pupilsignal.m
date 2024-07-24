@@ -20,7 +20,8 @@ event_name = 'feedback'; % which event
 pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
 base_trialspecific = 0; % get baseline signal for that trial
 behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials'; % get behavioral data
-preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\preprocessed\pupil\gaze_data'; % directory to get preprocessed data
+preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\preprocessed_trial'; % directory to get preprocessed data
+safesave_needed = 1; % set to 1 if you want to use safe_save instead of safe
 
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
@@ -86,5 +87,10 @@ for s = 1:num_subs
             end
         end
     end
-    save(subj_ids{s},'pupil') % save
+
+    if safesave_needed == 0
+        save(subj_ids{s},'pupil') % save
+    else
+        safe_save(subj_ids{s},pupil) % safe save
+    end
 end

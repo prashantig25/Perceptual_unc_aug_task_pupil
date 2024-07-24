@@ -23,6 +23,7 @@ behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_pre
 preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\preprocessed_trial'; % directory to get preprocessed data
 save_xgaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\gaze_position\x-gaze"; % directory to store x-gaze
 save_ygaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\gaze_position\y-gaze"; % directory to store y-gaze
+savesafe_needed = 1; % set to 1 if you want to use savesafe instead of save
 
 % LOOP OVER SUBJECTS
 for s = 2:num_subs
@@ -68,6 +69,13 @@ for s = 2:num_subs
         [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
             event_name,n,data,trial_list,pre_duration);        
     end
-    save(fullfile(save_xgaze,strcat(subj_ids{s})),'xgaze_event') % save
-    save(fullfile(save_ygaze,strcat(subj_ids{s})),'ygaze_event') % save
+
+    % SAVE
+    if safesave_needed == 0
+        save(fullfile(save_xgaze,strcat(subj_ids{s})),'xgaze_event') % save
+        save(fullfile(save_ygaze,strcat(subj_ids{s})),'ygaze_event') % save
+    else
+        safe_save(fullfile(save_xgaze,strcat(subj_ids{s})),xgaze_event) % save
+        safe_save(fullfile(save_ygaze,strcat(subj_ids{s})),ygaze_event) % save
+    end
 end
