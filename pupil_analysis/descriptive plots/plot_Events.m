@@ -36,4 +36,4 @@ for i = 1:num_subs
 end
 
 % SAVE
-safe_save("fb_dilation",subj_pupil_signal)
+safe_save("fb_dilation.mat",subj_pupil_signal)
