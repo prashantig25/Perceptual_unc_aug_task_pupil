@@ -14,9 +14,6 @@ function perm = get_permtest(var, num_subjs, col, var1, var2, two_tailed, betas)
     %   data
     % OUTPUT:
     %   perm: struct with output from the permutation test
-
-    % PATH STUFF (remove this while uploading to Github)
-    addpath("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\functions\figures\pupil_reg\spm8_updates_r6313");
     
     % INITIALIZE VARS
     num_vars = length(var);
