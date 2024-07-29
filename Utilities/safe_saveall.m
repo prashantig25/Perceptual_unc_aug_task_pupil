@@ -10,6 +10,7 @@ function safe_saveall(filename, newData)
         % Load the existing data
         if contains(filename, '.mat')
             oldData = load(filename);
+            oldData = oldData.newData;
         elseif contains(filename, '.csv') || contains(filename, '.txt') || contains(filename, '.xlsx')
             oldData = readtable(filename);
         else
@@ -17,7 +18,7 @@ function safe_saveall(filename, newData)
         end
         
         % Compare the new data with the old data
-        if isequal(newData, oldData)
+        if isequaln(newData, oldData)
             disp('Data is consistent. No need to save.');
         else
             % For different data, create a new filename
