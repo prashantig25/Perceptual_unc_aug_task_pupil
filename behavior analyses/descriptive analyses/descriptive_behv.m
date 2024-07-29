@@ -58,6 +58,7 @@ for n = 1:num_subjs
     perc_curve(n,:) = nanmean(perc_subj);    
 end
 
+% SAVE
 if save_mat == 1
     safe_saveall(fullfile(save_dir,"mix_curve.mat"),mix_curve)
     safe_saveall(fullfile(save_dir,"perc_curve.mat"),perc_curve)
