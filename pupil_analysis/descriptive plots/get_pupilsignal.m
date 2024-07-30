@@ -22,6 +22,7 @@ base_trialspecific = 0; % get baseline signal for that trial
 behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials'; % get behavioral data
 preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\preprocessed_trial'; % directory to get preprocessed data
 safesave_needed = 1; % set to 1 if you want to use safe_save instead of safe
+first_derivative = 1; 
 
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
@@ -65,7 +66,7 @@ for s = 1:num_subs
         pupil_event = NaN(n,time_pupil); % initialise array to store pupil
         base_event = zeros(n,time_base); % initialise array to store baseline pupil
         [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_event,event_name, ...
-            n,data,trial_base,base_trialspecific,pre_duration,base_duration); % get pupil event
+            n,data,trial_base,base_trialspecific,pre_duration,base_duration,first_derivative); % get pupil event
         
         % BASELINE CORRECTION
         base_event_mean = zeros(n,1); % initialise array to store mean of baseline pupil
@@ -91,6 +92,6 @@ for s = 1:num_subs
     if safesave_needed == 0
         save(subj_ids{s},'pupil') % save
     else
-        safe_save(strcat(subj_ids{s},".mat"),pupil) % safe save
+        safe_saveall(strcat(subj_ids{s},'.mat'),pupil) % safe save
     end
 end
