@@ -17,7 +17,7 @@ preds_all = readtable("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_m
 pred_vars = {'pe','abs_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff'};% cell array with names of predictor variables
 resp_var = 'pupil'; % name of response variable
 cat_vars = {'condition'}; % cell array with names of categorical variables
-binned = 1; % whether binned regression approach is to be used
+binned = 0; % whether binned regression approach is to be used
 if binned == 1 
     num_bins = 2; % number of bins
     bins = prctile(preds_all.con_diff,0:50:100); % bin edges
@@ -179,12 +179,13 @@ for i = 1:num_subs
 end
 
 % SAVE
-safe_save("pe_condiff2bins.mat", betas_struct);
+safe_saveall("pe_condiff.mat", betas_struct);
 
+betas_struct = importdata("pe_condiff2bins.mat");
 % RUN PERM TEST
 num_vars = 1:num_vars+1; % number of variables
 var1 = betas_struct.with_intercept; 
 var2 = betas_struct.with_intercept;
 betas = 1; % permutation test on regression data
 perm = get_permtest(num_vars, num_subs, col, var1, var2, two_tailed, betas);
-safe_save("perm_pe_condiff2bins.mat", perm);
+safe_saveall("perm_pe_condiffbins.mat", perm);
