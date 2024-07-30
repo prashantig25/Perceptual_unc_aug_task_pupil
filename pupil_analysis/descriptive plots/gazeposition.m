@@ -21,12 +21,12 @@ pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
 base_trialspecific = 0; % get baseline signal for that trial
 behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials'; % get behavioral data
 preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\preprocessed_trial'; % directory to get preprocessed data
-save_xgaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\gaze_position\x-gaze"; % directory to store x-gaze
-save_ygaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\gaze_position\y-gaze"; % directory to store y-gaze
+save_xgaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\pupil\events\x-gaze"; % directory to store x-gaze
+save_ygaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\pupil\events\y-gaze"; % directory to store y-gaze
 savesafe_needed = 1; % set to 1 if you want to use savesafe instead of save
 
 % LOOP OVER SUBJECTS
-for s = 1:num_subs
+for s = 2:num_subs
 
     % LOOP OVER SESSIONS
     for ss = 1:num_sess(s)
@@ -71,11 +71,11 @@ for s = 1:num_subs
     end
 
     % SAVE
-    if safesave_needed == 0
+    if savesafe_needed == 0
         save(fullfile(save_xgaze,strcat(subj_ids{s})),'xgaze_event') % save
         save(fullfile(save_ygaze,strcat(subj_ids{s})),'ygaze_event') % save
     else
-        safe_save(fullfile(save_xgaze,strcat(subj_ids{s}),".mat"),xgaze_event) % save
-        safe_save(fullfile(save_ygaze,strcat(subj_ids{s}),".mat"),ygaze_event) % save
+        safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) % save
+        safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event) % save
     end
 end

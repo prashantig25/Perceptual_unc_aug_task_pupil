@@ -89,4 +89,4 @@ condiffbin.prob = perm.prob;
 condiffbin.pebin1 = subj_pupil_signal_pebin1;
 condiffbin.pebin2 = subj_pupil_signal_pebin2;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
-safe_save("fb_PE2bins.mat",condiffbin)
+safe_saveall("fb_PE2bins.mat",condiffbin)
