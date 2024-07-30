@@ -9,8 +9,7 @@ function safe_saveall(filename, newData)
     if isfile(filename)
         % Load the existing data
         if contains(filename, '.mat')
-            oldData = load(filename);
-            oldData = oldData.newData;
+            oldData = importdata(filename);
         elseif contains(filename, '.csv') || contains(filename, '.txt') || contains(filename, '.xlsx')
             oldData = readtable(filename);
         else
