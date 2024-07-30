@@ -62,7 +62,7 @@ for n = 1:num_subjs
     if strcmp(timewindow,'patch') == 1
         pupil_signal = pupil;
     elseif strcmp(timewindow,'feedback') == 1 
-        pupil_signal = pupil(:,1:300);
+        pupil_signal = pupil(:,1:col);
     end
     pupil_signal(missedtrials==1,:) = []; % remove missed trials
 
@@ -88,4 +88,13 @@ for n = 1:num_subjs
 end
 
 % SAVE BETAS
-save("betas_behvresidual_abs_pecondiff_nomain.mat","betas_pupil")
+safe_saveall("betas_behvresidual_abs_pecondiff_nomain.mat", betas_pupil);
+
+% RUN PERM TEST
+num_vars = 1:num_vars+1; % number of variables
+var1 = betas_pupil.with_intercept; 
+var2 = betas_pupil.with_intercept;
+betas = 1; % permutation test on regression data
+two_tailed = 0; % run one-tailed permutation test 
+perm = get_permtest(num_vars, num_subjs, col, var1, var2, two_tailed, betas);
+safe_saveall("perm_betas_behvresidual_abs_pecondiff_nomain.mat", perm);
