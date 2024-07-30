@@ -41,4 +41,4 @@ for i = 1:num_subjs
 end
 
 % SAVE
-safe_save("full_trial.mat",trial_all);
+safe_saveall("full_trial.mat",trial_all);
