@@ -1,4 +1,3 @@
-%% IMPORT DAT, ASC, AND BEHAVIOURAL FILES FOR PUPIL, TASK, AND EVENTS DATA
 function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, event_names, deconv_time, savedir)
 
         % function PREPROCESS_FUNCTION performs the preprocessing of pupillometry
