@@ -40,8 +40,7 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
     
             % CONVERT TO TABLE
             fprintf('converting to table...\n');
-            var_names = {'time_stamp','eye_x','eye_y','pupil_diam'};
-            [data_table] = conv2table(data, var_names);
+            [data_table] = conv2table(data);
             data_matched = data_table;
             pupil_og = data_matched.pupil_diam;
     
