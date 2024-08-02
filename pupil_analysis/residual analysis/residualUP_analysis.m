@@ -7,14 +7,13 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
     '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
     '3319','129','4684','3886','620','901','900'}; % subject-IDs
-load("post_signedUP_predict.mat"); posterior_all = posterior_up_subjs; % posterior update
+load("post_absUP_predict.mat"); posterior_all = posterior_up_subjs; % posterior update
 mdl = 'up~ pupil + pe:pupil:con_diff + pupil:pe + pupil:con_diff +post_up'; % residual-analysis model
 num_vars = 5; % number of predictors
 resp_var = {'up'}; % response var
 cat_vars = {''}; % cell-array of categorical vars
 pred_vars = {'post_up','pe','pupil','con_diff'}; % cell array with predictor vars
-preds_all = readtable("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\" + ...
-    "data_files\behv_regression\preprocessed_lr_pupil.xlsx"); % get behavioral variables
+preds_all = readtable(strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 col = 300; % length of pupil signal
 num_subjs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
@@ -22,9 +21,12 @@ timewindow = 'feedback'; % pupil signal from which window is used for residual a
 betas_pupil.with_intercept = NaN(1,num_vars+1,length(subj_ids),col); % initialised structure to store model-estimated betas
 
 % PATH STUFF
-behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials';
-preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\preprocessed\pupil\gaze_data';
-pupil_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 7\pupil_manuscript\data_files\pupil_events\fb\basecorrected';
+currentDir = pwd; % Get the current working directory
+save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'residual'); 
+pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+preds_all = readtable(strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+behv_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+mkdir(save_dir);
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
 subj_ids_num = [];
@@ -53,7 +55,9 @@ for n = 1:num_subjs
         data_run = [data_run(:,[1:16]),rt,slider];
         behv_data = [behv_data; data_run];
     end
-    missedtrials = isnan(behv_data.rt) | isnan(behv_data.slider);
+    missedtrials_rt = isnan(behv_data.rt);
+    behv_data(missedtrials_rt==1,:) = []; % remove missed trials
+    missedtrials = isnan(behv_data.slider);
 
     % LOAD PUPIL SIGNAL
     filename = strcat(pupil_dir,'\',subj_ids{n},'.mat');
@@ -88,7 +92,7 @@ for n = 1:num_subjs
 end
 
 % SAVE BETAS
-safe_saveall("betas_behvresidual_abs_pecondiff_nomain.mat", betas_pupil);
+safe_saveall(strcat(save_dir,filesep,"betas_behvresidual_abs_pecondiff_nomain.mat"), betas_pupil);
 
 % RUN PERM TEST
 num_vars = 1:num_vars+1; % number of variables
@@ -97,4 +101,4 @@ var2 = betas_pupil.with_intercept;
 betas = 1; % permutation test on regression data
 two_tailed = 0; % run one-tailed permutation test 
 perm = get_permtest(num_vars, num_subjs, col, var1, var2, two_tailed, betas);
-safe_saveall("perm_betas_behvresidual_abs_pecondiff_nomain.mat", perm);
+safe_saveall(strcat(save_dir,filesep,"perm_betas_behvresidual_abs_pecondiff_nomain.mat"), perm);
