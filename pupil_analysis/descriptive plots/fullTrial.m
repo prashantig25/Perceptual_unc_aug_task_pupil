@@ -15,9 +15,12 @@ total = 630; % how long should the entire trial be
 trial_all = NaN(num_subjs,total);
 
 % PATH STUFF
-patch_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_files\pupilEvents_trial\patch";
-resp_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_files\pupilEvents_trial\resp";
-fb_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_files\pupilEvents_trial\fb";
+currentDir = pwd; % Get the current working directory
+save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
+fb_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+patch_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch'); % directory to get preprocessed data
+resp_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp'); % directory to get preprocessed data
+mkdir(save_dir);
 
 % LOOP OVER SUBJECTS
 for i = 1:num_subjs
@@ -41,4 +44,4 @@ for i = 1:num_subjs
 end
 
 % SAVE
-safe_saveall("full_trial.mat",trial_all);
+safe_saveall(strcat(save_dir,filesep,"full_trial.mat"),trial_all);

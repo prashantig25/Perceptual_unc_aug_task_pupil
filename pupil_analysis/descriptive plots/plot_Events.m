@@ -11,9 +11,13 @@ timewindow = 'feedback'; % specify for which event pupil signal is being plotted
 col = 300; % length of signal to be plotted
 num_subs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
-preds_all = readtable("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 7\pupil_manuscript\" + ...
-    "data_files\preprocessed_behv\preprocessed_lr_pupil.xlsx");
-pupil_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 7\pupil_manuscript\data_files\pupil_events\fb\basecorrected';
+
+% PATH STUFF
+currentDir = pwd; % Get the current working directory
+save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
+pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+preds_all = readtable(strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+mkdir(save_dir);
 
 % INITIALISE VARS TO STORE PUPIL SIGNAL
 subj_pupil_signal = NaN(num_subs,col);
@@ -36,4 +40,4 @@ for i = 1:num_subs
 end
 
 % SAVE
-safe_saveall("fb_dilation.mat",subj_pupil_signal)
+safe_saveall(strcat(save_dir,filesep,"fb_dilation.mat"),subj_pupil_signal)

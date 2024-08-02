@@ -19,14 +19,17 @@ time_base = 10; % time duration of the base
 event_name = 'feedback'; % which event
 pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
 base_trialspecific = 0; % get baseline signal for that trial
-behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials'; % get behavioral data
-preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\preprocessed_trial'; % directory to get preprocessed data
-save_xgaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\pupil\events\x-gaze"; % directory to store x-gaze
-save_ygaze = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\pupil\events\y-gaze"; % directory to store y-gaze
+currentDir = pwd; % Get the current working directory
+save_xgaze = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
+save_ygaze = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
+preproc_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed', filesep, 'with events'); % directory to get preprocessed data
+behv_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+mkdir(save_xgaze);
+mkdir(save_ygaze);
 savesafe_needed = 1; % set to 1 if you want to use savesafe instead of save
 
 % LOOP OVER SUBJECTS
-for s = 2:num_subs
+for s = 1%:num_subs
 
     % LOOP OVER SESSIONS
     for ss = 1:num_sess(s)

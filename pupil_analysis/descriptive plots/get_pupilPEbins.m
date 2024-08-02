@@ -11,14 +11,16 @@ num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 timewindow = 'feedback';
 col = 300;
 num_subs = length(subj_ids); % number of subjects
-preds_all = readtable("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 7\pupil_manuscript\" + ...
-    "data_files\preprocessed_behv\preprocessed_lr_pupil.xlsx"); % get behavioral predictors
 subj_pupil_signal_pebin2 = NaN(num_subs,col); % initialised array for PE bin = 2
 subj_pupil_signal_pebin1 = NaN(num_subs,col); % initialised array for PE bin = 1
 
 % PATH STUFF
-pupil_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 7\pupil_manuscript\data_files\pupil_events\fb\basecorrected';
-behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials';
+currentDir = pwd; % Get the current working directory
+save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
+pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+behv_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+preds_all = readtable(strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+mkdir(save_dir);
 
 for i = 1:num_subs
 
@@ -60,7 +62,7 @@ for i = 1:num_subs
     % GET PUPIL DATA
     filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
     load(filename,'pupil');
-    pupil(missed_trials,:) = []; % delete missed trials from pupil
+  %  pupil(missed_trials,:) = []; % delete missed trials from pupil
     pupil(validIndices,:)  = []; % delete pe == 0 from pupil
 
     if strcmp(timewindow,'patch') == 1
@@ -89,4 +91,4 @@ condiffbin.prob = perm.prob;
 condiffbin.pebin1 = subj_pupil_signal_pebin1;
 condiffbin.pebin2 = subj_pupil_signal_pebin2;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
-safe_saveall("fb_PE2bins.mat",condiffbin)
+safe_saveall(strcat(save_dir,filesep,"fb_PE2bins.mat"),condiffbin)
