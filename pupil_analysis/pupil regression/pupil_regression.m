@@ -1,6 +1,16 @@
 clc
 clearvars
 
+% PATH STUFF
+currentDir = pwd; % Get the current working directory
+save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'regression'); 
+pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+preds_all = readtable(strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+behv_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+xgaze_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
+ygaze_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
+mkdir(save_dir);
+
 % INITIALIZE VARS
 subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
@@ -12,12 +22,10 @@ col = 300; % number of samples on which the regression is applied
 num_subs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
 regress_rt = 0; % remove RT effects
-preds_all = readtable("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\" + ...
-    "data_files\behv_regression\preprocessed_lr_pupil.xlsx");
 pred_vars = {'pe','abs_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff'};% cell array with names of predictor variables
 resp_var = 'pupil'; % name of response variable
 cat_vars = {'condition'}; % cell array with names of categorical variables
-binned = 0; % whether binned regression approach is to be used
+binned = 1; % whether binned regression approach is to be used
 if binned == 1 
     num_bins = 2; % number of bins
     bins = prctile(preds_all.con_diff,0:50:100); % bin edges
@@ -32,15 +40,8 @@ else
 end
 betas_struct.with_intercept = NaN(num_bins,num_vars+1,length(subj_ids),col); % initialize struct to store number of bins
 
-% PATH STUFF
-behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials';
-preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\preprocessed\pupil\gaze_data';
-pupil_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\pupil_signal\baseline corrected\fb';
-xgaze_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\gaze_position\x-gaze';
-ygaze_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\gaze_position\y-gaze';
-
 % LOOP OVER SUBJECTS
-for i = 1:num_subs
+for i = 1%:num_subs
 
     % GET BEHAVIORAL DATA
     fprintf('reading in %s ...\n', subj_ids{i});
@@ -179,13 +180,12 @@ for i = 1:num_subs
 end
 
 % SAVE
-safe_saveall("pe_condiff.mat", betas_struct);
+safe_saveall(strcat(save_dir,filesep,"pe_condiffbins.mat"), betas_struct);
 
-betas_struct = importdata("pe_condiff2bins.mat");
 % RUN PERM TEST
 num_vars = 1:num_vars+1; % number of variables
 var1 = betas_struct.with_intercept; 
 var2 = betas_struct.with_intercept;
 betas = 1; % permutation test on regression data
 perm = get_permtest(num_vars, num_subs, col, var1, var2, two_tailed, betas);
-safe_saveall("perm_pe_condiffbins.mat", perm);
+safe_saveall(strcat(save_dir,filesep,"perm_pe_condiffbins.mat"), perm);
