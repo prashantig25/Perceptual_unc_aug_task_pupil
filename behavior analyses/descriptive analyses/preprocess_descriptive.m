@@ -13,8 +13,12 @@ num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 total_blocks = 8; % total number of blocks in the task
 task_name = '_main';
 format = '.xlsx';
-behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials';
-save_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\behavior\preprocessed";
+
+% CHANGE DIRECTORY ACCORDINGLY
+currentDir = pwd; % Get the current working directory
+behv_dir = strcat('data',filesep,'GB data',filesep,'behavior',filesep,'raw data');
+save_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'preprocessed'); 
+mkdir(save_dir);
 
 num_subjs = length(subj_ids); % number of subjects
 data_subj = []; % empty array for each subjects data
@@ -148,8 +152,12 @@ for n = 1:num_subjs
     data_subj.blocks = blocks; % add to table
 
     % SAVE FILE
-    save_file = strcat(save_dir,'\',num2str(subj_ids{n}),'.xlsx');
+    save_file = strcat(save_dir,filesep,num2str(subj_ids{n}),'.xlsx');
     safe_saveall(save_file,data_subj);
     data_all = [data_all; data_subj];
     data_subj = [];
 end
+
+% SAVE FILE
+save_file = strcat(save_dir,filesep,'pupilbehv_all.xlsx');
+safe_saveall(save_file,data_all);

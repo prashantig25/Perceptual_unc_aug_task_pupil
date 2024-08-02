@@ -2,7 +2,6 @@ clc
 clearvars
 
 % INITIALISE VARS
-pred_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\behavior\preprocessed";
 subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
     '4225','4792','3952','4249','4681','4738','3904','852','3337',...
@@ -14,7 +13,12 @@ num_contrast = 2; % high and low contrast blocks
 save_mat = 1; % save data
 t = 20; % number of trials
 num_blocks = 8; % number of blocks
-save_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\behavior\descriptive";
+
+% CHANGE DIRECTORY ACCORDINGLY
+currentDir = pwd; % Get the current working directory
+behv_dir = strcat('data',filesep,'GB data',filesep,'behavior',filesep,'preprocessed');
+save_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'descriptive'); 
+mkdir(save_dir);
 
 % INITIALIZE VARS TO STORE
 mix_ecoperf = NaN(num_subjs,1);
@@ -29,7 +33,7 @@ perc_curve = NaN(num_subjs,t);
 for n = 1:num_subjs
 
     % GET BEHAVIORAL DATA
-    filename = strcat(pred_dir,'\',subj_ids{n},'.xlsx');
+    filename = strcat(behv_dir,'\',subj_ids{n},'.xlsx');
     data = readtable(filename);
 
     % CORRECT MU FOR CONGRUENCE
@@ -64,7 +68,7 @@ if save_mat == 1
     safe_saveall(fullfile(save_dir,"perc_curve.mat"),perc_curve)
 
     safe_saveall(fullfile(save_dir,"mix_ecoperf.mat"),mix_ecoperf)
-    safe_saveall(fullfile(save_dir,"perc_curve.mat"),perc_ecoperf)
+    safe_saveall(fullfile(save_dir,"perc_ecoperf.mat"),perc_ecoperf)
 
     safe_saveall(fullfile(save_dir,"mix_mu.mat"),mix_mu)
     safe_saveall(fullfile(save_dir,"perc_mu.mat"),perc_mu)
