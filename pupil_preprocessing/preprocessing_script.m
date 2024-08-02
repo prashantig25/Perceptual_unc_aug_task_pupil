@@ -13,7 +13,9 @@ event_names = {'blinks','saccades'}; % event names
 deconv_time = [0,6]; % deconvolution time interval
 
 % PATH STUFF (update accordingly)
-savedir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\pupil\preprocessed';
+currentDir = pwd; % Get the current working directory
+save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); 
+mkdir(save_dir);
 
 % PREPROCESS
 preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, event_names, deconv_time, savedir)
