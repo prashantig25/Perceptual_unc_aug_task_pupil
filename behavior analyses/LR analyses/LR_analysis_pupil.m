@@ -24,14 +24,19 @@ preprocess_obj.add_vars(norm_condiff,{'norm_condiff'});
 preprocess_obj.add_vars(preprocess_obj.data.ru,'reward_unc');
 preprocess_obj.add_vars(preprocess_obj.data.confirm_rew,'pe_sign');
 
+% CHANGE DIRECTORY ACCORDINGLY
+currentDir = pwd; % Get the current working directory
+save_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses'); 
+mkdir(save_dir);
+
 % SAVE PREPROCESSED FILE
-safe_saveall('preprocessed_lr_pupil.xlsx',preprocess_obj.data)
-safe_saveall('preprocessed_lr_pupil_no_zerope.xlsx',preprocess_obj.data(preprocess_obj.data.pe ~= 0, :));
+safe_saveall(fullfile(save_dir,'preprocessed_lr_pupil.xlsx'),preprocess_obj.data)
+safe_saveall(fullfile(save_dir,'preprocessed_lr_pupil_no_zerope.xlsx'),preprocess_obj.data(preprocess_obj.data.pe ~= 0, :));
 %%
 % FIT THE MODEL
 lr_analysis = lr_analysis_obj();
 [betas_all,rsquared_full,residuals_all,coeffs_name,posterior_up_subjs] = lr_analysis.get_coeffs(@fitlm);
 
 % SAVE DATA 
-safe_saveall("betas_signed.mat",betas_all); % save betas
-safe_saveall("post_signedUP_predict.mat",posterior_up_subjs); 
+safe_saveall(fullfile(save_dir,"betas_abs.mat"),betas_all); % save betas
+safe_saveall(fullfile(save_dir,"post_absUP_predict.mat"),posterior_up_subjs); 

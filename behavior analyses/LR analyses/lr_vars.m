@@ -15,7 +15,7 @@ classdef lr_vars < handle
         num_subjs = 47; % number of participants
         weighted = 1; % if weighted regression needs to be run
         var_names = {'pe','contrast_diff','salience','congruence','pe_sign'}; % variable names for posterior updates
-        absolute_analysis = 0; % pre-process data for absolute LR analysis
+        absolute_analysis = 1; % pre-process data for absolute LR analysis
         grouped = 0; % set to 1 if regression model needs to be fit separately for different groups of trials
         num_groups = 2; % number of groups for grouped regression
         pupil = 1; % fit model to pupil dataset
