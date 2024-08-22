@@ -26,13 +26,13 @@ mkdir(save_dir);
 for i = 1:num_subjs
 
     filename = strcat(patch_dir,'\',subj_ids{i},'.mat');
-    load(filename,'pupil'); patch = pupil(:,1:col_patch);
+    importdata(filename); patch = pupil(:,1:col_patch);
 
     filename = strcat(resp_dir,'\',subj_ids{i},'.mat');
-    load(filename,'pupil'); resp = pupil;
+    importdata(filename); resp = pupil;
 
     filename = strcat(fb_dir,'\',subj_ids{i},'.mat');
-    load(filename,'pupil'); fb = pupil(:,1:col_fb);
+    importdata(filename); fb = pupil(:,1:col_fb);
 
     patch_tp = repelem(1,1,size(patch,2));
     resp_tp = [zeros(1,num_break),repelem(2,1,size(resp,2)-num_break)];
