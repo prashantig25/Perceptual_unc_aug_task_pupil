@@ -69,14 +69,14 @@ for i = 1%:num_subs
     % GET PUPIL SIGNAL, X-GAZE, Y-GAZE
     fprintf('pupil signal...\n');
     filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
-    load(filename,'pupil');
+    pupil = importdata(filename);
     size_pupil = size(pupil);
 
     filename = strcat(xgaze_dir,'\',subj_ids{i},'.mat');
-    load(filename,"xgaze_event");
+    xgaze_event = importdata(filename);
 
     filename = strcat(ygaze_dir,'\',subj_ids{i},'.mat');
-    load(filename,"ygaze_event");
+    ygaze_event = importdata(filename);
 
     if strcmp(timewindow,'patch') == 1
         pupil_signal = pupil;
