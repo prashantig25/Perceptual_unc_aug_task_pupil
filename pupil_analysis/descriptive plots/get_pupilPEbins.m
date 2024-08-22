@@ -26,7 +26,7 @@ for i = 1:num_subs
 
     % GET PUPIL DATA
     filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
-    load(filename,'pupil');
+    pupil = importdata(filename');
     size_pupil = size(pupil);
 
     % INITIALISE
@@ -61,7 +61,7 @@ for i = 1:num_subs
 
     % GET PUPIL DATA
     filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
-    load(filename,'pupil');
+    pupil = importdata(filename);
   %  pupil(missed_trials,:) = []; % delete missed trials from pupil
     pupil(validIndices,:)  = []; % delete pe == 0 from pupil
 
