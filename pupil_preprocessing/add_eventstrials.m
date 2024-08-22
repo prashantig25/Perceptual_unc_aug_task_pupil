@@ -9,9 +9,9 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3319','129','4684','3886','620','901','900'}; % subject IDs
 num_subs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
-preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\pupil\preprocessed'; % directory to get preprocessed data
+preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames'; % directory to get preprocessed data
 behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials'; % directory to get behavioral data
-save_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\pupil\preprocessed\with_events'; % directory to save data
+save_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\preprocessed_trial'; % directory to save data
 prev_num_trials = 0; % number of trials from previous blocks 
 num_trials_sess = 0; % number of trials for participants with multiple sessions
 
@@ -84,11 +84,10 @@ for s = 1:num_subs
             data.trial = data.trial_num + prev_num_trials;
         end
         num_trials_sess = data.trial_num(end); % number of trials in previous block
-
+        
+        % SAVE FILE
+        filename = strcat(save_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
+        safe_saveall(filename,data);
+        prev_num_trials = 0;
     end
-
-    % SAVE FILE
-    filename = strcat(save_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
-    safe_saveall(filename,data);
-    prev_num_trials = 0;
 end
