@@ -26,7 +26,7 @@ subj_pupil_signal = NaN(num_subs,col);
 for i = 1:num_subs
 
     % GET PUPIL DATA
-    filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
+    filename = strcat(pupil_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename);
     if strcmp(timewindow,'patch') == 1
         pupil_signal = pupil;
