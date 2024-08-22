@@ -27,7 +27,7 @@ for i = 1:num_subs
 
     % GET PUPIL DATA
     filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
-    load(filename,'pupil');
+    pupil = importdata(filename);
     if strcmp(timewindow,'patch') == 1
         pupil_signal = pupil;
     elseif strcmp(timewindow,'feedback') == 1
