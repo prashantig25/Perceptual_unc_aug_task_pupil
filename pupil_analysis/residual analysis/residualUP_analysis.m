@@ -7,7 +7,7 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
     '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
     '3319','129','4684','3886','620','901','900'}; % subject-IDs
-load("post_absUP_predict.mat"); posterior_all = posterior_up_subjs; % posterior update
+posterior_all = importdata("post_absUP_predict.mat"); % posterior update
 mdl = 'up~ pupil + pe:pupil:con_diff + pupil:pe + pupil:con_diff +post_up'; % residual-analysis model
 num_vars = 5; % number of predictors
 resp_var = {'up'}; % response var
@@ -61,7 +61,7 @@ for n = 1:num_subjs
 
     % LOAD PUPIL SIGNAL
     filename = strcat(pupil_dir,'\',subj_ids{n},'.mat');
-    load(filename,'pupil');
+    pupil = importdata(filename);
     size_pupil = size(pupil);
     if strcmp(timewindow,'patch') == 1
         pupil_signal = pupil;
