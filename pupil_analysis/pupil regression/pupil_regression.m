@@ -1,16 +1,6 @@
 clc
 clearvars
 
-% PATH STUFF
-currentDir = pwd; % Get the current working directory
-save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'regression'); 
-pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
-preds_all = readtable(strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
-behv_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-xgaze_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
-ygaze_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
-mkdir(save_dir);
-
 % INITIALIZE VARS
 subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
@@ -21,27 +11,70 @@ timewindow = 'feedback'; % time-window on which regression needs to be applied
 col = 300; % number of samples on which the regression is applied
 num_subs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
-regress_rt = 0; % remove RT effects
-pred_vars = {'pe','abs_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff'};% cell array with names of predictor variables
+pred_vars = {'pe','abs_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline'};% cell array with names of predictor variables
 resp_var = 'pupil'; % name of response variable
 cat_vars = {'condition'}; % cell array with names of categorical variables
-binned = 1; % whether binned regression approach is to be used
+binned = 0; % whether binned regression approach is to be used
+main_mdl = 0; % if the betas should be estimated for the main model (Fig. 3 in MS)
+baseline_mdl = 0; % if betas should be estimated by fitting the model to non-baseline corrected pupil signal
+noRT_mdl = 1; % if betas should be estimated after excluding RT as a regressor but regressing RTs separately
+currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main';
+preds_all = readtable(strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 if binned == 1 
     num_bins = 2; % number of bins
     bins = prctile(preds_all.con_diff,0:50:100); % bin edges
     model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + rt';
     num_vars = 5; % number of predictor vars
     two_tailed = 1; % apply two-tailed permutation test
-else
+    pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+    save_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'binned'); 
+    perm_save = "perm_pe_condiff2bins";
+    betas_save = "pe_condiff2bins";
+    regress_rt = 0; % remove RT effects
+elseif main_mdl == 1
     num_bins = 1;
     model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + rt + zsc_condiff + pe:zsc_condiff';
     num_vars = 7; % number of predictor vars
     two_tailed = 0; % apply two-tailed permutation test
+    pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+    save_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main'); 
+    perm_save = "perm_pe_condiff";
+    betas_save = "pe_condiff";
+    regress_rt = 0; % remove RT effects
+elseif baseline_mdl == 1
+    num_bins = 1;
+    model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + rt + zsc_condiff + pe:zsc_condiff + baseline';
+    num_vars = 8; % number of predictor vars
+    two_tailed = 0; % apply two-tailed permutation test
+    pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'non baseline corrected', filesep, 'fb'); % directory to get preprocessed data
+    save_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main'); 
+    perm_save = "perm_pe_condiff_regressedbaseline";
+    betas_save = "pe_condiff_regressedbaseline";
+    regress_rt = 0; % remove RT effects
+elseif noRT_mdl == 1
+    num_bins = 1;
+    model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + zsc_condiff + pe:zsc_condiff + rt';
+    num_vars = 7; % number of predictor vars
+    two_tailed = 0; % apply two-tailed permutation tesT
+    pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+    save_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main'); 
+    perm_save = "perm_pe_condiff_regressedRT";
+    betas_save = "pe_condiff_regressedRT";
+    regress_rt = 1; % remove RT effects
 end
 betas_struct.with_intercept = NaN(num_bins,num_vars+1,length(subj_ids),col); % initialize struct to store number of bins
 
+% PATH STUFF
+currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
+behv_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+xgaze_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
+ygaze_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
+base_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb'); 
+mkdir(save_dir);
+
+
 % LOOP OVER SUBJECTS
-for i = 1%:num_subs
+for i = 1:num_subs
 
     % GET BEHAVIORAL DATA
     fprintf('reading in %s ...\n', subj_ids{i});
@@ -103,6 +136,14 @@ for i = 1%:num_subs
         end
     end
 
+    % IF BASELINE MODEL IS BEING USED
+    if baseline_mdl == 1
+        fprintf('getting baseline pupil measures...\n');
+        filename = strcat(base_dir,'\',subj_ids{i},'.mat');
+        base = importdata(filename);
+        base(missedtrials_slider==1,:) = [];
+    end
+
     % GET BEHAVIORAL PREDICTORS
     fprintf('get predictors from behavioural data...\n');
     preds = preds_all(preds_all.id == str2num(subj_ids{i}),:);
@@ -140,6 +181,9 @@ for i = 1%:num_subs
                 ygaze = nanzscore(ygaze_signal(:,c));
                 behv = behv_data;
                 predictors = preds;
+                if baseline_mdl == 1
+                    base_regressor = nanzscore(base);
+                end
             else
                 y = nanzscore(pupil_signal_bins(:,c));
                 xgaze = nanzscore(xgaze_signal_bins(:,c));
@@ -155,6 +199,9 @@ for i = 1%:num_subs
             ygazeValid = ygaze(validIndices==1);
             preds_nan = predictors(validIndices==1,:);
             behv_nan = behv(validIndices==1,:);
+            if baseline_mdl == 1
+                base_nan = base_regressor(validIndices == 1,:);
+            end
             if height(preds_nan) > num_vars + 1
 
                 % should be greater than number of predictors + intercept
@@ -169,6 +216,10 @@ for i = 1%:num_subs
                     'VariableNames',{'pupil','xgaze','ygaze', ...
                     'zsc_condiff','abs_pe','pe','zsc_up','rt','condition'});
 
+                if baseline_mdl == 1
+                    tbl.baseline = base_nan;
+                end
+
                 % FIT THE MODEL
                 [betas,rsquared,residuals,coeffs_name,lm] = linear_fit(tbl,model_def ...
                     ,pred_vars,resp_var,cat_vars,num_vars,0,0,0,0);
@@ -180,7 +231,7 @@ for i = 1%:num_subs
 end
 
 % SAVE
-safe_saveall(strcat(save_dir,filesep,"pe_condiffbins.mat"), betas_struct);
+safe_saveall(strcat(save_dir, filesep, betas_save,".mat"), betas_struct);
 
 % RUN PERM TEST
 num_vars = 1:num_vars+1; % number of variables
@@ -188,4 +239,4 @@ var1 = betas_struct.with_intercept;
 var2 = betas_struct.with_intercept;
 betas = 1; % permutation test on regression data
 perm = get_permtest(num_vars, num_subs, col, var1, var2, two_tailed, betas);
-safe_saveall(strcat(save_dir,filesep,"perm_pe_condiffbins.mat"), perm);
+safe_saveall(strcat(save_dir, filesep,perm_save,".mat"), perm);
