@@ -4,12 +4,12 @@ classdef lr_vars < handle
     properties
         filename = 'preprocessed_lr_pupil_no_zerope.xlsx'; % filename with pre-processed data
         data % pre-processed data
-        mdl = 'up ~ pe + pe:congruence  + pe:contrast_diff + pe:salience + pe:pe_sign'; % model defininition
-        pred_vars = {'pe','contrast_diff','congruence','reward_unc' ...
-                ,'reward','mu','pe_sign','fb_phasic','fb_tonic','patch_phasic','patch_tonic','fb_phasic_peak','fb_phasic_full','salience'}; % cell array with names of predictor variables
+        mdl % variable to store model definition
+        lr_mdl = 1 % run best behavioral model 
+        pred_vars  % cell array with names of predictor variables
         resp_var = 'up'; % name of response variable
-        cat_vars = {'congruence','condition','reward_unc','pe_sign','salience'}; % cell array with names of categorical variables
-        num_vars = 5; % number of predictor variables
+        cat_vars % cell array with names of categorical variables
+        num_vars % number of predictor variables
         res_subjs = []; % empty array to store residuals
         weight_y_n = 1; % if non-weighted regression, weight_y_n = 0
         num_subjs = 47; % number of participants
@@ -24,5 +24,6 @@ classdef lr_vars < handle
         space_pavlovian = 0; % fit model to space pavlovian dataset
         sensitivity = 0; % fit model to sensitivity dataset
         online = 0; % fit model to eLife online dataset
+        agent = 0; % fit model to agent dataset
     end
 end

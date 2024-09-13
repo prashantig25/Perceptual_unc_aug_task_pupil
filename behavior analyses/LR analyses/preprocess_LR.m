@@ -38,6 +38,295 @@ classdef preprocess_LR < preprocess_vars
             end
         end
 
+%         function flip_mu(obj)
+%             
+%             % function flip_mu computes the reported contingency parameter, after
+%             % correcting for incongruent blocks (eq. 16).
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.flipped_mu: congruence corrected reported
+%             %   contingency parameter
+%             
+%             for i = 1:height(obj.data)
+%                 if obj.data.congruence(i) == 0 % for incongruent blocks
+%                     obj.flipped_mu(i) = 1-obj.mu(i);
+%                 else
+%                     obj.flipped_mu(i) = obj.mu(i);
+%                 end
+%            end
+%         end
+% 
+%         function compute_action_dep_rew(obj) 
+%             
+%             % function compute_action_dep_rew recodes task generated reward
+%             % contingent on action.
+%             %
+%             % INPUT:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.recoded_reward: recoded reward for a = 0
+%             
+%             for i = 1:height(obj.data)
+%                 obj.recoded_reward(i) = obj.obtained_reward(i) + (obj.action(i)*((-1) .^ ...
+%                     (2 + obj.obtained_reward(i))));
+%             end
+%         end
+%         
+%         function compute_mu(obj)
+%             
+%             % function compute_mu computes the reported contingency parameter,
+%             % depending on if actual mu < 0.5.
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.mu_t: reported contingency parameter for
+%             %   current trial
+%             %   obj.mu_t_1: reported contingency parameter for
+%             %   previous trial
+%             for i = 2:height(obj.data)
+%                 if obj.space_pavlovian == 0
+%                     if obj.data.contrast(i) == 1 % if actual mu < 0.5
+%                         obj.mu_t_1(i) = 1-obj.flipped_mu(i-1);
+%                         obj.mu_t(i) = 1-obj.flipped_mu(i);
+%                     else
+%                         obj.mu_t_1(i) = obj.flipped_mu(i-1);
+%                         obj.mu_t(i) = obj.flipped_mu(i);
+%                     end
+%                 else
+%                     obj.mu_t_1(i) = obj.flipped_mu(i-1);
+%                     obj.mu_t(i) = obj.flipped_mu(i);
+%                 end
+%             end
+%             end
+% 
+%         function [pe,up] = compute_state_dep_pe(obj)
+%             
+%             % function compute_state_dep_pe computes prediction error, using recoded
+%             % reward and contingent on state
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.pe: prediciton error
+%             %   obj.up: update
+%             
+%             if obj.space_pavlovian == 0
+%             for i = 2:height(obj.data)
+%                 if obj.state(i) == 0
+%                     obj.data.pe(i) = obj.recoded_reward(i) - obj.mu_t_1(i);
+%                 else
+%                     obj.data.pe(i) = (1-obj.recoded_reward(i))-obj.mu_t_1(i);
+%                 end
+%                 obj.data.up(i) = obj.mu_t(i) - obj.mu_t_1(i);
+%             end
+%             else
+%             for i = 2:height(obj.data)
+%                 if obj.data.state_prob(i) < 0.5
+%                     obj.data.pe(i) = (1-obj.state(i)) - obj.mu_t_1(i);
+%                 else
+%                     obj.data.pe(i) = obj.state(i)-obj.mu_t_1(i);
+%                 end
+%                 obj.data.up(i) = obj.mu_t(i) - obj.mu_t_1(i);
+%             end
+%             end
+%             obj.data.pe(obj.data.trials == 1,1) = 0;
+%             if obj.absolute_lr == 1 % for absolute LR analysis
+%                 obj.data.pe = abs(obj.data.pe);
+%                 obj.data.up = abs(obj.data.up);
+%             end
+%         end
+% 
+%         function compute_confirm(obj)
+%             
+%             % function compute_confirm checks whether the outcome confirms the
+%             % choice.
+%             %
+%             % INPUT:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.confirm_rew: if the outcome was confirming
+%             
+%             for i = 1:height(obj.data)
+%                 if obj.space_pavlovian == 0
+%                     if obj.data.contrast(i) == 1 % actual mu < 0.5
+%                         if obj.state(i) == obj.action(i) % the less rewarding state and action combination
+%                             obj.data.confirm_rew(i) = 1-obj.obtained_reward(i);
+%                         else
+%                             obj.data.confirm_rew(i) = obj.obtained_reward(i);
+%                         end
+%                     else
+%                         if obj.state(i) ~= obj.action(i) % the less rewarding state and action combination
+%                             obj.data.confirm_rew(i) = 1-obj.obtained_reward(i);
+%                         else
+%                             obj.data.confirm_rew(i) = obj.obtained_reward(i);
+%                         end
+%                     end
+%                 else
+%                     obj.data.confirm_rew(i) = 1*sign(obj.data.pe(i));
+%                 end
+%             end
+%         end
+% 
+%         function remove_conditions(obj)
+%             
+%             % function remove_conditions removes conditions that are not wanted for
+%             % further analysis.
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.condition: reduced condition array
+%             
+%             if length(obj.removed_cond) == 1
+%                 obj.data = obj.data(obj.condition ~= obj.removed_cond,:);
+%             else
+%                 for i = 1:length(obj.removed_cond)
+%                     obj.data = obj.data(obj.condition ~= obj.removed_cond(i),:);
+%                     obj.condition = obj.condition(obj.condition ~= obj.removed_cond(i),:);
+%                 end
+%             end
+%             if obj.agent == 0
+%                 obj.condition = obj.data.choice_cond;
+%             else
+%                 obj.condition = obj.data.condition;
+%             end
+%         end
+% 
+%         function zscored = compute_nanzscore(var_zscore)
+%             
+%             % function compute_nanzscore computes the z-score for a given 
+%             % variable.
+%             %
+%             % INPUTS:
+%             %   var_zscore: variable that needs to be z-scored
+%             %
+%             % OUTPUTS:
+%             %   zscored: z-scored variable
+%             
+%             zscored = nanzscore(var_zscore);
+%         end
+% 
+%         function normalised = compute_normalise(~,var_normalise)
+%             
+%             % function compute_normalise normalises a given variable.
+%             %
+%             % INPUTS:
+%             %   var_normalise: variable that needs to be normalised
+%             %
+%             % OUTPUTS:
+%             %   normalised: normalised variable
+%             
+%             norm_data = NaN(height(var_normalise),1);
+%             normalised = normalise_zero_one(var_normalise,norm_data);
+%         end
+% 
+%         function compute_ru(obj)
+%             
+%             % function compute_ru checks if reward uncertainty is high or low, given
+%             % the experimental condition.
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %
+%             % OUTPUTS:
+%             %   obj.ru: reward uncertainty
+%             
+%            for i = 1:height(obj.data)
+%                 if obj.condition(i) == 1
+%                     obj.data.ru(i) = 0;
+%                 else
+%                     obj.data.ru(i) = 1;
+%                 end
+%            end
+%         end
+% 
+%         function add_vars(obj,var,varname)
+%             
+%             % function add_vars adds array as table columns.
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %   var: array to be added
+%             %   varname: table column name to be used
+%             %
+%             % OUTPUT:
+%             %   obj.data: table with added column
+%             
+%             obj.data = addvars(obj.data,var,'NewVariableNames',varname);
+%         end
+% 
+%         function remove_zero_pe(obj)
+%             
+%             % function remove_zero_pe gets rid of trials with PE = 0
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.data: table without PE = 0
+%             
+%             obj.data = obj.data(obj.data.pe ~= 0,:);
+%         end
+% 
+%         function add_splithalf(obj)
+%             
+%             % function add_splithalf splits and groups alternating trials into
+%             % different groups.
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.data.splithalf: split half variable for that trial
+%             
+%             for h = 1:height(obj.data)
+%                 if mod(obj.data.trials(h),2) == 0
+%                     obj.data.splithalf(h) = 1;
+%                 else
+%                     obj.data.splithalf(h) = 0;
+%                 end
+%             end
+%         end
+% 
+%         function add_saliencechoice(obj)
+%             
+%             % function add_saliencechoice adds a categorical variable for whether
+%             % the more salient choice was made on a given trial.
+%             %
+%             % INPUTS:
+%             %   obj: current object
+%             %
+%             % OUTPUT:
+%             %   obj.data.saliencechoice: variable regarding the salient
+%             %   choice
+%             
+%             for i = 1:height(obj.data)
+%                 if obj.data.contrast_left(i) > obj.data.contrast_right(i)
+%                     if obj.data.choice(i) == 0
+%                         obj.data.salience_choice(i) = 1;
+%                     else
+%                         obj.data.salience_choice(i) = 0;
+%                     end
+%                 else
+%                     if obj.data.choice(i) == 1
+%                         obj.data.salience_choice(i) = 1;
+%                     else
+%                         obj.data.salience_choice(i) = 0;
+%                     end
+%                 end
+%             end
+%         end
+
+        %%%%%%%%%%%%%%%%
         function flip_mu(obj)
             
             % function flip_mu computes the reported contingency parameter, after
@@ -49,14 +338,10 @@ classdef preprocess_LR < preprocess_vars
             % OUTPUT:
             %   obj.flipped_mu: congruence corrected reported
             %   contingency parameter
-            
-            for i = 1:height(obj.data)
-                if obj.data.congruence(i) == 0 % for incongruent blocks
-                    obj.flipped_mu(i) = 1-obj.mu(i);
-                else
-                    obj.flipped_mu(i) = obj.mu(i);
-                end
-           end
+
+            incongruent_idx = obj.data.congruence == 0; % incongruent trials index
+            obj.flipped_mu(incongruent_idx) = 1 - obj.mu(incongruent_idx); % for incongruent 
+            obj.flipped_mu(~incongruent_idx) = obj.mu(~incongruent_idx); % for congruent 
         end
 
         function compute_action_dep_rew(obj) 
@@ -69,11 +354,9 @@ classdef preprocess_LR < preprocess_vars
             %
             % OUTPUT:
             %   obj.recoded_reward: recoded reward for a = 0
-            
-            for i = 1:height(obj.data)
-                obj.recoded_reward(i) = obj.obtained_reward(i) + (obj.action(i)*((-1) .^ ...
-                    (2 + obj.obtained_reward(i))));
-            end
+
+            recoding = obj.action .* ((-1) .^ (2 + obj.obtained_reward)); % recoding for action = 0
+            obj.recoded_reward = obj.obtained_reward + recoding; % storing recoded values
         end
         
         function compute_mu(obj)
@@ -89,21 +372,17 @@ classdef preprocess_LR < preprocess_vars
             %   current trial
             %   obj.mu_t_1: reported contingency parameter for
             %   previous trial
+
             for i = 2:height(obj.data)
-                if obj.space_pavlovian == 0
-                    if obj.data.contrast(i) == 1 % if actual mu < 0.5
-                        obj.mu_t_1(i) = 1-obj.flipped_mu(i-1);
-                        obj.mu_t(i) = 1-obj.flipped_mu(i);
-                    else
-                        obj.mu_t_1(i) = obj.flipped_mu(i-1);
-                        obj.mu_t(i) = obj.flipped_mu(i);
-                    end
+                if obj.data.contrast(i) == 1 % if actual mu < 0.5
+                    obj.mu_t_1(i) = 1-obj.flipped_mu(i-1);
+                    obj.mu_t(i) = 1-obj.flipped_mu(i);
                 else
                     obj.mu_t_1(i) = obj.flipped_mu(i-1);
                     obj.mu_t(i) = obj.flipped_mu(i);
                 end
             end
-            end
+        end
 
         function [pe,up] = compute_state_dep_pe(obj)
             
@@ -116,26 +395,16 @@ classdef preprocess_LR < preprocess_vars
             % OUTPUT:
             %   obj.pe: prediciton error
             %   obj.up: update
+
+            state_zero_idx = obj.state == 0; % index for rows where state is 0
+
+            % COMPUTE PE
+            obj.data.pe(state_zero_idx) = obj.recoded_reward(state_zero_idx) - obj.mu_t_1(state_zero_idx); % state = 0
+            obj.data.pe(~state_zero_idx) = (1 - obj.recoded_reward(~state_zero_idx)) - obj.mu_t_1(~state_zero_idx); % state = 1
             
-            if obj.space_pavlovian == 0
-            for i = 2:height(obj.data)
-                if obj.state(i) == 0
-                    obj.data.pe(i) = obj.recoded_reward(i) - obj.mu_t_1(i);
-                else
-                    obj.data.pe(i) = (1-obj.recoded_reward(i))-obj.mu_t_1(i);
-                end
-                obj.data.up(i) = obj.mu_t(i) - obj.mu_t_1(i);
-            end
-            else
-            for i = 2:height(obj.data)
-                if obj.data.state_prob(i) < 0.5
-                    obj.data.pe(i) = (1-obj.state(i)) - obj.mu_t_1(i);
-                else
-                    obj.data.pe(i) = obj.state(i)-obj.mu_t_1(i);
-                end
-                obj.data.up(i) = obj.mu_t(i) - obj.mu_t_1(i);
-            end
-            end
+            % COMPUTE UP
+            obj.data.up = NaN(height(obj.data),1);
+            obj.data.up(2:end) = obj.mu_t(2:height(obj.data)) - obj.mu_t_1(2:height(obj.data));
             obj.data.pe(obj.data.trials == 1,1) = 0;
             if obj.absolute_lr == 1 % for absolute LR analysis
                 obj.data.pe = abs(obj.data.pe);
@@ -153,26 +422,17 @@ classdef preprocess_LR < preprocess_vars
             %
             % OUTPUT:
             %   obj.confirm_rew: if the outcome was confirming
+
+            % High contrast trials
+            contrast_one_idx = obj.data.contrast == 1;
             
-            for i = 1:height(obj.data)
-                if obj.space_pavlovian == 0
-                    if obj.data.contrast(i) == 1 % actual mu < 0.5
-                        if obj.state(i) == obj.action(i) % the less rewarding state and action combination
-                            obj.data.confirm_rew(i) = 1-obj.obtained_reward(i);
-                        else
-                            obj.data.confirm_rew(i) = obj.obtained_reward(i);
-                        end
-                    else
-                        if obj.state(i) ~= obj.action(i) % the less rewarding state and action combination
-                            obj.data.confirm_rew(i) = 1-obj.obtained_reward(i);
-                        else
-                            obj.data.confirm_rew(i) = obj.obtained_reward(i);
-                        end
-                    end
-                else
-                    obj.data.confirm_rew(i) = 1*sign(obj.data.pe(i));
-                end
-            end
+            % actual mu < 0.5
+            obj.data.confirm_rew(contrast_one_idx & (obj.state == obj.action)) = 1 - obj.obtained_reward(contrast_one_idx & (obj.state == obj.action)); % less rewarding state-action
+            obj.data.confirm_rew(contrast_one_idx & (obj.state ~= obj.action)) = obj.obtained_reward(contrast_one_idx & (obj.state ~= obj.action));
+            
+            % actual mu > 0.5
+            obj.data.confirm_rew(~contrast_one_idx & (obj.state ~= obj.action)) = 1 - obj.obtained_reward(~contrast_one_idx & (obj.state ~= obj.action)); % less rewarding state-action
+            obj.data.confirm_rew(~contrast_one_idx & (obj.state == obj.action)) = obj.obtained_reward(~contrast_one_idx & (obj.state == obj.action));
         end
 
         function remove_conditions(obj)
@@ -186,19 +446,8 @@ classdef preprocess_LR < preprocess_vars
             % OUTPUT:
             %   obj.condition: reduced condition array
             
-            if length(obj.removed_cond) == 1
-                obj.data = obj.data(obj.condition ~= obj.removed_cond,:);
-            else
-                for i = 1:length(obj.removed_cond)
-                    obj.data = obj.data(obj.condition ~= obj.removed_cond(i),:);
-                    obj.condition = obj.condition(obj.condition ~= obj.removed_cond(i),:);
-                end
-            end
-            if obj.agent == 0
-                obj.condition = obj.data.choice_cond;
-            else
-                obj.condition = obj.data.condition;
-            end
+            obj.data = obj.data(obj.condition ~= obj.removed_cond,:);
+            obj.condition = obj.data.choice_cond;
         end
 
         function zscored = compute_nanzscore(var_zscore)
@@ -239,14 +488,8 @@ classdef preprocess_LR < preprocess_vars
             %
             % OUTPUTS:
             %   obj.ru: reward uncertainty
-            
-           for i = 1:height(obj.data)
-                if obj.condition(i) == 1
-                    obj.data.ru(i) = 0;
-                else
-                    obj.data.ru(i) = 1;
-                end
-           end
+
+            obj.data.ru = obj.condition ~= 1; % Set ru to 0 where condition is 1, and to 1 otherwise
         end
 
         function add_vars(obj,var,varname)
@@ -287,14 +530,9 @@ classdef preprocess_LR < preprocess_vars
             %
             % OUTPUT:
             %   obj.data.splithalf: split half variable for that trial
-            
-            for h = 1:height(obj.data)
-                if mod(obj.data.trials(h),2) == 0
-                    obj.data.splithalf(h) = 1;
-                else
-                    obj.data.splithalf(h) = 0;
-                end
-            end
+
+            even_trials_idx = mod(obj.data.trials, 2) == 0; % Create a logical array where the trial numbers are even
+            obj.data.splithalf = even_trials_idx; % Set splithalf to 1 where trials are even, and 0 otherwise
         end
 
         function add_saliencechoice(obj)
@@ -308,22 +546,13 @@ classdef preprocess_LR < preprocess_vars
             % OUTPUT:
             %   obj.data.saliencechoice: variable regarding the salient
             %   choice
-            
-            for i = 1:height(obj.data)
-                if obj.data.contrast_left(i) > obj.data.contrast_right(i)
-                    if obj.data.choice(i) == 0
-                        obj.data.salience_choice(i) = 1;
-                    else
-                        obj.data.salience_choice(i) = 0;
-                    end
-                else
-                    if obj.data.choice(i) == 1
-                        obj.data.salience_choice(i) = 1;
-                    else
-                        obj.data.salience_choice(i) = 0;
-                    end
-                end
-            end
+
+            left_greater_idx = find(obj.data.contrast_left > obj.data.contrast_right); % contrast left is greater than contrast right
+            right_greater_idx = find(obj.data.contrast_left <= obj.data.contrast_right); % contrast right is greater than contrast left
+
+            % Set salience_choice to 1 or 0 based on choice for these indices
+            obj.data.salience_choice(left_greater_idx) = obj.data.choice(left_greater_idx) == 0;
+            obj.data.salience_choice(right_greater_idx) = obj.data.choice(right_greater_idx) == 1;
         end
 
     end
