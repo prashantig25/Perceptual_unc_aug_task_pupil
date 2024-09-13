@@ -13,9 +13,10 @@ event_names = {'blinks','saccades'}; % event names
 deconv_time = [0,6]; % deconvolution time interval
 
 % PATH STUFF (update accordingly)
-currentDir = pwd; % Get the current working directory
+currentDir_asc = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main\pupil_dataset\pupil_converted\ASC'; % Get the current working directory
+currentDir_dat = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main\pupil_dataset\pupil_converted\DAT'; % Get the current working directory
 save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); 
 mkdir(save_dir);
 
 % PREPROCESS
-preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, event_names, deconv_time, savedir)
+preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, event_names, deconv_time, save_dir, currentDir_asc, currentDir_dat)

@@ -1,4 +1,5 @@
-function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, event_names, deconv_time, savedir)
+function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, ...
+    event_names, deconv_time, savedir, asc_dir, dat_dir)
 
         % function PREPROCESS_FUNCTION performs the preprocessing of pupillometry
         % data collected using EyeLink
@@ -27,11 +28,11 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
             % DAT FOR PUPIL SIZE AND GAZE COORDINATES
             % ASC FOR EVENTS, BLINKS, SACCADES
             if strcmp(subj_ids(s),'4672') == 1 % only for subj 4672 (read NOTES on top of script to understand)
-                filename_dat = strcat(subj_ids{s},'_','m',num2str(ss),'.EDF_red','.DAT');
-                filename_asc = strcat(subj_ids{s},'_','m',num2str(ss),'_red.asc');
+                filename_dat = strcat(dat_dir, filesep, subj_ids{s},'_','m',num2str(ss),'.EDF_red','.DAT');
+                filename_asc = strcat(asc_dir, filesep, subj_ids{s},'_','m',num2str(ss),'_red.asc');
             else
-                filename_dat = strcat(subj_ids{s},'m',num2str(ss),'.EDF','.dat');
-                filename_asc = strcat(subj_ids{s},'m',num2str(ss),'.asc');
+                filename_dat = strcat(dat_dir, filesep, subj_ids{s},'m',num2str(ss),'.EDF','.dat');
+                filename_asc = strcat(asc_dir, filesep, subj_ids{s},'m',num2str(ss),'.asc');
             end
             data = importdata(filename_dat); % read DAT file
             [asc] = read_eyelink_ascNK_AU(filename_asc); % read ASC file

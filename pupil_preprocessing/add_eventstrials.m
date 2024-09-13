@@ -9,13 +9,21 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3319','129','4684','3886','620','901','900'}; % subject IDs
 num_subs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
-preproc_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames'; % directory to get preprocessed data
-behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials'; % directory to get behavioral data
-save_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\preprocessed_eventnames\preprocessed_trial'; % directory to save data
+currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
+used_preprocessed = 1; % if you don't want to preprocess but used pre-processed data then set it to 1
+if used_preprocessed == 0
+    preproc_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
+    save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); 
+else
+    preproc_dir = strcat(currentDir,filesep,'pupil_dataset', filesep,'pupil_preprocessedBIDS'); % directory to get preprocessed data
+    save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed',filesep,'already_preprocessed');
+end
+behv_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+mkdir(save_dir);
 prev_num_trials = 0; % number of trials from previous blocks 
 num_trials_sess = 0; % number of trials for participants with multiple sessions
 
-for s = 1:num_subs
+for s = 12:num_subs
     for ss = 1:num_sess(s)
 
         % READ ASC FILES
@@ -71,9 +79,27 @@ for s = 1:num_subs
         num_trial = length(condition); % number of trials in one run of the main task
 
         % GET PREPROCESSED DATA
-        filename = strcat(preproc_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
-        data = readtable(filename);
-        [data] = events_trialnums(data,events,event_per_trial,num_trial);
+%         filename = strcat(preproc_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
+%         data = readtable(filename);
+%         [data] = events_trialnums(data,events,event_per_trial,num_trial);
+
+        % GET PUPIL DATA FROM DIFFERENT SESSIONS
+        if used_preprocessed == 0
+            data = []; 
+            filename = strcat(preproc_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
+            data_run = readtable(filename);
+            [data] = events_trialnums(data,events,event_per_trial,num_trial);
+        else
+            if subj_ids{s} == "0806"
+                filename = strcat(preproc_dir,filesep,"sub_806",filesep,"pupil_preprocessed",filesep,"sub_806.tsv");
+                data = readtable(filename,"FileType","text",'Delimiter', '\t');
+            else
+                filename = strcat(preproc_dir,filesep,"sub_",subj_ids{s},filesep,"pupil_preprocessed",filesep,"sub_",subj_ids{s},".tsv");
+                data = readtable(filename,"FileType","text",'Delimiter', '\t');
+            end
+            data.time_stamp = data.timestamp;
+            [data] = events_trialnums(data,events,event_per_trial,num_trial);
+        end
 
         % ADJUST TRIAL NUMBERS FOR PARTICIPANTS WITH MULTIPLE RECORDING
         % SESSIONS
@@ -86,7 +112,11 @@ for s = 1:num_subs
         num_trials_sess = data.trial_num(end); % number of trials in previous block
         
         % SAVE FILE
-        filename = strcat(save_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
+        if used_preprocessed == 1
+            filename = strcat(save_dir,'\',subj_ids{s},'_main','.xlsx');
+        else
+            filename = strcat(save_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
+        end
         safe_saveall(filename,data);
         prev_num_trials = 0;
     end
