@@ -22,6 +22,8 @@ function safe_saveall(filename, newData)
             equality_check = isequaln(round(newData,10),round(oldData,10));
         elseif strcmp(string(class(newData)),"LinearModel") == 1
             equality_check = compare_LinearModels(newData,oldData);
+        elseif isstruct(newData)
+            equality_check = compareStructs(newData,oldData);
         else
             equality_check = isequaln(newData,oldData);
         end
