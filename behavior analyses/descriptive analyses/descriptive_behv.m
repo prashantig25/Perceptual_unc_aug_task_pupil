@@ -2,7 +2,7 @@ clc
 clearvars
 
 % INITIALISE VARS
-subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
+subj_ids = {'806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
     '4225','4792','3952','4249','4681','4738','3904','852','3337',...
     '3442','3571','4360','4522','4807','4943','594','379','4057','4813',...
@@ -15,9 +15,9 @@ t = 20; % number of trials
 num_blocks = 8; % number of blocks
 
 % CHANGE DIRECTORY ACCORDINGLY
-currentDir = pwd; % Get the current working directory
-behv_dir = strcat('data',filesep,'GB data',filesep,'behavior',filesep,'preprocessed');
-save_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'descriptive'); 
+currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
+behv_dir = strcat('pupil_dataset',filesep,'behavior_BIDS');
+save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'descriptive'); 
 mkdir(save_dir);
 
 % INITIALIZE VARS TO STORE
@@ -33,8 +33,9 @@ perc_curve = NaN(num_subjs,t);
 for n = 1:num_subjs
 
     % GET BEHAVIORAL DATA
-    filename = strcat(behv_dir,'\',subj_ids{n},'.xlsx');
-    data = readtable(filename);
+    tsv_file = fullfile(currentDir, filesep, behv_dir,strcat('sub_',num2str(subj_ids{n})),'behav', ...
+            strcat('sub_',num2str(subj_ids{n}),".tsv")); % path and file name for TSV file
+    data = readtable(tsv_file,"FileType","text",'Delimiter', '\t'); % read file
 
     % CORRECT MU FOR CONGRUENCE
     data.flipped_mu = data.mu;
