@@ -19,17 +19,16 @@ time_base = 10; % time duration of the base
 event_name = 'feedback'; % which event
 pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
 base_trialspecific = 0; % get baseline signal for that trial
-currentDir = pwd; % Get the current working directory
-save_xgaze = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
-save_ygaze = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
-preproc_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed', filesep, 'with events'); % directory to get preprocessed data
-behv_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
+save_xgaze = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
+save_ygaze = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
+preproc_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
+behv_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_xgaze);
 mkdir(save_ygaze);
-savesafe_needed = 1; % set to 1 if you want to use savesafe instead of save
 
 % LOOP OVER SUBJECTS
-for s = 1%:num_subs
+for s = 1:num_subs
 
     % LOOP OVER SESSIONS
     for ss = 1:num_sess(s)
@@ -74,11 +73,6 @@ for s = 1%:num_subs
     end
 
     % SAVE
-    if savesafe_needed == 0
-        save(fullfile(save_xgaze,strcat(subj_ids{s})),'xgaze_event') % save
-        save(fullfile(save_ygaze,strcat(subj_ids{s})),'ygaze_event') % save
-    else
-        safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) % save
-        safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event) % save
-    end
+    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) % save
+    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event) % save
 end

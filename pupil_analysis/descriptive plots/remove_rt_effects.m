@@ -1,7 +1,6 @@
 function residual = remove_rt_effects(pupil,rt)
 
     % NOTE: code is based on Urai et al., 2017
-    %
     % function REMOVE_RT_EFFECTS removes trial-by-trial variations in pupil
     % signal caused by very slow/long RTs
     %

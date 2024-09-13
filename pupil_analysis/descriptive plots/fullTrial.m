@@ -15,29 +15,32 @@ total = 630; % how long should the entire trial be
 trial_all = NaN(num_subjs,total);
 
 % PATH STUFF
-currentDir = pwd; % Get the current working directory
-save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
-fb_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
-patch_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch'); % directory to get preprocessed data
-resp_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp'); % directory to get preprocessed data
+currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
+save_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
+fb_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+patch_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch'); % directory to get preprocessed data
+resp_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp'); % directory to get preprocessed data
 mkdir(save_dir);
 
 % LOOP OVER SUBJECTS
 for i = 1:num_subjs
 
+    % IMPORT EVENT-RELATED DATA
     filename = strcat(patch_dir,'\',subj_ids{i},'.mat');
-    importdata(filename); patch = pupil(:,1:col_patch);
+    pupil = importdata(filename); patch = pupil(:,1:col_patch);
 
     filename = strcat(resp_dir,'\',subj_ids{i},'.mat');
-    importdata(filename); resp = pupil;
+    pupil = importdata(filename); resp = pupil;
 
     filename = strcat(fb_dir,'\',subj_ids{i},'.mat');
-    importdata(filename); fb = pupil(:,1:col_fb);
+    pupil = importdata(filename); fb = pupil(:,1:col_fb);
 
+    % INITIALIZE ARRAY FOR TIME POINT
     patch_tp = repelem(1,1,size(patch,2));
     resp_tp = [zeros(1,num_break),repelem(2,1,size(resp,2)-num_break)];
     fb_tp = [zeros(1,num_break),repelem(3,1,size(fb,2)-num_break)];
 
+    % CONCATANATE
     trial = [patch,resp,fb];
     trial_subj = nanmean(trial,1);
     trial_all(i,:) = trial_subj;

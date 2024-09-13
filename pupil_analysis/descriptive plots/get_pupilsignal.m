@@ -19,13 +19,16 @@ time_base = 10; % time duration of the base
 event_name = 'feedback'; % which event
 pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
 base_trialspecific = 0; % get baseline signal for that trial
-currentDir = pwd; % Get the current working directory
-save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); 
-preproc_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed', filesep, 'with events'); % directory to get preprocessed data
-behv_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
+save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); 
+used_preprocessed = 1; % if you don't want to preprocess but used pre-processed data then set it to 1
+if used_preprocessed == 0
+    preproc_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
+else
+    preproc_dir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main\data\GB data\pupil\preprocessed\already_preprocessed'; % directory to get preprocessed data
+end
+behv_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
-safesave_needed = 1; % set to 1 if you want to use safe_save instead of safe
-first_derivative = 1; 
 
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
@@ -53,12 +56,18 @@ for s = 1:num_subs
         condition = behv_data.condition; % task conditions
 
         % GET PUPIL DATA FROM DIFFERENT SESSIONS
-        data = []; 
-        for j = 1:num_sess(s)
-            filename = strcat(preproc_dir,'\',subj_ids{s},'_main',num2str(j),'.xlsx');
-            data_run = readtable(filename);
-            data = [data; data_run];
+        if used_preprocessed == 0
+            data = []; 
+            for j = 1:num_sess(s)
+                filename = strcat(preproc_dir,'\',subj_ids{s},'_main',num2str(j),'.xlsx');
+                data_run = readtable(filename);
+                data = [data; data_run];
+            end
+        else
+            filename = strcat(preproc_dir,'\',subj_ids{s},'_main','.xlsx');
+            data = readtable(filename);
         end
+
         trial_list = unique(data.trial); % number of trials      
         trial_base = trial_list; % check this ??
         n = length(condition);
@@ -92,9 +101,5 @@ for s = 1:num_subs
         end
     end
 
-    if safesave_needed == 0
-        save(subj_ids{s},'pupil') % save
-    else
-        safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
-    end
+    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
 end

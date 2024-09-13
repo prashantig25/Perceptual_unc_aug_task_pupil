@@ -22,25 +22,15 @@ function [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_e
         %   base_event: cell array with baseline response
 
         % STORE EVENT NAMES AS NUMBERS
-        for i = 1:height(data)
-            if strcmp(data.events(i),'trial_start')
-                data.event_code(i) = 1;
-            elseif strcmp(data.events(i),'instructed_delay_start')
-                    data.event_code(i) = 3;
-            elseif strcmp(data.events(i),'patches_start')
-                  data.event_code(i) = 2;
-            elseif strcmp(data.events(i),'response_start')
-                data.event_code(i) = 4;
-            elseif strcmp(data.events(i),'feedback_start')
-                data.event_code(i) = 6;
-            elseif strcmp(data.events(i),'slider_start')
-            data.event_code(i) = 8;
-            elseif strcmp(data.events(i),'delay_start')
-                data.event_code(i) = 5;
-            elseif strcmp(data.events(i),'delay1_start')
-                data.event_code(i) = 7;
-            end
-        end
+        data.event_code = zeros(height(data), 1);  % Pre-allocate the event_code column
+        data.event_code(strcmp(data.events, 'trial_start')) = 1;
+        data.event_code(strcmp(data.events, 'instructed_delay_start')) = 3;
+        data.event_code(strcmp(data.events, 'patches_start')) = 2;
+        data.event_code(strcmp(data.events, 'response_start')) = 4;
+        data.event_code(strcmp(data.events, 'feedback_start')) = 6;
+        data.event_code(strcmp(data.events, 'slider_start')) = 8;
+        data.event_code(strcmp(data.events, 'delay_start')) = 5;
+        data.event_code(strcmp(data.events, 'delay1_start')) = 7;
 
         % LOOP OVER NUMBER OF TRIALS
         for j = 1:num_trials

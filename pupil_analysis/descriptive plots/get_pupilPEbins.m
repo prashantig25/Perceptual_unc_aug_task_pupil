@@ -15,18 +15,18 @@ subj_pupil_signal_pebin2 = NaN(num_subs,col); % initialised array for PE bin = 2
 subj_pupil_signal_pebin1 = NaN(num_subs,col); % initialised array for PE bin = 1
 
 % PATH STUFF
-currentDir = pwd; % Get the current working directory
-save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
-pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
-behv_dir = strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-preds_all = readtable(strcat('data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
+save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
+pupil_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+behv_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+preds_all = readtable(strcat(currentDir,filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 mkdir(save_dir);
 
 for i = 1:num_subs
 
     % GET PUPIL DATA
     filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
-    pupil = importdata(filename');
+    pupil = importdata(filename);
     size_pupil = size(pupil);
 
     % INITIALISE
@@ -62,7 +62,6 @@ for i = 1:num_subs
     % GET PUPIL DATA
     filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
     pupil = importdata(filename);
-  %  pupil(missed_trials,:) = []; % delete missed trials from pupil
     pupil(validIndices,:)  = []; % delete pe == 0 from pupil
 
     if strcmp(timewindow,'patch') == 1
