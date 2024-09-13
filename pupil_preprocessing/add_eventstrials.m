@@ -10,7 +10,8 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
 num_subs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
 currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
-used_preprocessed = 1; % if you don't want to preprocess but used pre-processed data then set it to 1
+used_preprocessed = 0; % if you don't want to preprocess but used pre-processed data then set it to 1. this does not work currently. 
+% need to fix a few bugs but will work if it is set to 0 with preprocessing done before that.
 if used_preprocessed == 0
     preproc_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
     save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); 
@@ -23,7 +24,7 @@ mkdir(save_dir);
 prev_num_trials = 0; % number of trials from previous blocks 
 num_trials_sess = 0; % number of trials for participants with multiple sessions
 
-for s = 12:num_subs
+for s = 11:num_subs
     for ss = 1:num_sess(s)
 
         % READ ASC FILES
@@ -77,11 +78,6 @@ for s = 12:num_subs
         behv_data = readtable(strcat(behv_dir,'\',filename_behv)); % import from participant's behavioural file
         condition = behv_data.condition; % task conditions
         num_trial = length(condition); % number of trials in one run of the main task
-
-        % GET PREPROCESSED DATA
-%         filename = strcat(preproc_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
-%         data = readtable(filename);
-%         [data] = events_trialnums(data,events,event_per_trial,num_trial);
 
         % GET PUPIL DATA FROM DIFFERENT SESSIONS
         if used_preprocessed == 0
