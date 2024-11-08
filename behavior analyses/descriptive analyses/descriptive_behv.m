@@ -10,14 +10,22 @@ subj_ids = {'806','3970','4300','4885','4954','907','2505','3985','4711',...
 num_subjs = length(subj_ids); % number of subjects
 num_cond = 2; % number of conditions
 num_contrast = 2; % high and low contrast blocks
-save_mat = 1; % save data
 t = 20; % number of trials
 num_blocks = 8; % number of blocks
 
-% CHANGE DIRECTORY ACCORDINGLY
-currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
-behv_dir = strcat('pupil_dataset',filesep,'behavior_BIDS');
-save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'descriptive'); 
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+behv_dir = strcat(desiredPath, filesep, 'pupil_dataset',filesep,'behavior_BIDS');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'descriptive'); 
 mkdir(save_dir);
 
 % INITIALIZE VARS TO STORE
@@ -33,7 +41,7 @@ perc_curve = NaN(num_subjs,t);
 for n = 1:num_subjs
 
     % GET BEHAVIORAL DATA
-    tsv_file = fullfile(currentDir, filesep, behv_dir,strcat('sub_',num2str(subj_ids{n})),'behav', ...
+    tsv_file = fullfile(behv_dir,strcat('sub_',num2str(subj_ids{n})),'behav', ...
             strcat('sub_',num2str(subj_ids{n}),".tsv")); % path and file name for TSV file
     data = readtable(tsv_file,"FileType","text",'Delimiter', '\t'); % read file
 
@@ -64,13 +72,11 @@ for n = 1:num_subjs
 end
 
 % SAVE
-if save_mat == 1
-    safe_saveall(fullfile(save_dir,"mix_curve.mat"),mix_curve)
-    safe_saveall(fullfile(save_dir,"perc_curve.mat"),perc_curve)
+safe_saveall(fullfile(save_dir,"mix_curve.mat"),mix_curve)
+safe_saveall(fullfile(save_dir,"perc_curve.mat"),perc_curve)
 
-    safe_saveall(fullfile(save_dir,"mix_ecoperf.mat"),mix_ecoperf)
-    safe_saveall(fullfile(save_dir,"perc_ecoperf.mat"),perc_ecoperf)
+safe_saveall(fullfile(save_dir,"mix_ecoperf.mat"),mix_ecoperf)
+safe_saveall(fullfile(save_dir,"perc_ecoperf.mat"),perc_ecoperf)
 
-    safe_saveall(fullfile(save_dir,"mix_mu.mat"),mix_mu)
-    safe_saveall(fullfile(save_dir,"perc_mu.mat"),perc_mu)
-end
+safe_saveall(fullfile(save_dir,"mix_mu.mat"),mix_mu)
+safe_saveall(fullfile(save_dir,"perc_mu.mat"),perc_mu)

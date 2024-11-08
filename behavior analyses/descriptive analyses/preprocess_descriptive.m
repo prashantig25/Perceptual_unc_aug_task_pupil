@@ -14,10 +14,19 @@ total_blocks = 8; % total number of blocks in the task
 task_name = '_main'; % task name
 format = '.xlsx'; % format to save preprocessed files
 
-% CHANGE DIRECTORY ACCORDINGLY
-currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
-behv_dir = strcat('pupil_dataset',filesep,'behavior_BIDS');
-save_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'preprocessed'); 
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+behv_dir = strcat(desiredPath, filesep, 'pupil_dataset',filesep,'behavior_BIDS');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'preprocessed'); 
 mkdir(save_dir);
 
 num_subjs = length(subj_ids); % number of subjects
@@ -32,7 +41,7 @@ for n = 1:num_subjs
     sess_trials = [];
 
     % LOOP OVER NUMBER OF SESSIONS FOR THAT PARTICIPANT
-    tsv_file = fullfile(currentDir, filesep, behv_dir,strcat('sub_',num2str(subj_ids{n})),'behav', ...
+    tsv_file = fullfile(behv_dir,strcat('sub_',num2str(subj_ids{n})),'behav', ...
         strcat('sub_',num2str(subj_ids{n}),".tsv")); % path and file name for TSV file
     data_subj = readtable(tsv_file,"FileType","text",'Delimiter', '\t'); % read file
   
