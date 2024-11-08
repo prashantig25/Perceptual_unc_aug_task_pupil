@@ -1,3 +1,5 @@
+This repository contains the code required to reproduce all of the analyses and figures from INSERT OUR PREPRINT LINK.
+
 # Just making some notes for myself.
 
 Steps to work with the pupil dataset:
