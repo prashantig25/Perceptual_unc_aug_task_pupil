@@ -4,10 +4,6 @@ clearvars
 col = 300; % length of x-axis
 xaxis = linspace(-300,2700,col); % x-axis
 nsubjs = 47; % number of subjects
-betas_pupil = importdata("betas_behvresidual_abs_pecondiff_nomain.mat");
-preds_all = readtable("preprocessed_lr_pupil.xlsx");
-posterior_all = importdata("post_absUP_predict.mat"); % posterior update
-betas_field = betas_pupil.with_intercept;
 subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
     '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
@@ -15,8 +11,23 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '601','3319','129','4684','3886','620','901','900'};
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
 
-pupil_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\data_space\pupil\fb\base_corrected';
-behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials';
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain.mat"));
+preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
+posterior_all = importdata("post_absUP_predict.mat"); % posterior update
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'residual'); 
+betas_field = betas_pupil.with_intercept;
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
 subj_ids_num = [];
@@ -33,33 +44,12 @@ for s = [1:nsubjs]
 
     % GET BEHAVIORAL DATA
     fprintf('reading in %s ...\n', subj_ids{s});
-    behv_data = [];
-    data_run = [];
-    for j = 1:num_sess(s)
-        filename = strcat(behv_dir,'\',subj_ids{s},'_','main',num2str(j),'.xlsx');
-        if strcmp(subj_ids{s},'4672') == 1
-            filename = strcat(behv_dir,'\',subj_ids{s},'_','main',num2str(j),'_red.xlsx');
-        end
-        data_run = readtable(filename);
-        rt = table(data_run.choice_rt,'VariableNames',{'rt'});
-        slider = table(data_run.slider_respond_response,'VariableNames',{'slider'});
-        data_run = [data_run(:,[1:16]),rt,slider];
-        behv_data = [behv_data; data_run];
-    end
-
-    % MISSED TRIALS
-    missedtrials_rt = isnan(behv_data.rt); % trials with rt = NaN
-    behvdata_missedRT = behv_data(missedtrials_rt == 0,:); % remove these trials
-    missedtrials_slider = isnan(behvdata_missedRT.slider); % trials with slider = NaN
-    missedtrials = isnan(behv_data.rt) | isnan(behv_data.slider); % remove these trials
-    behv_data(missedtrials == 1,:) = [];
 
     % LOAD PUPIL SIGNAL
-    filename = strcat(pupil_dir,'\',subj_ids{s},'.mat');
+    filename = strcat(pupil_dir,filesep,subj_ids{s},'.mat');
     pupil = importdata(filename);
     size_pupil = size(pupil);
     pupil_signal = pupil(:,1:col);
-    pupil_signal(missedtrials_slider==1,:) = [];
 
     % GET BEHAVIORAL REGRESSORS
     preds = preds_all(preds_all.id == str2num(subj_ids{s}),:);
@@ -113,4 +103,4 @@ for s = [1:nsubjs]
     clear coeffs
 end
 
-safe_saveall("BSarousal_interactions.mat",posterior);
+safe_saveall(strcat(save_dir, filesep, "BSarousal_interactions.mat"),posterior);

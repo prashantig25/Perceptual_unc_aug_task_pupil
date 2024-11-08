@@ -7,7 +7,6 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
     '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
     '3319','129','4684','3886','620','901','900'}; % subject-IDs
-posterior_all = importdata("post_absUP_predict.mat"); % posterior update
 mdl = 'up~ pupil + pe:pupil:con_diff + pupil:pe + pupil:con_diff + post_up'; % residual-analysis model
 num_vars = 5; % number of predictors
 resp_var = {'up'}; % response var
@@ -18,13 +17,24 @@ num_subjs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
 timewindow = 'feedback'; % pupil signal from which window is used for residual analysis
 betas_pupil.with_intercept = NaN(1,num_vars+1,length(subj_ids),col); % initialised structure to store model-estimated betas
+residulalsAnalyse_SSE = NaN(length(subj_ids),col); % initialised structure to store model-estimated betas
 
-% PATH STUFF
-currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
-save_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'residual'); 
-pupil_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
-preds_all = readtable(strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
-behv_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+posterior_all = importdata("post_absUP_predict.mat"); % posterior update
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'residual'); 
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
@@ -44,9 +54,9 @@ for n = 1:num_subjs
     behv_data = [];
     data_run = [];
     for j = 1:num_sess(n)
-        filename = strcat(behv_dir,'\',subj_ids{n},'_','main',num2str(j),'.xlsx');
+        filename = strcat(behv_dir,filesep,subj_ids{n},'_','main',num2str(j),'.xlsx');
         if strcmp(subj_ids{n},'4672') == 1
-            filename = strcat(behv_dir,'\',subj_ids{n},'_','main',num2str(j),'_red.xlsx');
+            filename = strcat(behv_dir,filesep,subj_ids{n},'_','main',num2str(j),'_red.xlsx');
         end
         data_run = readtable(filename);
         rt = table(data_run.choice_rt,'VariableNames',{'rt'});
@@ -59,7 +69,7 @@ for n = 1:num_subjs
     missedtrials = isnan(behv_data.slider);
 
     % LOAD PUPIL SIGNAL
-    filename = strcat(pupil_dir,'\',subj_ids{n},'.mat');
+    filename = strcat(pupil_dir,filesep,subj_ids{n},'.mat');
     pupil = importdata(filename);
     size_pupil = size(pupil);
     if strcmp(timewindow,'patch') == 1
@@ -67,24 +77,23 @@ for n = 1:num_subjs
     elseif strcmp(timewindow,'feedback') == 1 
         pupil_signal = pupil(:,1:col);
     end
-    pupil_signal(missedtrials==1,:) = []; % remove missed trials
 
     % GET BEHAVIORAL REGRESSORS
     preds = preds_all(preds_all.id == str2num(subj_ids{n}),:);
+    post_up = abs(posterior_all{array_index(n),1});  
     validIndices = find(preds.pe == 0); % pe == 0
     preds(validIndices,:) = []; % delete pe == 0
     pupil_signal(validIndices,:) = []; % delete pe == 0
 
     % FIT THE MODEL FOR EACH SAMPLE OF PUPIL SIGNAL
     for c = 1:col
-        post_up = abs(posterior_all{array_index(n),1});
         up = abs(preds.up);
         pe = abs(preds.pe);
         condiff = preds.con_diff;
         pupil_tp = pupil_signal(:,c);
         tbl = table(nanzscore(up),nanzscore(post_up),nanzscore(pe), ...
             nanzscore(pupil_tp),nanzscore(condiff),'VariableNames',{'up','post_up','pe','pupil','con_diff'});
-        [betas,rsquared,residuals,coeffs_name,lm] = linear_fit(tbl,mdl, ...
+        [betas,rsquared,residuals,coeffs_name,lm,SSE] = linear_fit(tbl,mdl, ...
             pred_vars,resp_var,'',num_vars,0,0,0,0);
         betas_pupil.with_intercept(1,:,n,c) = betas;
     end
