@@ -24,7 +24,9 @@ To reproduce our pupillometry results, please follow these steps.
 
 The scripts can be run in MATLAB.
 
+# Questions ?
 
+Please contact prashantig25@gmail.com in case of questions, queries or clarifications. 
 
 # Just making some notes for myself.
 
