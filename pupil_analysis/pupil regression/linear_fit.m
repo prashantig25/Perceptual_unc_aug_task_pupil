@@ -1,4 +1,4 @@
-function [betas,rsquared,residuals,coeffs_name,lm] = linear_fit(tbl,mdl,pred_vars,resp_var, ...
+function [betas,rsquared,residuals,coeffs_name,lm,SSE] = linear_fit(tbl,mdl,pred_vars,resp_var, ...
     cat_vars,num_vars,weight_y_n,varargin)
     
     % function linear_fit fits a linear regression model to the updates as a
@@ -35,6 +35,7 @@ function [betas,rsquared,residuals,coeffs_name,lm] = linear_fit(tbl,mdl,pred_var
 
     % SAVE R-SQUARED, RESIDUALS AND BETA VALUES
     rsquared = lm.Rsquared.Ordinary;
+    SSE = lm.SSE;
     residuals = lm.Residuals.Raw;
     betas = nan(1,num_vars+1);
     for b = 1:num_vars+1

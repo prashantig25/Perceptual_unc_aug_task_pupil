@@ -1,8 +1,25 @@
 % INITIALIZE VARS
 col = 300; % number of datapoints
 num_subjs = 47; % number of subjects
-betas_struct = importdata("pe_pecondiff_new.mat");
-preds_all = readtable("preprocessed_lr_pupil_no_zerope.xlsx");
+
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+
+save_dir = strcat(desiredPath, filesep, "data", filesep, "GB data",...
+    filesep, "pupil", filesep, "regression", filesep, "main");
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data",...
+    filesep, "pupil", filesep, "regression", filesep, "main", filesep, "pe_condiff.mat"));
+preds_all = readtable(strcat(desiredPath, filesep, "data", filesep, "GB data",...
+    filesep, "behavior", filesep, "LR analyses", filesep, "preprocessed_lr_pupil_no_zerope.xlsx"));
 betas_field = betas_struct.with_intercept;
 subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
@@ -30,4 +47,4 @@ for s = 1:num_subjs
 end
 
 % SAVE
-safe_saveall("BSweightedPE_interactions.mat",posterior);
+safe_saveall(strcat(save_dir, filesep, "BSweightedPE_interactions.mat"),posterior);
