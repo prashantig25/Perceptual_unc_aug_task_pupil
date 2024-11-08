@@ -38,11 +38,8 @@ classdef lr_analysis_obj < lr_vars
             if obj.lr_mdl == 1
                 obj.mdl = 'up ~ pe + pe:salience + pe:congruence + pe:pe_sign + pe:contrast_diff';
                 obj.compute_numvars;
-            elseif obj.risk_mdl == 1
-                obj.mdl = 'up ~ pe + pe:salience + pe:congruence + pe:pe_sign + pe:contrast_diff + pe:reward_unc';
-                obj.compute_numvars;
-            elseif obj.saliencechoice_mdl == 1
-                obj.mdl = 'up ~ pe + pe:contrast_diff + pe:salience_choice + pe:congruence + pe:pe_sign ';
+            elseif obj.baseline_mdl == 1
+                obj.mdl = 'up ~ 1';
                 obj.compute_numvars;
             end
 
@@ -59,7 +56,7 @@ classdef lr_analysis_obj < lr_vars
             end
         end
 
-        function [betas,rsquared,residuals,coeffs_name,lm] = linear_fit(obj,tbl,fit_fn,varargin)
+        function [betas,rsquared,residuals,coeffs_name,lm,loglikelihood,SSE] = linear_fit(obj,tbl,fit_fn,varargin)
             
             % function linear_fit fits a linear regression model to the updates as a
             % function of prediction error and other task based computational
@@ -78,6 +75,7 @@ classdef lr_analysis_obj < lr_vars
             %   residuals: residuals after fitting mdl to the data
             %   coeffs_name: cell array containing name of all regressors
             %   lm: fitted model
+            %   loglikelihood: loglikelihood for the fitted model
             
             % FIT THE MODEL USING WEIGHTED/NON-WEIGHTED REGRESSION
             if obj.weight_y_n == 1
@@ -90,15 +88,23 @@ classdef lr_analysis_obj < lr_vars
         
             % SAVE R-SQUARED, RESIDUALS AND BETA VALUES
             rsquared = lm.Rsquared.Ordinary;
+            SSE = lm.SSE;
             residuals = lm.Residuals.Raw;
+            loglikelihood = lm.LogLikelihood;
             betas = nan(1,obj.num_vars+1);
-            for b = 1:obj.num_vars+1
-                betas(1,b) = lm.Coefficients.Estimate(b);
+            if obj.baseline_mdl == 0
+                for b = 1:obj.num_vars+1
+                    betas(1,b) = lm.Coefficients.Estimate(b);
+                end
+            elseif obj.baseline_mdl == 1
+                for b = 1:obj.num_vars
+                    betas(1,b) = lm.Coefficients.Estimate(b);
+                end
             end
             coeffs_name = lm.CoefficientNames;
         end
 
-        function [betas_all,rsquared_full,residuals_all,coeffs_name,posterior_all] = get_coeffs(obj,fit_fn)
+        function [betas_all,rsquared_full,residuals_all,coeffs_name,posterior_all,loglikelihood_full,SSE_full] = get_coeffs(obj,fit_fn)
             
             % function get_coeffs fits the linear regression model by running non-weighted
             % and weighted regressions to get the beta coefficients across
@@ -106,6 +112,7 @@ classdef lr_analysis_obj < lr_vars
             %
             % INPUT:
             %   obj: current object
+            %   fit_fn: function to be used, adjust if using mock fitlm
             %
             % OUTPUT:
             %   betas_all: betas for all regressors
@@ -114,18 +121,17 @@ classdef lr_analysis_obj < lr_vars
             %   coeffs_name: cell array with the model generated coefficients
             %   name
             %   posterior_up_subjs: posterior predicted updates by model
-            %   fit_fn: function to be used, adjust if using mock fitlm
+            %   loglikelihood_full: loglikehood values for each participant
+            %   SSE_full: SSE for each participant
             
             % SET VARIABLES TO RUN THE FUNCTION
-            if obj.pupil == 0 && obj.space_instrumental == 0 && obj.sensitivity == 0
-                id_subjs = unique(obj.data.ID);
-            else
-                id_subjs = unique(obj.data.id);
-            end
+            id_subjs = unique(obj.data.id);
             
             % INITIALISE VARIABLES
             betas_all = NaN(length(obj.num_subjs),obj.num_vars);
             rsquared_full = NaN(length(obj.num_subjs),1);
+            SSE_full = NaN(length(obj.num_subjs),1);
+            loglikelihood_full = NaN(length(obj.num_subjs),1);
             residuals_all = cell(length(obj.num_subjs),1);
             posterior_all = cell(length(obj.num_subjs),1);
 
@@ -138,34 +144,13 @@ classdef lr_analysis_obj < lr_vars
             % FIT THE MODEL TO GET RESIDUALS (non-weighted)
             for i = 1:obj.num_subjs
                 obj.weight_y_n = 0; % non-weighted
-                if obj.pupil == 0 && obj.space_instrumental == 0 && obj.sensitivity == 0
-                    data_subject = obj.data(obj.data.ID == id_subjs(i),:); % single-subject data
-                else
-                    data_subject = obj.data(obj.data.id == id_subjs(i),:); % single-subject data
-                end
-                if obj.pupil == 1
-                    tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2), data_subject.contrast,...
+                data_subject = obj.data(obj.data.id == id_subjs(i),:); % single-subject data
+                tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2), data_subject.contrast,...
                     data_subject.condition,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign, ...
                     data_subject.salience_choice,...
                     'VariableNames',{'pe','up','contrast_diff','salience','condition','congruence' ...
                     ,'reward_unc','pe_sign','salience_choice'});
-                elseif obj.space_instrumental == 1
-                    tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2), data_subject.contrast,...
-                        data_subject.condition,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign,data_subject.salience_choice,...
-                        'VariableNames',{'pe','up','contrast_diff','salience','condition','congruence' ...
-                        ,'reward_unc','pe_sign','salience_choice'});
-                elseif obj.space_pavlovian == 1
-                    tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2),...
-                        data_subject.condition,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign,...
-                        'VariableNames',{'pe','up','contrast_diff','condition','congruence' ...
-                        ,'reward_unc','pe_sign'});
-                elseif obj.online == 1
-                    tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2), data_subject.contrast,...
-                        data_subject.choice_cond,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign,data_subject.salience_choice,...
-                        'VariableNames',{'pe','up','contrast_diff','salience','condition','congruence' ...
-                        ,'reward_unc','pe_sign','salience_choice'});
-                end
-                [betas,rsquared,residuals_reg,coeffs_name,lm] = obj.linear_fit(tbl,fit_fn);
+                [~,~,residuals_reg,coeffs_name,~,~,~] = obj.linear_fit(tbl,fit_fn);
                 obj.res_subjs = [obj.res_subjs; residuals_reg, repelem(id_subjs(i),length(residuals_reg)).'];
             end
             
@@ -176,35 +161,17 @@ classdef lr_analysis_obj < lr_vars
                 wt_subjs(:,2) = obj.res_subjs(:,2);
                 for i = 1:obj.num_subjs
                     weights_subj = wt_subjs(wt_subjs(:,2) == id_subjs(i));
-                    if obj.pupil == 1
-                        data_subject = obj.data(obj.data.id == id_subjs(i),:);
-                        tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2), data_subject.contrast,...
-                            data_subject.condition,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign, ...
-                            data_subject.salience_choice,...
-                            'VariableNames',{'pe','up','contrast_diff','salience','condition','congruence' ...
-                            ,'reward_unc','pe_sign','salience_choice'});
-                    elseif obj.space_instrumental == 1
-                        data_subject = obj.data(obj.data.id == id_subjs(i),:);
-                        tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2), data_subject.contrast,...
-                            data_subject.condition,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign,data_subject.salience_choice,...
-                            'VariableNames',{'pe','up','contrast_diff','salience','condition','congruence' ...
-                            ,'reward_unc','pe_sign','salience_choice'});
-                    elseif obj.space_pavlovian == 1
-                        data_subject = obj.data(obj.data.id == id_subjs(i),:);
-                        tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2),...
-                            data_subject.condition,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign,...
-                            'VariableNames',{'pe','up','contrast_diff','condition','congruence' ...
-                            ,'reward_unc','pe_sign'});
-                    elseif obj.online == 1
-                        data_subject = obj.data(obj.data.ID == id_subjs(i),:);
-                        tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2), data_subject.contrast,...
-                            data_subject.choice_cond,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign,data_subject.salience_choice,...
-                            'VariableNames',{'pe','up','contrast_diff','salience','condition','congruence' ...
-                            ,'reward_unc','pe_sign','salience_choice'});
-                    end
-                    [betas,rsquared,residuals_reg,coeffs_name,lm] = obj.linear_fit(tbl,fit_fn,weights_subj);
+                    data_subject = obj.data(obj.data.id == id_subjs(i),:);
+                    tbl = table(data_subject.pe,data_subject.up, round(data_subject.norm_condiff,2), data_subject.contrast,...
+                        data_subject.condition,data_subject.congruence,data_subject.reward_unc,data_subject.pe_sign, ...
+                        data_subject.salience_choice,...
+                        'VariableNames',{'pe','up','contrast_diff','salience','condition','congruence' ...
+                        ,'reward_unc','pe_sign','salience_choice'});
+                    [betas,rsquared,residuals_reg,coeffs_name,lm,loglikelihood,SSE] = obj.linear_fit(tbl,fit_fn,weights_subj);
                     betas_all(i,:) = betas(2:end);
                     rsquared_full(i,1) = rsquared;
+                    SSE_full(i,1) = SSE;
+                    loglikelihood_full(i,1) = loglikelihood;
                     residuals_all{i,1} = residuals_reg;
                     [post_up] = predict(lm,tbl);
                     posterior_all{i,1} = post_up;

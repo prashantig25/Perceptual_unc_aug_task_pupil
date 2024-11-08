@@ -3,14 +3,14 @@ classdef preprocess_vars < handle
 % behavioural data, to compute regressors for model based analyses.
     properties
         filename = 'pupilbehv_all.xlsx';  % path of file with behavioural data
-        agent = 0 % if analysis is being run for normative agent
-        pupil = 1; % if analysis is being run for behavioural data from pupil study
-        space = 0; % if analysis is being run for space task data (instrumental version)
-        space_pavlovian = 0; % for only space pavlovian task
-        online = 0; % if analysis is being run on online dataset
+%         agent = 0 % if analysis is being run for normative agent
+%         pupil = 1; % if analysis is being run for behavioural data from pupil study
+%         space = 0; % if analysis is being run for space task data (instrumental version)
+%         space_pavlovian = 0; % for only space pavlovian task
+%         online = 0; % if analysis is being run on online dataset
         removed_cond = [3] % experimental condition number that is to be excluded during analysis
         num_subjs = 47; % number of participants
-        absolute_lr = 0; % if analysis should be fit to absolute UPs and absolute PEs 
+%         absolute_lr = 0; % if analysis should be fit to absolute UPs and absolute PEs 
         data % table with behavioural data
         mu % reported contingency parameter/reward probability
         flipped_mu % reported contingency parameter/reward probability, corrected for congruence ref. eq 16
