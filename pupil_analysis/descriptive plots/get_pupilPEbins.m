@@ -13,19 +13,33 @@ col = 300;
 num_subs = length(subj_ids); % number of subjects
 subj_pupil_signal_pebin2 = NaN(num_subs,col); % initialised array for PE bin = 2
 subj_pupil_signal_pebin1 = NaN(num_subs,col); % initialised array for PE bin = 1
+subj_pupil_signal_pebin2correct = NaN(num_subs,col); % initialised array for PE bin = 2
+subj_pupil_signal_pebin1correct = NaN(num_subs,col); % initialised array for PE bin = 1
+subj_pupil_signal_pebin2incorrect = NaN(num_subs,col); % initialised array for PE bin = 2
+subj_pupil_signal_pebin1incorrect = NaN(num_subs,col); % initialised array for PE bin = 1
+plot_accuracy = 1; % get PE bins for accuracy
 
-% PATH STUFF
-currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
-save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
-pupil_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
-behv_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-preds_all = readtable(strcat(currentDir,filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
+pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+preds_all = readtable(strcat(desiredPath,filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 mkdir(save_dir);
 
 for i = 1:num_subs
 
     % GET PUPIL DATA
-    filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
+    filename = strcat(pupil_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename);
     size_pupil = size(pupil);
 
@@ -35,9 +49,9 @@ for i = 1:num_subs
 
     % GET BEHAVIORAL DATA
     for j = 1:num_sess(i)
-        filename = strcat(behv_dir,'\',subj_ids{i},'_','main',num2str(j),'.xlsx');
+        filename = strcat(behv_dir,filesep,subj_ids{i},'_','main',num2str(j),'.xlsx');
         if strcmp(subj_ids{i},'4672') == 1
-            filename = strcat(behv_dir,'\',subj_ids{i},'_','main',num2str(j),'_red.xlsx');
+            filename = strcat(behv_dir,filesep,subj_ids{i},'_','main',num2str(j),'_red.xlsx');
         end
         data_run = readtable(filename); % get RT and slider data
         rt = table(data_run.choice_rt,'VariableNames',{'rt'});
@@ -57,12 +71,10 @@ for i = 1:num_subs
     % GET PE DATA
     preds = preds_all(preds_all.id == str2num(subj_ids{i}),:);
     validIndices = find(preds.pe == 0); % pe == 0
-    preds(validIndices,:) = []; % delete pe == 0
 
     % GET PUPIL DATA
-    filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
+    filename = strcat(pupil_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename);
-    pupil(validIndices,:)  = []; % delete pe == 0 from pupil
 
     if strcmp(timewindow,'patch') == 1
         pupil_signal = pupil;
@@ -74,6 +86,20 @@ for i = 1:num_subs
 
     subj_pupil_signal_pebin1(i,:) = nanmean(pupil_signal(preds.bins == 1,:));
     subj_pupil_signal_pebin2(i,:) = nanmean(pupil_signal(preds.bins == 2,:));
+
+    if plot_accuracy == 1
+        pupil_signalcorrect = pupil_signal(preds.correct == 1,:);
+        pupil_signalincorrect = pupil_signal(preds.correct == 0,:);
+
+        preds_incorrect = preds(preds.correct == 0,:);
+        preds_correct = preds(preds.correct == 1,:);
+
+        subj_pupil_signal_pebin1correct(i,:) = nanmean(pupil_signalcorrect(preds_correct.bins == 1,:));
+        subj_pupil_signal_pebin2correct(i,:) = nanmean(pupil_signalcorrect(preds_correct.bins == 2,:));
+
+        subj_pupil_signal_pebin1incorrect(i,:) = nanmean(pupil_signalincorrect(preds_incorrect.bins == 1,:));
+        subj_pupil_signal_pebin2incorrect(i,:) = nanmean(pupil_signalincorrect(preds_incorrect.bins == 2,:));
+    end
 end
 
 % RUN PERM TEST
@@ -89,5 +115,9 @@ condiffbin.stat = perm.mask;
 condiffbin.prob = perm.prob;
 condiffbin.pebin1 = subj_pupil_signal_pebin1;
 condiffbin.pebin2 = subj_pupil_signal_pebin2;
+condiffbin.pebin1_correct = subj_pupil_signal_pebin1correct;
+condiffbin.pebin1_incorrect = subj_pupil_signal_pebin1incorrect;
+condiffbin.pebin2_correct = subj_pupil_signal_pebin2correct;
+condiffbin.pebin2_incorrect = subj_pupil_signal_pebin2incorrect;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
-safe_saveall(strcat(save_dir,filesep,"fb_PE2bins.mat"),condiffbin)
+safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_reward.mat"),condiffbin)

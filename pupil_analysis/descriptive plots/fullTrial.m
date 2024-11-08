@@ -14,12 +14,21 @@ col_fb = 300; % how long should the patch-related pupil signal
 total = 630; % how long should the entire trial be
 trial_all = NaN(num_subjs,total);
 
-% PATH STUFF
-currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
-save_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
-fb_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
-patch_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch'); % directory to get preprocessed data
-resp_dir = strcat(currentDir, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp'); % directory to get preprocessed data
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
+fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'new', filesep, 'fb'); % directory to get preprocessed data
+patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'new', filesep, 'patch'); % directory to get preprocessed data
+resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'new', filesep, 'resp'); % directory to get preprocessed data
 mkdir(save_dir);
 
 % LOOP OVER SUBJECTS

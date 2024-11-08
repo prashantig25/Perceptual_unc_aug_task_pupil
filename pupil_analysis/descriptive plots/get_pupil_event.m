@@ -1,6 +1,5 @@
 function [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_event, ...
     event_name,num_trials,data,trial_list,trial_base,pre_duration,base_duration)
-
         % funtion GET_PUPIL_EVENT returns non-baseline corrected pupil
         % response for an event or full trial and baseline signal for an
         % event or full trial.
@@ -50,14 +49,14 @@ function [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_e
                 pupil_pre_patch = pupil_patch_base(end-pre_duration:end); % get pre-patch pupil signal
                 pupil_patch_event = [pupil_pre_patch;pupil_patch_event]; % combine pre- and post- signal
                 pupil_event(j,:) = pupil_patch_event(1:time_pupil); % get signal for a specific duration
-                pupil_base_patch = pupil_patch_base(end-(pre_duration+base_duration):end-pre_duration+1); % get baseline signal
+                pupil_base_patch = pupil_patch_base(end-(pre_duration+base_duration+1):end-(pre_duration+1)); % get baseline signal
                 if trial_base == 0 % store event-specific baseline
                     base_event(j,:) = pupil_base_patch;
                 end
             elseif strcmp(event_name,'response') == 1 % response-locked
                 pupil_resp_event = [pupil_resp;pupil_delay;pupil_fb;pupil_delay1;pupil_slider];
                 pupil_pre_resp = [pupil_patch_base;pupil_patch;pupil_inst_delay;];
-                pupil_base_resp = pupil_pre_resp(end-(pre_duration+base_duration):end-pre_duration+1);
+                pupil_base_resp = pupil_pre_resp(end-(pre_duration+base_duration+1):end-(pre_duration+1));
                 pupil_pre_resp = pupil_pre_resp(end-pre_duration:end);
                 pupil_resp_event = pupil_resp_event(1:time_pupil);
                 pupil_resp_event = [pupil_pre_resp; pupil_resp_event(1:end-30)];

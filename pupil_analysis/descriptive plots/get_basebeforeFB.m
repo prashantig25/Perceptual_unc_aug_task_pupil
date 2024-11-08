@@ -12,13 +12,13 @@ num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
 samp_rate = 100; % sampling rate in Hz after down-sampling
 pre_duration = 29; % set duration for start of pre-event signal (note: good idea to use some pre-event signal)
 base_duration = 9; % set duration for baseline signal
-base = 1; % baseline correct signal
 regress_rt = 0; % regress RT from pupil phasic signal
-time_pupil = 1000; % time duration of the pupil
+time_pupil = 200; % time duration of the pupil
 time_base = 10; % time duration of the base
-event_name = 'feedback'; % which event
+event_name = 'tonic_prefb'; % which event
 pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
 base_trialspecific = 0; % get baseline signal for that trial
+
 % USER-BASED PATH
 currentDir = cd; % current directory
 reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
@@ -30,12 +30,16 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
-save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
-preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
+
+save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb'); 
+used_preprocessed = 0; % if you don't want to preprocess but used pre-processed data then set it to 1
+if used_preprocessed == 0
+    preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed', filesep, 'after adding events trials'); % directory to get preprocessed data
+else
+    preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed', filesep, 'already_preprocessed'); % directory to get preprocessed data
+end
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-mkdir(save_xgaze);
-mkdir(save_ygaze);
+mkdir(save_dir);
 
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
@@ -63,26 +67,50 @@ for s = 1:num_subs
         condition = behv_data.condition; % task conditions
 
         % GET PUPIL DATA FROM DIFFERENT SESSIONS
-        data = []; 
-        for j = 1:num_sess(s)
-            filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(j),'.xlsx');
-            data_run = readtable(filename);
-            data = [data; data_run];
+        if used_preprocessed == 0
+            data = []; 
+            for j = 1:num_sess(s)
+                filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(j),'.xlsx');
+                data_run = readtable(filename);
+                data = [data; data_run];
+            end
+        else
+            filename = strcat(preproc_dir,filesep,subj_ids{s},'_main','.xlsx');
+            data = readtable(filename);
         end
+
         trial_list = unique(data.trial); % number of trials      
         trial_base = trial_list; % check this ??
         n = length(condition);
         missedtrials = ~isnan(behv_data.rt); % missed trials
         behv_data(missedtrials == 0,:) = []; % remove missed trials
 
-        % GET EVENT-LOCKED GAZE POSITION
-        xgaze_event = NaN(n,time_pupil); % initialise array to store pupil
-        ygaze_event = zeros(n,time_base); % initialise array to store baseline pupil
-        [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
-            event_name,n,data,trial_list,pre_duration);        
+        % GET EVENT-LOCKED PUPIL SIGNAL
+        pupil_event = NaN(n,time_pupil); % initialise array to store pupil
+        base_event = zeros(n,time_base); % initialise array to store baseline pupil
+        [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_event,event_name, ...
+            n,data,trial_base,base_trialspecific,pre_duration,base_duration); % get pupil event
+        
+        % BASELINE CORRECTION
+%         base_event_mean = zeros(n,1); % initialise array to store mean of baseline pupil
+%         for i = 1:n
+%             base_event_mean(i) = mean(base_event(i,:));
+%         end
+%         base_corrected = base_correction(pupil_event, base_event_mean, time_pupil); % baseline correct
+%         if base == 0 % non-baseline corrected pupil
+           pupil_cell{1,s} = pupil_event;
+           pupil = nanmean(pupil_event,2);
+%         else
+%            pupil_cell{1,s} = base_corrected;
+%            pupil = base_corrected;
+%         end
+        pupil(missedtrials == 0,:) = []; % remove pupil response of missed trials
+        if regress_rt == 1 % regress out RT
+            for c = 1:col
+                pupil(:,c) = remove_rt_effects(pupil(:,c),log(behv_data.rt));
+            end
+        end
     end
 
-    % SAVE
-    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) % save
-    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event) % save
+    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
 end
