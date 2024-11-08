@@ -11,7 +11,7 @@ Please follow these steps to run all the main and supplementary analyses from ou
 To reproduce our behavioural results, these are the required steps:
 1. To preprocess and clean up the behavioral data, run preprocess_descriptive.m 
 2. To get descriptive data about participants' choices and learning, run descriptive_behv.m
-3. Next to reproduce all our model-based analyses of participants' learning behavior, run LR_analysis_pupil.
+3. Next to reproduce all our model-based analyses of participants' learning behavior, run LR_analysis_pupil.m.
 
 To reproduce our pupillometry results, please follow these steps. 
 
@@ -22,7 +22,7 @@ To reproduce our pupillometry results, please follow these steps.
 
 # Software
 
-The scripts can be run in MATLAB.
+The scripts can be run in MATLAB. For statistical analyses of the pupil results, we rely on FieldTrip (https://www.fieldtriptoolbox.org/download/). Please download it and add to your path for the analyses. 
 
 # Questions ?
 
