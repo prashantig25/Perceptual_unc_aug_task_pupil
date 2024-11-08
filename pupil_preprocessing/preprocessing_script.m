@@ -5,7 +5,7 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
     '3319','129','4684','3886','620','901','900'}; % subject IDs
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
-plot_steps = 1; % if you want to visualise data for each preprocessing step
+plot_steps = 0; % if you want to visualise data for each preprocessing step
 sampling_rate = 1000;% original sampling rate
 freqs = [0.01 10];% filter cutoffs [lo hi]
 downsample_rate = 100; % sampling rate after down sampling
@@ -13,9 +13,26 @@ event_names = {'blinks','saccades'}; % event names
 deconv_time = [0,6]; % deconvolution time interval
 
 % PATH STUFF (update accordingly)
-currentDir_asc = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main\pupil_dataset\pupil_converted\ASC'; % Get the current working directory
-currentDir_dat = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main\pupil_dataset\pupil_converted\DAT'; % Get the current working directory
-save_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); 
+% Define the base directory
+
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+baseDir = strcat("pupil_dataset", filesep, "pupil_converted");
+
+% Use filesep for platform independence and strcat for concatenation
+currentDir_asc = strcat(desiredPath, filesep, baseDir, filesep, 'ASC'); % Construct ASC directory path
+currentDir_dat = strcat(desiredPath, filesep, baseDir, filesep, 'DAT'); % Construct DAT directory path
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed', filesep, 'before events trials'); 
 mkdir(save_dir);
 
 % PREPROCESS

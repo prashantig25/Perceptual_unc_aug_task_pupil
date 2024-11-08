@@ -9,22 +9,34 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3319','129','4684','3886','620','901','900'}; % subject IDs
 num_subs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
-currentDir = 'D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main'; % Get the current working directory
+
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+
 used_preprocessed = 0; % if you don't want to preprocess but used pre-processed data then set it to 1. this does not work currently. 
 % need to fix a few bugs but will work if it is set to 0 with preprocessing done before that.
 if used_preprocessed == 0
-    preproc_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
-    save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); 
+    preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
+    save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed',filesep,'after adding events trials'); 
 else
-    preproc_dir = strcat(currentDir,filesep,'pupil_dataset', filesep,'pupil_preprocessedBIDS'); % directory to get preprocessed data
-    save_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed',filesep,'already_preprocessed');
+    preproc_dir = strcat(desiredPath,filesep,'pupil_dataset', filesep,'pupil_preprocessedBIDS'); % directory to get preprocessed data
+    save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed',filesep,'already_preprocessed');
 end
-behv_dir = strcat(currentDir,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+behv_dir = strcat(desiredPath,filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
 prev_num_trials = 0; % number of trials from previous blocks 
 num_trials_sess = 0; % number of trials for participants with multiple sessions
 
-for s = 11:num_subs
+for s = 1:num_subs
     for ss = 1:num_sess(s)
 
         % READ ASC FILES
@@ -75,16 +87,16 @@ for s = 11:num_subs
 
         % GET BEHAVIOURAL DATA FOR THE PARTICIPANT
         filename_behv = strcat(subj_ids{s},'_','main',num2str(ss),'.xlsx');
-        behv_data = readtable(strcat(behv_dir,'\',filename_behv)); % import from participant's behavioural file
+        behv_data = readtable(strcat(behv_dir,filesep,filename_behv)); % import from participant's behavioural file
         condition = behv_data.condition; % task conditions
         num_trial = length(condition); % number of trials in one run of the main task
 
         % GET PUPIL DATA FROM DIFFERENT SESSIONS
         if used_preprocessed == 0
             data = []; 
-            filename = strcat(preproc_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
+            filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'.xlsx');
             data_run = readtable(filename);
-            [data] = events_trialnums(data,events,event_per_trial,num_trial);
+            [data] = events_trialnums(data_run,events,event_per_trial,num_trial);
         else
             if subj_ids{s} == "0806"
                 filename = strcat(preproc_dir,filesep,"sub_806",filesep,"pupil_preprocessed",filesep,"sub_806.tsv");
@@ -109,9 +121,9 @@ for s = 11:num_subs
         
         % SAVE FILE
         if used_preprocessed == 1
-            filename = strcat(save_dir,'\',subj_ids{s},'_main','.xlsx');
+            filename = strcat(save_dir,filesep,subj_ids{s},'_main','.xlsx');
         else
-            filename = strcat(save_dir,'\',subj_ids{s},'_main',num2str(ss),'.xlsx');
+            filename = strcat(save_dir,filesep,subj_ids{s},'_main',num2str(ss),'.xlsx');
         end
         safe_saveall(filename,data);
         prev_num_trials = 0;
