@@ -1,5 +1,8 @@
 %% from Urai et al 
 function stat = clusterStat(data1, data2, nsubj)
+    
+    % check if FieldTrip has been correctly installed (our addition and not Urai's)
+    checkFieldTripInstallation;
 
     % do cluster stats across the group
     cfgstats                  = [];
