@@ -1,3 +1,6 @@
+clc
+clearvars
+
 subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
     '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
@@ -33,16 +36,15 @@ regress_rt = 0; % remove RT effects
 
 num_bins = 1;
 bins_array = num_bins;
-model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + reward + pe:zsc_condiff + rt + zsc_condiff + reward:zsc_condiff';
-num_vars = 9; % number of predictor vars
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_condiff';
+num_vars = 7; % number of predictor vars
 two_tailed = 0; % apply two-tailed permutation test
-pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
 save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main');
-perm_save = "perm_pecondiff_rewardcondiff_interaction";
-betas_save = "pecondiff_rewardcondiff_interaction";
+perm_save = "perm_pe_condiff";
+betas_save = "pe_condiff";
 binned = 0; % whether binned regression approach is to be used
 
-% betas_struct.with_intercept = NaN(num_bins,num_vars+1,length(subj_ids),col); % initialize struct to store number of bins
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 xgaze_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
 ygaze_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
