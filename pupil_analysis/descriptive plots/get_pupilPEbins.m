@@ -120,4 +120,4 @@ condiffbin.pebin1_incorrect = subj_pupil_signal_pebin1incorrect;
 condiffbin.pebin2_correct = subj_pupil_signal_pebin2correct;
 condiffbin.pebin2_incorrect = subj_pupil_signal_pebin2incorrect;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
-safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_reward.mat"),condiffbin)
+safe_saveall(strcat(save_dir,filesep,"fb_PE2bins.mat"),condiffbin)
