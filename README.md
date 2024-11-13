@@ -22,7 +22,7 @@ To reproduce our pupillometry results, please follow these steps.
 
 # Software
 
-The scripts can be run in MATLAB. For statistical analyses of the pupil results, we rely on FieldTrip (https://www.fieldtriptoolbox.org/download/). Please download it and add to your path for the analyses. 
+The scripts can be run in MATLAB. For statistical analyses of the pupil results, we rely on FieldTrip (https://www.fieldtriptoolbox.org/download/). Please download it and add to your local path that contains this repository. 
 
 # Questions ?
 
