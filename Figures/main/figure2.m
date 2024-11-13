@@ -1,4 +1,6 @@
-%% INITIALISE VARIABLES
+% figure2 plots task, choice and learning behavior.
+
+% INITIALISE VARIABLES
 
 clc
 clearvars

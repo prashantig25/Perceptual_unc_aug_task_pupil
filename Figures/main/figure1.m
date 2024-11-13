@@ -1,3 +1,5 @@
+% figure1 creates a hypothesis illustration figure.
+
 clc
 clearvars
 
