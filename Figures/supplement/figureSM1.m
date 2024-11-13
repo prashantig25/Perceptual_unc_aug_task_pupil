@@ -1,3 +1,5 @@
+% figureSM1 plots choice performance.
+
 clc
 clearvars
 
