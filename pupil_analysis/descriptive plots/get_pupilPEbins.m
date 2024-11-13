@@ -1,3 +1,6 @@
+% get_pupilPEbins computes pupil response for separate bins of high and low
+% PE.
+
 clc
 clearvars
 

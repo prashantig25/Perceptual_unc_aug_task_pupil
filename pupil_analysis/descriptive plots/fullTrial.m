@@ -1,3 +1,5 @@
+% fullTrial saves pupil signal from different events for the entire trial.
+
 clc
 clearvars
 

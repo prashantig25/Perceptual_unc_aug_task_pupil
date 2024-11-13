@@ -1,3 +1,5 @@
+% get_basebeforeFB saves tonic pupil response before feedback.
+
 clc
 clearvars
 

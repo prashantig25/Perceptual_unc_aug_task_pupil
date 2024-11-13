@@ -1,3 +1,5 @@
+% get_pupilsignal saves single-trial pupil response for feedback.
+
 clc
 clearvars
 

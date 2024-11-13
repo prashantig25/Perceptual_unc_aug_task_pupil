@@ -1,3 +1,6 @@
+% gazeposition saves single trial x-gaze and y-gaze data for each
+% participant.
+
 clc
 clearvars
 
