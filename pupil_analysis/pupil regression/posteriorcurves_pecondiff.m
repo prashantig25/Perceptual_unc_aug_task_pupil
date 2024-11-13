@@ -1,3 +1,6 @@
+% posteriorcurves_pecondiff saves posterior curves from model-based
+% analyses of the pupil response.
+
 % INITIALIZE VARS
 col = 300; % number of datapoints
 num_subjs = 47; % number of subjects

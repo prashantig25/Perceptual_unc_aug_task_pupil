@@ -1,3 +1,6 @@
+% pupil_regressionNew runs model-based analyses on event-locked pupil
+% response.
+
 clc
 clearvars
 
@@ -114,6 +117,49 @@ baseline_mdl = 1; % if betas should be estimated by fitting the model to non-bas
 [betas_struct,perm] = run_pupilRegression(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, ...
     subj_ids, num_subs, num_sess, timewindow, regress_rt, baseline_mdl, ...
     preds_all, binned, bins, binned_accuracy, two_tailed, save_dir, betas_save, perm_save ...
+    ,base_dir, bins_array, col, num_vars, model_def, pred_vars, cat_vars, resp_var);
+safe_saveall(strcat(save_dir, filesep, betas_save,".mat"), betas_struct);
+safe_saveall(strcat(save_dir, filesep,perm_save,".mat"), perm);
+
+% MODEL-BASED ANALYSES OF PATCH-LOCKED PUPIL DILATION
+
+timewindow = 'patch'; % time-window on which regression needs to be applied
+col = 300; % number of samples on which the regression is applied
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf','condition'};% cell array with names of predictor variables
+
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+regress_rt = 0; % remove RT effects
+
+% RUN MAIN MODEL (Figure 4)
+
+num_bins = 1;
+bins_array = num_bins;
+model_def = 'pupil ~ xgaze + ygaze  + condition + zsc_condiff';
+num_vars = 4; % number of predictor vars
+two_tailed = 0; % apply two-tailed permutation test
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'patch'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main');
+perm_save = "perm_patch_condiff";
+betas_save = "patch_condiff";
+binned = 0; % whether binned regression approach is to be used
+
+behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+mkdir(save_dir);
+
+[betas_struct,perm] = run_pupilRegression(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, ...
+    subj_ids, num_subs, num_sess, timewindow, regress_rt, baseline_mdl, ...
+    preds_all, binned, bins_array, binned_accuracy, two_tailed, save_dir, betas_save, perm_save ...
     ,base_dir, bins_array, col, num_vars, model_def, pred_vars, cat_vars, resp_var);
 safe_saveall(strcat(save_dir, filesep, betas_save,".mat"), betas_struct);
 safe_saveall(strcat(save_dir, filesep,perm_save,".mat"), perm);
