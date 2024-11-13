@@ -1,3 +1,6 @@
+% residualUP_analysis runs analysis to explain residual learning using
+% pupil-linked arousal.
+
 clc
 clearvars 
 

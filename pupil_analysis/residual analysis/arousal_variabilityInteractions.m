@@ -1,3 +1,4 @@
+% arousal_variabilityInteractions saves posterior interaction curves
 clc
 clearvars
 
