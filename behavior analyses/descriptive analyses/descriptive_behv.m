@@ -1,3 +1,6 @@
+% descriptive_behv saves descriptive data about participants' 
+% choice and learning.
+
 clc
 clearvars
 

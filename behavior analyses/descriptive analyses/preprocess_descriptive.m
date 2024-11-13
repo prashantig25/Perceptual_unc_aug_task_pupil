@@ -1,4 +1,5 @@
-%% GET RELEVANT BEHAVIOURAL DATA FROM PSYCHOPY FILES
+% preprocess_descriptive cleans and preprocesses raw behavioral files.
+
 clc
 clearvars
 
