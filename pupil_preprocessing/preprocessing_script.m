@@ -1,3 +1,6 @@
+% preprocessing_script runs our preprocessing pipeline on the raw pupil
+% data.
+
 % INITIALISE VARS AND DON'T CHANGE SUBJECT IDs and NUM_SESS
 subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '3376','4927','190','306','3391','5047','3922','659','421','3943',...

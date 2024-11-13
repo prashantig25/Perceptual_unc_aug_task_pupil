@@ -1,3 +1,6 @@
+% add_eventstrials add trial number and event name to each time point of
+% the preprocessed pupil signal.
+
 clc
 clearvars
 
