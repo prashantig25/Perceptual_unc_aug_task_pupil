@@ -3,6 +3,8 @@ This repository contains the code required to reproduce all of the analyses and 
 # Where can I get the data from?
 
 To access all the raw behavioral and pupillometry data (preprocessed versions also included), please use INSERT GIN REPO LINK.
+Please download the .zip file from the 'main' branch of this repository. 
+Add all the extracted files (called 'pupil_dataset') to the repository folder on your local path.
 
 # How to reproduce all the analyses?
 
@@ -26,4 +28,4 @@ The scripts can be run in MATLAB. For statistical analyses of the pupil results,
 
 # Questions ?
 
-Please contact prashantig25@gmail.com in case of questions, queries or clarifications. 
+Please contact prashantig25@gmail.com in case of questions, queries, or clarifications. 
