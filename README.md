@@ -2,9 +2,13 @@ This repository contains the code required to reproduce all of the analyses and 
 
 # Where can I get the data from?
 
-To access all the raw behavioral and pupillometry data (preprocessed versions also included), please use INSERT GIN REPO LINK.
-Please download the .zip file from the 'main' branch of this repository. 
-Add all the extracted files (called 'pupil_dataset') to the repository folder on your local path.
+To access all the raw behavioral and pupillometry data (preprocessed versions also included), please follow these steps:
+
+1. Download Datalad (https://handbook.datalad.org/en/latest/intro/installation.html) to your computer.
+2. Next, clone the repo with the data using this command (datalad clone git@gin.g-node.org:/prashantig25/pupil_dataset.git) using command prompt. 
+3. If the cloned folder is NOT already inside the path of the repo, please move it inside the repo folder.
+4. Change the current directory on your command prompt to the directory of the cloned repo.
+5. Finally, to save the data use this command (datalad get .).
 
 # How to reproduce all the analyses?
 
