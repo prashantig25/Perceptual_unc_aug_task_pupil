@@ -28,9 +28,9 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'descriptive'); 
-fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'new', filesep, 'fb'); % directory to get preprocessed data
-patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'new', filesep, 'patch'); % directory to get preprocessed data
-resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'new', filesep, 'resp'); % directory to get preprocessed data
+fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial'); % directory to get preprocessed data
+patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch'); % directory to get preprocessed data
+resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp'); % directory to get preprocessed data
 mkdir(save_dir);
 
 % LOOP OVER SUBJECTS
