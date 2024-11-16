@@ -10,7 +10,7 @@ To access all the raw behavioral and pupillometry data (preprocessed versions al
 4. Change the current directory on your command prompt to the directory of the cloned repo.
 5. Finally, to save the data use this command (datalad get .).
 
-Note for us: we can skip this entire thing at least for reviewers if it feels too complex. reviewers can still run all analysis and plot figures. they would only need behavioral data which is not large and can be shared via github.
+Note for us: we can skip this entire thing at least for reviewers if it feels too complex and time consuming. reviewers can still run all analysis and plot figures. they would only need behavioral data which is not large and can be shared via github.
 
 # How to reproduce all the analyses?
 
