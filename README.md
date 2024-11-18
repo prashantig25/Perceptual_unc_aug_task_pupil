@@ -5,12 +5,13 @@ This repository contains the code required to reproduce all of the analyses and 
 To access all the raw behavioral and pupillometry data (preprocessed versions also included), please follow these steps:
 
 1. Download Datalad (https://handbook.datalad.org/en/latest/intro/installation.html) to your computer.
+created datalad and GIN account, get SSH keys, put them in your account, and then download everything. 
 2. Next, clone the repo with the data using this command (datalad clone git@gin.g-node.org:/prashantig25/pupil_dataset.git) using command prompt. 
 3. If the cloned folder is NOT already inside the path of the repo ('Perceptual_unc_aug_task_pupil'), please move it inside the repo ('Perceptual_unc_aug_task_pupil') folder on your local path.
 4. Change the current directory on your command prompt to the directory of the cloned repo.
 5. Finally, to save the data use this command (datalad get .).
 
-Note for us: we can skip this entire thing at least for reviewers if it feels too complex and time consuming. reviewers can still run all analysis and plot figures. they would only need behavioral data which is not large and can be shared via github.
+Note for us: we can skip this entire thing at least for reviewers if it feels too complex and time-consuming. reviewers can still run all analysis and plot figures. they would only need behavioral data which is not large and can be shared via github.
 
 # How to reproduce all the analyses?
 
