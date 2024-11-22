@@ -170,6 +170,13 @@ for r = bins_array
         ygazeValid = ygaze(validIndices==1);
         preds_nan = predictors(validIndices==1,:);
         behv_nan = behv(validIndices==1,:);
+
+        validIndices = ~isnan(preds_nan.up);
+        yValid = yValid(validIndices==1);
+        xgazeValid = xgazeValid(validIndices==1);
+        ygazeValid = ygazeValid(validIndices==1);
+        preds_nan = preds_nan(validIndices==1,:);
+        behv_nan = behv_nan(validIndices==1,:);
         if baseline_mdl == 1
             base_nan = base_regressor(validIndices == 1,:);
         end
@@ -183,7 +190,7 @@ for r = bins_array
             tbl = table(yValid,xgazeValid,ygazeValid,...
                 nanzscore(preds_nan.con_diff),nanzscore(preds_nan.pe),...
                 nanzscore(abs(preds_nan.pe)),nanzscore(abs(preds_nan.up)), ...
-                nanzscore(log(behv_nan.rt)),preds_nan.condition,preds_nan.ecoperf,preds_nan.correct,...
+                nanzscore(log(preds_nan.rt)),preds_nan.condition,preds_nan.ecoperf,preds_nan.correct,...
                 'VariableNames',{'pupil','xgaze','ygaze', ...
                 'zsc_condiff','signed_pe','pe','zsc_up','rt','condition','ecoperf','reward'});
 

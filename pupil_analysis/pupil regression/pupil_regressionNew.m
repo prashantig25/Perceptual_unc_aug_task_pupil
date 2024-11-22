@@ -17,7 +17,7 @@ pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','basel
 resp_var = 'pupil'; % name of response variable
 cat_vars = {'condition','reward','ecoperf'}; % cell array with names of categorical variables
 binned_accuracy = 0; % whether binned regression approach is to be used for separate bins of correct and incorrect trials
-main_mdl = 1; % if the betas should be estimated for the main model (Fig. 3 in MS)
+main_mdl = 1; % if the betas should be estimated for the main model (Fig. 4 in MS)
 baseline_mdl = 0; % if betas should be estimated by fitting the model to non-baseline corrected pupil signal
 noRT_mdl = 0; % if betas should be estimated after excluding RT as a regressor but regressing RTs separately
 
@@ -32,7 +32,7 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 regress_rt = 0; % remove RT effects
 
 % RUN MAIN MODEL (Figure 4)
@@ -42,16 +42,16 @@ bins_array = num_bins;
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_condiff';
 num_vars = 7; % number of predictor vars
 two_tailed = 0; % apply two-tailed permutation test
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main');
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'regression', filesep, 'main');
 perm_save = "perm_pe_condiff";
 betas_save = "pe_condiff";
 binned = 0; % whether binned regression approach is to be used
 
-behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-xgaze_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
-ygaze_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
-base_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb'); 
+behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+xgaze_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
+ygaze_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
+base_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb'); 
 mkdir(save_dir);
 
 [betas_struct,perm] = run_pupilRegression(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, ...
@@ -69,8 +69,9 @@ bins = prctile(preds_all.con_diff,0:50:100); % bin edges
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + rt';
 num_vars = 5; % number of predictor vars
 two_tailed = 1; % apply two-tailed permutation test
-pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'binned');
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'regression', filesep, 'knapen');
+mkdir(save_dir)
 perm_save = "perm_pe_condiff2bins";
 betas_save = "pe_condiff2bins";
 binned = 1;
@@ -83,17 +84,19 @@ safe_saveall(strcat(save_dir, filesep, betas_save,".mat"), betas_struct);
 safe_saveall(strcat(save_dir, filesep,perm_save,".mat"), perm);
 
 % RUN REGRESSED RT MODEL (Figure S8)
+%%
 
 num_bins = 1;
 bins_array = num_bins;
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + zsc_condiff + pe:zsc_condiff + rt';
 num_vars = 7; % number of predictor vars
 two_tailed = 0; % apply two-tailed permutation tesT
-pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main');
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'regression', filesep, 'main');
 perm_save = "perm_pe_condiff_regressedRT";
 betas_save = "pe_condiff_regressedRT";
 binned = 0; % whether binned regression approach is to be used
+regress_rt = 1; % regress RT effects
 
 [betas_struct,perm] = run_pupilRegression(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, ...
     subj_ids, num_subs, num_sess, timewindow, regress_rt, baseline_mdl, ...
@@ -108,11 +111,12 @@ num_bins = 1;
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + rt + zsc_condiff + pe:zsc_condiff + baseline';
 num_vars = 8; % number of predictor vars
 two_tailed = 0; % apply two-tailed permutation test
-pupil_dir = strcat('data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'non baseline corrected', filesep, 'fb'); % directory to get preprocessed data
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main');
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'regression', filesep, 'main');
 perm_save = "perm_pe_condiff_regressedbaseline";
 betas_save = "pe_condiff_regressedbaseline";
 baseline_mdl = 1; % if betas should be estimated by fitting the model to non-baseline corrected pupil signal
+regress_rt = 0;
 
 [betas_struct,perm] = run_pupilRegression(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, ...
     subj_ids, num_subs, num_sess, timewindow, regress_rt, baseline_mdl, ...
@@ -138,23 +142,21 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 regress_rt = 0; % remove RT effects
-
-% RUN MAIN MODEL (Figure 4)
 
 num_bins = 1;
 bins_array = num_bins;
 model_def = 'pupil ~ xgaze + ygaze  + condition + zsc_condiff';
 num_vars = 4; % number of predictor vars
 two_tailed = 0; % apply two-tailed permutation test
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'patch'); % directory to get preprocessed data
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'regression', filesep, 'main');
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep,'patch'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'regression', filesep, 'main');
 perm_save = "perm_patch_condiff";
 betas_save = "patch_condiff";
 binned = 0; % whether binned regression approach is to be used
 
-behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
 
 [betas_struct,perm] = run_pupilRegression(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, ...
