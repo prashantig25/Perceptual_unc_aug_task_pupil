@@ -27,8 +27,8 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-behv_dir = strcat(desiredPath, filesep, 'pupil_dataset',filesep,'behavior_BIDS');
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'descriptive'); 
+behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected', filesep, 'behavior', filesep, 'BIDS');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'descriptive'); 
 mkdir(save_dir);
 
 % INITIALIZE VARS TO STORE
