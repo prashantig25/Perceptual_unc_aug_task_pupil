@@ -8,6 +8,7 @@ classdef preprocess_LR < preprocess_vars
             % the class.
 
             obj.data = readtable(obj.filename);
+            obj.data(isnan(obj.data.slider),:) = [];
             obj.mu = obj.data.mu;
             obj.condition = obj.data.condition;
             obj.obtained_reward = obj.data.correct;

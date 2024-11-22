@@ -3,6 +3,7 @@
 
 clc
 clearvars 
+cleanUP; % run to clean up missing slider responses before further LR analyses
 
 % SCRIPT TO RUN MODEL BASED ANALYSIS OF LEARNING RATES
 preprocess_obj = preprocess_LR(); % initialise object with all required variables and functions
@@ -34,7 +35,7 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses'); 
+save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses'); 
 mkdir(save_dir);
 
 % SAVE PREPROCESSED FILE
