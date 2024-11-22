@@ -1,5 +1,5 @@
 function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, ...
-    event_names, deconv_time, savedir, asc_dir, dat_dir)
+    event_names, deconv_time, savedir, asc_dir, dat_dir, save_dirASC)
 
         % function PREPROCESS_FUNCTION performs the preprocessing of pupillometry
         % data collected using EyeLink
@@ -37,6 +37,7 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
             data = importdata(filename_dat); % read DAT file
             [asc] = read_eyelink_ascNK_AU(filename_asc); % read ASC file
             data_asc = asc2dat(asc); % convert asc to dat file
+            safe_saveall(strcat(save_dirASC, filesep,subj_ids{s},'_DAT',num2str(ss),".mat"),data_asc);
             events = data_asc.event; % get events information from the DAT file
     
             % CONVERT TO TABLE
@@ -66,7 +67,57 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
                 hold on
                 legend('before interpolation','after interpolation')
             end
-    
+
+            % PEAK CORRECTION
+            fprintf('peak correction...\n');
+            assert(~any(isnan(pupilcopy)));
+            win             = hanning(11);
+            pupildatsmooth  = filter2(win.',pupilcopy,'same');
+
+            % IDENTIFY PEAKS
+            pupildiff   = diff(pupildatsmooth) - mean(diff(pupildatsmooth)) / std(diff(pupildatsmooth));
+            [peaks, loc]    = findpeaks(abs(pupildiff), 'minpeakheight', 3*std(pupildiff), 'minpeakdistance', 0.5*1000);
+            
+            if ~isempty(peaks),
+                % convert peaks into blinksmp
+                newblinksmp = nan(length(peaks), 2);
+                for p = 1:length(peaks),
+                    newblinksmp(p, 1) = loc(p) - 2*padding1(2) * sampling_rate; % peak detected will be eye-opening again
+                    newblinksmp(p, 2) = loc(p) + padding1(2) * sampling_rate;
+                end
+                
+                % merge 2 blinks into 1 if they are < 250 ms together (coalesce)
+                coalesce = 0.250;
+                for b = 1:size(newblinksmp, 1)-1,
+                    if newblinksmp(b+1, 1) - newblinksmp(b, 2) < coalesce * sampling_rate,
+                        newblinksmp(b, 2) = newblinksmp(b+1, 2);
+                        newblinksmp(b+1, :) = nan;
+                    end
+                end
+                % remove those duplicates
+                newblinksmp(isnan(nanmean(newblinksmp, 2)), :) = [];
+                
+                % make sure none are outside of the data range
+                newblinksmp(newblinksmp < 1) = 1;
+                newblinksmp(newblinksmp > length(pupilcopy)) = length(pupilcopy) -1;
+                
+                % make the pupil NaN at those points
+                for b = 1:size(newblinksmp,1),
+                    pupilcopy(newblinksmp(b,1):newblinksmp(b,2)) = NaN;
+                end
+                
+                pupilcopy1 = pupilcopy;
+                % interpolate linearly
+                pupilcopy(isnan(pupilcopy)) = interp1(find(~isnan(pupilcopy)), ...
+                    pupilcopy(~isnan(pupilcopy)), find(isnan(pupilcopy)), 'linear');
+
+                % extrapolate ends
+                pupilcopy(isnan(pupilcopy)) = interp1(find(~isnan(pupilcopy)), ...
+                    pupilcopy(~isnan(pupilcopy)), find(isnan(pupilcopy)), 'nearest', 'extrap');
+            else
+                newblinksmp = [];
+            end
+
             % FILTER
             fprintf('butterworth filtering...\n');
             [~, low_pupil, band_pupil] = apply_filter(pupilcopy, sampling_rate, freqs);
@@ -90,6 +141,7 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
             samp_pupil = decimate(band_pupil,downsample_rate,1);
     
             % PREPARE FOR DECONVOLUTION
+            fprintf('performing deconvolution...\n');
             interval = 6; % time in seconds, after blinks/saccades for deconvolution
             deconv_freq = newsample_rate; % frequency
     
@@ -100,7 +152,7 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
             blink_ends = round(blinksmp(:,2)/100);
             del_sacc = []; % empty array for saccades that need to be deleted
             sacc_ends = round(data_asc.saccsmp(:,2)/100);
-    
+
             % SIMILARLY, REMOVE BLINKS/SACCADES THAT HAPPEN TOO EARLY ON IN THE
             % TASK (because MATLAB indexing starts from 1 and can't deal with
             % blink times less than 1)
@@ -111,7 +163,7 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
             tp_sacc = data_asc.saccsmp(:,2)/sampling_rate;
             tp_sacc(del_sacc,:) = [];
     
-            [tp_blinks, tp_sacc, blink_ends, pupil] = check_blinks_saccades(samp_pupil, interval, ...
+            [tp_blinks, tp_sacc, blink_ends, pupil, sacc_ends] = check_blinks_saccades(samp_pupil, interval, ...
                 deconv_freq, blink_ends, sacc_ends,tp_blinks,tp_sacc);
     
             % INITIALISE VARS FOR DECONVOLUTION
@@ -220,9 +272,12 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
             blink_reg(blink_ends) = 1;
             sacc_reg = zeros(1,length(pupil_og));
             sacc_reg(sacc_ends) = 1;
-    
+
+            blinkIRFup = blink_kernel;
+            saccIRFup = sacc_kernel;
+
             % PERFORM THE CONVOLUTION
-            [pupil_clean_bp, pupil_clean_lp] = perform_convolutionGLM(blink_reg, blink_kernel, sacc_reg, sacc_kernel, band_pupil, low_pupil);
+            [pupil_clean_bp, pupil_clean_lp] = perform_convolutionGLM(blink_reg, blinkIRFup, sacc_reg, saccIRFup, band_pupil, low_pupil);
     
             if plot_steps == 1
                 figure
@@ -259,9 +314,10 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
             data = down_sample(data_matched,sample_num);
     
             % SAVE
-            filename = strcat(savedir,filesep,subj_ids{s},'_main',num2str(ss),'.xlsx');
+            filename = strcat(savedir,filesep,subj_ids{s},'_main',num2str(ss),'_resampled_peak.xlsx');
             safe_saveall(filename,data);
             clear padblinksmp
+            clear newblinksmp
         end
     end
 end

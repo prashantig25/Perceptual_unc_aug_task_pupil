@@ -25,16 +25,10 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-used_preprocessed = 0; % if you don't want to preprocess but used pre-processed data then set it to 1. this does not work currently. 
-% need to fix a few bugs but will work if it is set to 0 with preprocessing done before that.
-if used_preprocessed == 0
-    preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
-    save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed',filesep,'after adding events trials'); 
-else
-    preproc_dir = strcat(desiredPath,filesep,'pupil_dataset', filesep,'pupil_preprocessedBIDS'); % directory to get preprocessed data
-    save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed',filesep,'already_preprocessed');
-end
-behv_dir = strcat(desiredPath,filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'peak corrected'); % directory to get preprocessed data
+save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep,'peak correctedNEW after trials');
+save_dirASC = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep,'asc2dat_converted');
+behv_dir = strcat(desiredPath,filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
 prev_num_trials = 0; % number of trials from previous blocks 
 num_trials_sess = 0; % number of trials for participants with multiple sessions
@@ -49,8 +43,8 @@ for s = 1:num_subs
         else
             filename_asc = strcat(subj_ids{s},'m',num2str(ss),'.asc'); 
         end
-        [asc] = read_eyelink_ascNK_AU(filename_asc); % read ASC file
-        data_asc = asc2dat(asc); % convert asc to dat file
+        filename_ascMAT = strcat(save_dirASC, filesep, subj_ids{s},'_DAT',num2str(ss),'.mat'); 
+        data_asc = importdata(filename_ascMAT);
         events = data_asc.event; % get events information from the DAT file
 
         % GET EVENT NAMES AND THEIR TIMESTAMPS
@@ -95,22 +89,11 @@ for s = 1:num_subs
         num_trial = length(condition); % number of trials in one run of the main task
 
         % GET PUPIL DATA FROM DIFFERENT SESSIONS
-        if used_preprocessed == 0
-            data = []; 
-            filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'.xlsx');
-            data_run = readtable(filename);
-            [data] = events_trialnums(data_run,events,event_per_trial,num_trial);
-        else
-            if subj_ids{s} == "0806"
-                filename = strcat(preproc_dir,filesep,"sub_806",filesep,"pupil_preprocessed",filesep,"sub_806.tsv");
-                data = readtable(filename,"FileType","text",'Delimiter', '\t');
-            else
-                filename = strcat(preproc_dir,filesep,"sub_",subj_ids{s},filesep,"pupil_preprocessed",filesep,"sub_",subj_ids{s},".tsv");
-                data = readtable(filename,"FileType","text",'Delimiter', '\t');
-            end
-            data.time_stamp = data.timestamp;
-            [data] = events_trialnums(data,events,event_per_trial,num_trial);
-        end
+        data = [];
+        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'_resampled_peak.xlsx');
+        %             filename = "4711_main1_resampled_peak.xlsx";
+        data_run = readtable(filename);
+        [data] = events_trialnums(data_run,events,event_per_trial,num_trial);
 
         % ADJUST TRIAL NUMBERS FOR PARTICIPANTS WITH MULTIPLE RECORDING
         % SESSIONS

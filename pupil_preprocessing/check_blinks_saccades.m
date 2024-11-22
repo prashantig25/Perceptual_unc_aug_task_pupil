@@ -1,4 +1,4 @@
-function [tp_blinks, tp_sacc, blink_ends, pupil] = check_blinks_saccades(samp_pupil, interval, ...
+function [tp_blinks, tp_sacc, blink_ends, pupil, sacc_ends] = check_blinks_saccades(samp_pupil, interval, ...
     deconv_freq, blink_ends, sacc_ends,tp_blinks,tp_sacc)
 
     % function CHECK_BLINKS_SACCADES check and remove blinks and saccades 
@@ -51,6 +51,7 @@ function [tp_blinks, tp_sacc, blink_ends, pupil] = check_blinks_saccades(samp_pu
 
     % DELETE SACCADES
     tp_sacc(del_sacc, :) = [];
+    sacc_ends(del_sacc, :) = [];
 
     % CLEANED DATA
     pupil = samp_pupil;

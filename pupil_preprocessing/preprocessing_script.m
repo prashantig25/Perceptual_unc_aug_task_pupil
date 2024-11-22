@@ -1,5 +1,8 @@
-% preprocessing_script runs our preprocessing pipeline on the raw pupil
-% data.
+% preprocessing_script runs the preprocessing pipeline on the raw pupil
+% data, saves the preprocessed data with trial numbers and event names.
+
+clc
+clearvars
 
 % INITIALISE VARS AND DON'T CHANGE SUBJECT IDs and NUM_SESS
 subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
@@ -35,8 +38,13 @@ baseDir = strcat("pupil_dataset", filesep, "pupil_converted");
 currentDir_asc = strcat(desiredPath, filesep, baseDir, filesep, 'ASC'); % Construct ASC directory path
 currentDir_dat = strcat(desiredPath, filesep, baseDir, filesep, 'DAT'); % Construct DAT directory path
 
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed', filesep, 'before events trials'); 
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'peak corrected'); 
+save_dirASC = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'asc2dat_converted'); 
 mkdir(save_dir);
+mkdir(save_dirASC);
 
 % PREPROCESS
-preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, event_names, deconv_time, save_dir, currentDir_asc, currentDir_dat)
+preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, event_names, deconv_time, save_dir, currentDir_asc, currentDir_dat, save_dirASC)
+
+% ADD EVENT NAMES AND TRIAL NUMBERS TO PREPROCESSED DATA
+add_eventstrials;
