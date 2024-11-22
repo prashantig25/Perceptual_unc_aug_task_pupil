@@ -1,0 +1,104 @@
+{
+	"ID":{
+		"LongName":"id",
+		"Description":"ID Numbers",
+		"Units":"integers"
+	},
+	"choice":{
+		"LongName":"Choice",
+		"Description":"Economic choice",
+		"Units":"integers",
+		"levels":[
+			"0: Left",
+			"1: Right"
+		]
+	},
+	"rt":{
+		"LongName":"rt",
+		"Description":"Reaction times",
+		"Units":"integers"
+	},
+	"trials":{
+		"LongName":"trial",
+		"Description":"Trial number",
+		"Units":"integers"
+	},
+	"blocks":{
+		"LongName":"blocks",
+		"Description":"Block number",
+		"Units":"integers"
+	},
+	"contrast":{
+		"LongName":"congruence",
+		"Description":"Congruence of a block",
+		"levels":[
+			"0: Incongruent block",
+			"1: Congruent block"
+		]
+	},
+	"condition":{
+		"LongName":"condition",
+		"Description":"Uncertainty condition for block",
+		"levels":[
+			"1: Both",
+			"2: Perceptual"
+		]
+	},
+	"state":{
+		"LongName":"state",
+		"Description":"State of the trial",
+		"levels":[
+			"0: Left stronger",
+			"1: Right stronger"
+		]
+	},
+	"action":{
+		"LongName":"action",
+		"Description":"More rewarding option of the trial",
+		"levels":[
+			"Left",
+			"Right"
+		]
+	},
+	"contrast_left":{
+		"LongName":"contrast_left",
+		"Description":"Contrast level of left patch",
+		"Units":"integer"
+	},
+	"contrast_right":{
+		"LongName":"contrast_right",
+		"Description":"Contrast level of right patch",
+		"Units":"integer"
+	},
+	"con_diff":{
+		"LongName":"con_diff",
+		"Description":"Contrast difference between patches",
+		"Units":"integer"
+	},
+	"ecoperf":{
+		"LongName":"ecoperf",
+		"Description":"Economic performance on that trial",
+		"Units":[
+			"0: Less rewarding choice",
+			"1: More rewarding choice"
+		]
+	},
+	"slider":{
+		"LongName":"slider",
+		"Description":"Slider response",
+		"Units":"integer"
+	},
+	"mu":{
+		"LongName":"mu",
+		"Description":"Slider response",
+		"Units":"integer"
+	},
+	"correct":{
+		"LongName":"correct",
+		"Description":"Reward received on that trial",
+		"Units":[
+			"0: Zero points",
+			"1: One point"
+		]
+	}
+}
