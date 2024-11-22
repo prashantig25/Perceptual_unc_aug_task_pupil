@@ -23,11 +23,12 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain.mat"));
-preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
-posterior_all = importdata("post_absUP_predict.mat"); % posterior update
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'residual'); 
+betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain.mat"));
+preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
+posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'post_absUP_predict.mat'));
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'residual'); 
+behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\preprocessed';
 betas_field = betas_pupil.with_intercept;
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
@@ -45,11 +46,15 @@ for s = [1:nsubjs]
 
     % GET BEHAVIORAL DATA
     fprintf('reading in %s ...\n', subj_ids{s});
+    filename = strcat(behv_dir,filesep,subj_ids{s},'.xlsx');
+    behv = readtable(filename);
+    sliderMissed = isnan(behv.slider);
 
     % LOAD PUPIL SIGNAL
     filename = strcat(pupil_dir,filesep,subj_ids{s},'.mat');
     pupil = importdata(filename);
     size_pupil = size(pupil);
+    pupil(sliderMissed == 1,:) = [];
     pupil_signal = pupil(:,1:col);
 
     % GET BEHAVIORAL REGRESSORS

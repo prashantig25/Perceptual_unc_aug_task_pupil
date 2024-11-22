@@ -33,11 +33,11 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-posterior_all = importdata("post_absUP_predict.mat"); % posterior update
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'residual'); 
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
-preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
-behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, "post_absUP_predict.mat")); % posterior update
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'residual'); 
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
@@ -80,6 +80,7 @@ for n = 1:num_subjs
     elseif strcmp(timewindow,'feedback') == 1 
         pupil_signal = pupil(:,1:col);
     end
+    pupil_signal(missedtrials == 1,:) = [];
 
     % GET BEHAVIORAL REGRESSORS
     preds = preds_all(preds_all.id == str2num(subj_ids{n}),:);
@@ -96,7 +97,7 @@ for n = 1:num_subjs
         pupil_tp = pupil_signal(:,c);
         tbl = table(nanzscore(up),nanzscore(post_up),nanzscore(pe), ...
             nanzscore(pupil_tp),nanzscore(condiff),'VariableNames',{'up','post_up','pe','pupil','con_diff'});
-        [betas,rsquared,residuals,coeffs_name,lm,SSE] = linear_fit(tbl,mdl, ...
+        [betas,rsquared,residuals,coeffs_name,lm] = linear_fit(tbl,mdl, ...
             pred_vars,resp_var,'',num_vars,0,0,0,0);
         betas_pupil.with_intercept(1,:,n,c) = betas;
     end
