@@ -3,10 +3,22 @@
 clc
 clearvars
 
-condiffbin = importdata("fb_PE2bins.mat"); % add PE bin curves
-betas_struct = importdata("pe_condiff2bins.mat"); % binned regression coefficients
-perm = importdata("perm_pe_condiff2bins.mat"); % permutation test
-trial_all = importdata("full_trial.mat"); % full trial
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+
+condiffbin = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "descriptive", filesep, "fb_PE2bins.mat")); % add PE bin curves
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "regression", filesep, "binned", filesep,"pe_condiff2bins.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "regression", filesep, "binned", filesep, "perm_pe_condiff2bins.mat")); % add PE bin curves
+trial_all = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "descriptive", filesep, "full_trial.mat")); % add PE bin curves
+
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 x = linspace(-300,2700,300); % x-axis
@@ -129,7 +141,7 @@ if disp_perm == 1
     plot(x(find(condiffbin.stat==1)), -0.05*ones(1, length(find(condiffbin.stat==1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(condiffbin.stat == 1)),-0.1,"\itp\rm = 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(condiffbin.stat == 1)),-0.1,"\itp\rm = 0.003","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 %% PLOT BINNED REGRESSION RESULTS
 
 % POSITION CHANGE
@@ -185,7 +197,7 @@ if disp_perm == 1
     plot(x(find(perm.mask(ncoeffs,:) == 1)), -0.02*ones(1, length(find(perm.mask(ncoeffs,:) == 1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,"\itp\rm = 0.008","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,"\itp\rm = 0.007","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax5_new,'Arial',7,0.5)

@@ -111,7 +111,7 @@ xlim([-300,2700])
 ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
 ylabel('BS-weighted-PE','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.01","FontName",fontname,"FontSize", ...
+text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.02","FontName",fontname,"FontSize", ...
     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 %% ADD POSTERIOR CURVES
