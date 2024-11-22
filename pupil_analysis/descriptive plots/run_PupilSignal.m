@@ -1,4 +1,4 @@
-function pupil = run_PupilSignal(num_sess,subj_ids,behv_dir,used_preprocessed, ...
+function [pupil,sliderOnset] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
     preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name,pre_duration, ...
     base_duration,base,base_trialspecific)
 % function run_PupilSignal gets event-specific pupil signal for each of the
@@ -7,7 +7,6 @@ function pupil = run_PupilSignal(num_sess,subj_ids,behv_dir,used_preprocessed, .
 %   num_sess: number of sessions for each participant
 %   subj_ids: cell array with subject IDs
 %   behv_dir: directory to get behavioral data
-%   used_preprocessed: if already preprocessed is to be used or the user
 %   preprocessed data is to be used (1)
 %   preproc_dir: directory to get preprocessed data
 %   regress_rt: whether RT to be regressed from pupil signal
@@ -45,16 +44,11 @@ end
 condition = behv_data.condition; % task conditions
 
 % GET PUPIL DATA FROM DIFFERENT SESSIONS
-if used_preprocessed == 0
-    data = [];
-    for j = 1:num_sess(s)
-        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(j),'.xlsx');
-        data_run = readtable(filename);
-        data = [data; data_run];
-    end
-else
-    filename = strcat(preproc_dir,filesep,subj_ids{s},'_main','.xlsx');
-    data = readtable(filename);
+data = [];
+for j = 1:num_sess(s)
+    filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(j),'.xlsx');
+    data_run = readtable(filename);
+    data = [data; data_run];
 end
 
 trial_list = unique(data.trial); % number of trials
@@ -66,7 +60,7 @@ behv_data(missedtrials == 0,:) = []; % remove missed trials
 % GET EVENT-LOCKED PUPIL SIGNAL
 pupil_event = NaN(n,time_pupil); % initialise array to store pupil
 base_event = zeros(n,time_base); % initialise array to store baseline pupil
-[pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_event,event_name, ...
+[pupil_event,base_event,sliderOnset]= get_pupil_event(time_pupil,pupil_event,base_event,event_name, ...
     n,data,trial_base,base_trialspecific,pre_duration,base_duration); % get pupil event
 
 % BASELINE CORRECTION

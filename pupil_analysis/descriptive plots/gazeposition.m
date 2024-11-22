@@ -33,9 +33,9 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
-save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
-preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'pupil', filesep, 'preprocessed'); % directory to get preprocessed data
+save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
+preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep, 'peak correctedNEW after trials'); % directory to get preprocessed data
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_xgaze);
 mkdir(save_ygaze);
