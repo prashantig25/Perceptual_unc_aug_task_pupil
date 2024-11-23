@@ -2,7 +2,7 @@ This repository contains the code required to reproduce all of the analyses and 
 
 # Where can I get the data from?
 
-To access all the raw behavioral and pupillometry data (preprocessed versions also included), please follow these steps:
+To access all the raw pupillometry data (preprocessed versions also included), please follow these steps:
 
 1. Download Datalad (https://handbook.datalad.org/en/latest/intro/installation.html) to your computer.
 2. Next, you need a Datalad and GIN account.
