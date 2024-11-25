@@ -17,6 +17,9 @@ freqs = [0.01 10];% filter cutoffs [lo hi]
 downsample_rate = 100; % sampling rate after down sampling
 event_names = {'blinks','saccades'}; % event names
 deconv_time = [0,6]; % deconvolution time interval
+using_DAT = 0; % always set to 0 if you are preprocessing files for the first time. 
+% The DAT files would be saved during the first run and can be used the
+% next time onwards.
 
 % PATH STUFF (update accordingly)
 % Define the base directory
@@ -44,7 +47,9 @@ mkdir(save_dir);
 mkdir(save_dirASC);
 
 % PREPROCESS
-preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, event_names, deconv_time, save_dir, currentDir_asc, currentDir_dat, save_dirASC)
+preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
+    downsample_rate, event_names, deconv_time, save_dir, currentDir_asc, currentDir_dat, ...
+    save_dirASC, using_DAT)
 
 % ADD EVENT NAMES AND TRIAL NUMBERS TO PREPROCESSED DATA
 add_eventstrials;

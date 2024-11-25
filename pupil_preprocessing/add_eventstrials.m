@@ -26,7 +26,7 @@ else
 end
 
 preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'peak corrected'); % directory to get preprocessed data
-save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep,'peak correctedNEW after trials');
+save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep,'saved now after trials');
 save_dirASC = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep,'asc2dat_converted');
 behv_dir = strcat(desiredPath,filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
@@ -91,7 +91,6 @@ for s = 1:num_subs
         % GET PUPIL DATA FROM DIFFERENT SESSIONS
         data = [];
         filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'_resampled_peak.xlsx');
-        %             filename = "4711_main1_resampled_peak.xlsx";
         data_run = readtable(filename);
         [data] = events_trialnums(data_run,events,event_per_trial,num_trial);
 
@@ -106,11 +105,11 @@ for s = 1:num_subs
         num_trials_sess = data.trial_num(end); % number of trials in previous block
         
         % SAVE FILE
-        if used_preprocessed == 1
-            filename = strcat(save_dir,filesep,subj_ids{s},'_main','.xlsx');
-        else
+%         if used_preprocessed == 1
+%             filename = strcat(save_dir,filesep,subj_ids{s},'_main','.xlsx');
+%         else
             filename = strcat(save_dir,filesep,subj_ids{s},'_main',num2str(ss),'.xlsx');
-        end
+%         end
         safe_saveall(filename,data);
         prev_num_trials = 0;
     end
