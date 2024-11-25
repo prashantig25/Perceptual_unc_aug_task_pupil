@@ -33,9 +33,10 @@ axes_old = [ax1,ax2,ax3,ax4,ax5];
 
 ylabel_strings = {'BS-modulated pupil (a.u.)','UP-modulated pupil (a.u.)','RT-modulated pupil (a.u.)','xgaze-modulated pupil (a.u.)','ygaze-modulated pupil (a.u.)'};
 ncoeffs = [4,6,7,2,3]; % order of coefficients 
+pval = {'',' = 0.03','< 0.001',' = 0.04',' < 0.001'};
 xpos_change = [-0.07,-0.0325,0,0.0325,0.07]; % change in axis position
-ylim_lower = [-0.03,-0.02,-0.15,-0.15,-0.25]; % lower limit of y-axis
-ylim_upper = [0.02,0.08,0.01,0.1,0.1]; % upper limit of y-axis
+ylim_lower = [-0.02,-0.02,-0.1,-0.1,-0.1]; % lower limit of y-axis
+ylim_upper = [0.01,0.08,0.1,0.1,0.1]; % upper limit of y-axis
 
 for a = 1:length(ncoeffs)
 
@@ -46,7 +47,7 @@ for a = 1:length(ncoeffs)
     delete(axes_old(a)); % delete old axis
 
     % GET POSITION TO PLOT P-VALUE
-    ylim_axes = [-0.02,0.08];
+    ylim_axes = [ylim_lower(a),ylim_upper(a)];
     [pval_pos] = create_pvalpos(ylim_axes);
 
     color_cell = {neutral}; % colors for low and high perceptual uncertainty data
@@ -76,7 +77,7 @@ for a = 1:length(ncoeffs)
         plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 0.08*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
             [119, 119, 119]./255, 'markersize', 4);
     end
-    text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.08,"\itp\rm = 0.02","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+    text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.08,strcat("\itp\rm",pval{a}),"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
     
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)

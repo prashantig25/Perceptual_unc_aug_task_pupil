@@ -35,8 +35,8 @@ axes_new = [ax1_new,ax2_new,ax3_new,ax4_new];
 ylabel_strings = {'UP-modulated pupil (a.u.)','RT-modulated pupil (a.u.)','xgaze-modulated pupil (a.u.)','ygaze-modulated pupil (a.u.)'};
 ncoeffs = [5,6,2,3]; % order of coefficients
 xpos_change = [-0.07,-0.035,0,0.04]; % change in position of tile
-ylim_lower = [-0.05,-0.14,-0.2,-0.3]; % y-axis lower limit
-ylim_upper = [0.1,-0.02,0.1,0.1]; % y-axisx upper limit
+ylim_lower = [-0.05,-0.08,-0.2,-0.1]; % y-axis lower limit
+ylim_upper = [0.1,0.05,0.12,0.1]; % y-axisx upper limit
 
 for a = 1:length(ncoeffs)
 
@@ -87,7 +87,7 @@ for a = 1:length(ncoeffs)
         plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 0.095*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
             [119, 119, 119]./255, 'markersize', 4);
     end
-    text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.095 ,"\itp\rm = 0.002","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+    text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.095 ,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
     
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)

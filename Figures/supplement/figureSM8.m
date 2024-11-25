@@ -3,8 +3,8 @@
 clc
 clearvars
 
-betas_struct = importdata("pe_condiff_regressedRT.mat");
-perm = importdata("perm_pe_condiff_regressedRT.mat");
+betas_struct = importdata("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\pupil\regression\main\pe_condiff_regressedRT.mat");
+perm = importdata("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\pupil\regression\main\perm_pe_condiff_regressedRT.mat");
 x = linspace(-300,2700,300); % x-axis
 num_subjs = 47; % number of subjects
 neutral = [7, 53, 94]/255;
@@ -41,8 +41,8 @@ ylabel_strings = [{"BS-modulated";"pupil (a.u.)"},{"PE-modulated";"pupil (a.u.)"
 ncoeffs = [4,5,8,6,7,2,3]; % order of coefficients
 xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02]; % position change for axes
 pval_position = [NaN,-0.02,-0.01,-0.01,-0.12,0.01,0.01]; % position to plot p-values
-ylim_lower = [-0.04,-0.05,-0.03,-0.03,-0.2,-0.2,-0.2]; % lower limit for y-axis
-ylim_upper = [0.01,0.1,0.04,0.06,0.2,0.1,0.02,-0.2]; % upper limit for y-axis
+ylim_lower = [-0.02,-0.04,-0.02,-0.025,-0.17,-0.1,-0.1]; % lower limit for y-axis
+ylim_upper = [0.01,0.07,0.025,0.05,0.15,0.15,0.05,-0.1]; % upper limit for y-axis
 
 for a = 1:length(ncoeffs)
 

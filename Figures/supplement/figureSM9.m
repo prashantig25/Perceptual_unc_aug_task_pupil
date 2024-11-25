@@ -33,7 +33,7 @@ axes_old = [ax1,ax2,ax3,ax4];
 %% PLOT COEFFICIENT CURVES
 
 ylabel_strings = [{"Gaze position";"on x-axis (a.u.)"},{"Gaze position";"on y-axis (a.u.)"},{"BS-modulated";"pupil (a.u.)"},{"Low reward";"uncertainty (a.u.)"},{"UP-modulated";"pupil (a.u.)"},{"RT-modulated";"pupil (a.u.)"},{"xgaze-modulated";"pupil (a.u.)"},{"ygaze-modulated";"pupil (a.u.)"}];
-ncoeffs = [1:4]; % order in which coefficients are to be plotted
+ncoeffs = [2:5]; % order in which coefficients are to be plotted
 xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02,0.05]; % change in axes position
 pval_position = [NaN,-0.03,-0.01,0.1,0.08,-0.01,-0.005,0.005]-0.001; % position to plot p-value
 ylim_lower = [-0.03,-0.07,-0.02,0.05,0.03,-0.05,-0.4,-0.3]; % lower limit for y-axis

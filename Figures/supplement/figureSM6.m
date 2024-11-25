@@ -24,10 +24,10 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 % Construct the file paths using fullfile
-rsquared_full_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data', filesep, 'behavior', filesep, 'LR analyses', filesep, 'partialR2_abs.mat');
-rsquared_signedpath = fullfile(desiredPath, filesep, 'data', filesep, 'GB data', filesep, 'behavior', filesep, 'LR analyses', filesep, 'partialR2_signed.mat');
-posterior_up_subjs_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data', filesep, 'behavior', filesep, 'LR analyses', filesep, 'post_absUP_predict.mat');
-data_subjs_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data', filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil_no_zerope.xlsx');
+rsquared_full_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data peak corrected', filesep, 'behavior', filesep, 'LR analyses', filesep, 'partialR2_abs.mat');
+rsquared_signedpath = fullfile(desiredPath, filesep, 'data', filesep, 'GB data peak corrected', filesep, 'behavior', filesep, 'LR analyses', filesep, 'partialR2_signed.mat');
+posterior_up_subjs_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data peak corrected', filesep, 'behavior', filesep, 'LR analyses', filesep, 'post_absUP_predict.mat');
+data_subjs_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data peak corrected', filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil_no_zerope.xlsx');
 
 % Load the data
 rsquared_full = importdata(rsquared_full_path); % r-squared values
