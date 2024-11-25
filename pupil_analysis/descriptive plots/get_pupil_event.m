@@ -1,4 +1,4 @@
-function [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_event, ...
+function [pupil_event,base_event,sliderOnset]= get_pupil_event(time_pupil,pupil_event,base_event, ...
     event_name,num_trials,data,trial_list,trial_base,pre_duration,base_duration)
         % funtion GET_PUPIL_EVENT returns non-baseline corrected pupil
         % response for an event or full trial and baseline signal for an
@@ -30,6 +30,7 @@ function [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_e
         data.event_code(strcmp(data.events, 'slider_start')) = 8;
         data.event_code(strcmp(data.events, 'delay_start')) = 5;
         data.event_code(strcmp(data.events, 'delay1_start')) = 7;
+        sliderOnset = NaN(num_trials,1);
 
         % LOOP OVER NUMBER OF TRIALS
         for j = 1:num_trials
@@ -66,14 +67,20 @@ function [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_e
                 end
             elseif strcmp(event_name,'full') == 1 % full trial
                 pupil_pre_patch = pupil_patch_base(end-pre_duration:end);
-                pupil_full = [pupil_pre_patch;pupil_patch;pupil_inst_delay;pupil_resp;pupil_delay;];
-                pupil_event(j,:) = pupil_full(1:time_pupil);
+                pupil_full = [pupil_pre_patch;pupil_patch;pupil_inst_delay;pupil_resp;pupil_delay;pupil_fb;pupil_delay1;pupil_slider];
+%                 pupil_event(j,:) = pupil_full(1:time_pupil);
                 pupil_base_patch = pupil_patch_base(end-(pre_duration+base_duration):end-pre_duration+1);
                 if trial_base == 0
                     base_event(j,:) = pupil_base_patch;
                 end
+                if length(pupil_full) < time_pupil
+                    pupil_event(j,1:length(pupil_full)) = pupil_full;
+                else
+                    pupil_event(j,1:time_pupil) = pupil_full(1:time_pupil);
+                end
             elseif strcmp(event_name,'feedback') == 1 % feedback locked
                 pupil_fb_event = [pupil_fb;pupil_delay1;pupil_slider]; %(1:140)
+                sliderOnset(j,:) = length(pupil_fb) + length(pupil_delay1);
                 pupil_pre_fb = [pupil_resp;pupil_delay];
                 pupil_base_fb = pupil_pre_fb(end-(pre_duration+base_duration+1):end-(pre_duration+1));
                 pupil_pre_fb = pupil_pre_fb(end-pre_duration:end);
@@ -84,6 +91,16 @@ function [pupil_event,base_event]= get_pupil_event(time_pupil,pupil_event,base_e
                 else
                     pupil_event(j,1:1000) = pupil_fb_event(1:time_pupil);
                 end 
+                if trial_base == 0
+                    base_event(j,:) = pupil_base_fb;
+                end
+             elseif strcmp(event_name,'slider_onset') == 1 % feedback locked
+                pupil_fb_event = [pupil_slider]; %(1:140)
+                pupil_pre_fb = [pupil_delay1];
+                pupil_base_fb = pupil_pre_fb(end-(pre_duration+base_duration+1):end-(pre_duration+1));
+                pupil_pre_fb = pupil_pre_fb(end-pre_duration:end);
+                pupil_fb_event = [pupil_pre_fb;pupil_fb_event];
+                pupil_event(j,:) = pupil_fb_event(1:time_pupil);
                 if trial_base == 0
                     base_event(j,:) = pupil_base_fb;
                 end

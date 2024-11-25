@@ -36,7 +36,7 @@ end
 
 save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial'); 
 save_sliderOnset = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset'); 
-preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'peak correctedNEW after trials'); % directory to get preprocessed data
+preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'peak corrected after trials'); % directory to get preprocessed data
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
 mkdir(save_sliderOnset);
@@ -54,7 +54,7 @@ for s = 1:num_subs
     safe_saveall(strcat(save_sliderOnset,filesep,subj_ids{s},'.mat'),sliderOnset) % safe save
 end
 
-% FB-LOCKED PUPIL SIGNAL CORRECTED WITH EVENT SPECIFIC BASELINE
+%% FB-LOCKED PUPIL SIGNAL CORRECTED WITH EVENT SPECIFIC BASELINE
 
 base_trialspecific = 0; % event specific baseline
 save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); 
@@ -130,7 +130,7 @@ for s = [1:num_subs]
     safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
 end
 
-%%
+%% BASELINE BEFORE FB
 
 base = 0; % baseline correct signal
 regress_rt = 0; % regress RT from pupil phasic signal
