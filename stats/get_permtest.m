@@ -14,8 +14,6 @@ function perm = get_permtest(var, num_subjs, col, var1, var2, two_tailed, betas)
     %   data
     % OUTPUT:
     %   perm: struct with output from the permutation test
-
-    %addpath(genpath('D:\Perceptual_unc_aug_task_pupil-main\Perceptual_unc_aug_task_pupil-main\Utilities'));
     
     % INITIALIZE VARS
     num_vars = length(var);
