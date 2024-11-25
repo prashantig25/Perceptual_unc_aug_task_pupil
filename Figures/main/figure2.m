@@ -38,8 +38,8 @@ num_vars = 5; % number of variables
 weight_y_n = 0; % weighted regression
 save_csv = 1; % save stats for 1(d) in CSV file for overleaf
 
-descriptive_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data\behavior\descriptive";
-regression_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data\behavior\LR analyses";
+descriptive_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\descriptive";
+regression_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\LR analyses";
 
 % load all required data
 mix_curve = importdata(fullfile(descriptive_path,"mix_curve.mat")); % learning curves
@@ -299,7 +299,7 @@ xlim_vals = [0 10.3];
 ylim_vals = [-0.01 0.17];
 adjust_figprops(ax10_new,font_name,font_size,line_width,xlim_vals,ylim_vals);
 [rho,pval] = corr(avg_ydata,avg_binneddata, 'rows', 'pairwise');
-title(strcat("\itr\rm = ",{' '},num2str(round(rho,2)),{' '}) + newline + "\itp\rm < 0.001", ...
+title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + "\itp\rm < 0.001", ...
     'FontWeight','normal','Interpreter','tex')
 if save_csv == 1
     save_figures = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\stats\behavior";

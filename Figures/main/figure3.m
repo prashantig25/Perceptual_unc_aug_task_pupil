@@ -15,8 +15,8 @@ else
 end
 
 condiffbin = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "descriptive", filesep, "fb_PE2bins.mat")); % add PE bin curves
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "regression", filesep, "binned", filesep,"pe_condiff2bins.mat")); % add PE bin curves
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "regression", filesep, "binned", filesep, "perm_pe_condiff2bins.mat")); % add PE bin curves
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "regression", filesep, "main", filesep, "perm_pe_condiff2bins.mat")); % add PE bin curves
 trial_all = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected", filesep, "pupil", filesep, "descriptive", filesep, "full_trial.mat")); % add PE bin curves
 
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
@@ -59,7 +59,7 @@ hold on
 plot(mean(trial_all,1),"Color",neutral,"LineWidth",2,"LineStyle","-")
 hold on
 shadedErrorBar(x,mean(trial_all,1),std(trial_all,1)./sqrt(num_subjs),{"Color",neutral},1)
-ylim([-0.15,0.7])
+ylim([-0.1,0.55])
 xlim([1,630])
 
 % ADD LINES TO SEPARATE EVENTS
@@ -103,7 +103,7 @@ delete(ax2); % delete old axis
 
 % GET POSITION FOR P-VALUE
 x = linspace(-300,2700,300); % x-axis
-ylim_axes = [-0.1,0.5];
+ylim_axes = [-0.1,0.45];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 avg_bin1= nanmean(condiffbin.pebin1);
@@ -131,6 +131,7 @@ xlabel('Time since feedback onset (ms)')
 ylabel('Pupil dilation')
 adjust_figprops(ax4_new,'Arial',7,0.5)
 xlim([-300,2700])
+ylim(ylim_axes)
 l = legend('Low PE','High PE','Location','best','EdgeColor', ...
     'none','AutoUpdate','off','FontSize',7,'FontName','Arial','Color','none');
 l.ItemTokenSize = [7 7];
@@ -141,7 +142,7 @@ if disp_perm == 1
     plot(x(find(condiffbin.stat==1)), -0.05*ones(1, length(find(condiffbin.stat==1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(condiffbin.stat == 1)),-0.1,"\itp\rm = 0.003","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(condiffbin.stat == 1)),-0.1,"\itp\rm = 0.004","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 %% PLOT BINNED REGRESSION RESULTS
 
 % POSITION CHANGE
@@ -151,7 +152,7 @@ box(ax5_new, 'off'); % remove box
 delete(ax3); % delete old axis
 
 % GET POSITION FOR P-VALUE
-ylim_axes = [-0.07,0.16];
+ylim_axes = [-0.05,0.1];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 ncoeffs = 4;
@@ -197,7 +198,7 @@ if disp_perm == 1
     plot(x(find(perm.mask(ncoeffs,:) == 1)), -0.02*ones(1, length(find(perm.mask(ncoeffs,:) == 1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,"\itp\rm = 0.007","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,"\itp\rm = 0.004","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax5_new,'Arial',7,0.5)

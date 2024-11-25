@@ -64,7 +64,7 @@ box(ax2_new, 'off'); % remove box
 delete(ax2); % delete old axis
 
 % GET POSITION FOR P-VALUE
-ylim_axes = [-0.02,0.08];
+ylim_axes = [-0.02,0.07];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 for s = 1:num_subjs
@@ -88,10 +88,10 @@ hold on
 plot(xaxis(find(perm.mask(3,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(3,:)==1)))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
-% ylim([-0.02,0.08])
+ylim([-0.02,0.07])
 xlabel('Time since feedback onset (ms)')
 ylabel('Pupil dilation','FontWeight','normal','FontName',font_name,'FontSize',font_size)
-text(mean(xaxis(perm.mask(3,:) == 1)),pval_pos + -0.003,"\itp\rm = 0.009","FontName",font_name,"FontSize", ...
+text(mean(xaxis(perm.mask(3,:) == 1)),pval_pos + -0.003,"\itp\rm = 0.008","FontName",font_name,"FontSize", ...
     font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 %% ADD SUBPLOT LABELS

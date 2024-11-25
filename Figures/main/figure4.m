@@ -53,7 +53,7 @@ delete(ax1);
 
 % GET POSITION TO PLOT P-VALUE 
 
-ylim_axes = [-0.04,0.12];
+ylim_axes = [-0.04,0.08];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
@@ -87,7 +87,7 @@ text(mean(xaxis(pe_pval == 1)),pval_pos + -0.01,"\itp\rm < 0.001","FontName",fon
 new_pos = change_position(ax2,[0.015,0,0.002,0]);
 ax2_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax2);
-ylim_axes = [-0.01,0.045];
+ylim_axes = [-0.01,0.025];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
@@ -138,7 +138,7 @@ set(gca,'Color','none','FontName','Arial','FontSize',8)
 xline(0,'--','LineWidth',0.5)
 yline(0,'--','LineWidth',0.5)
 xlim([-300,2700])
-ylim([-0.06,0.12])
+ylim([-0.03,0.09])
 xlabel('Time from feedback onset (ms)')
 ylabel('Posterior pupil dilation (a.u.)')
 hold on
