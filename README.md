@@ -35,4 +35,4 @@ The scripts can be run in MATLAB. For statistical analyses of the pupil results,
 
 # Questions ?
 
-Please contact prashantig25@gmail.com in case of questions, queries, or clarifications. 
+Please contact [prashantig25@gmail.com](mailto:prashantig25@gmail.com) in case of questions, queries, or clarifications. 
