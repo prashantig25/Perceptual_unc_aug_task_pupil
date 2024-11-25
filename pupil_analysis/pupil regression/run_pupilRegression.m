@@ -76,27 +76,27 @@ filename = strcat(ygaze_dir,'\',subj_ids{i},'.mat');
 ygaze_event = importdata(filename);
 
 if strcmp(timewindow,'patch') == 1
-    pupil_signal = pupil;
+    zsc_pupil = pupil;
     xgaze_signal = xgaze_event;
     ygaze_signal = ygaze_event;
     col = size_pupil(2);
 elseif strcmp(timewindow,'feedback') == 1
-    pupil_signal = pupil(:,1:col);
+    zsc_pupil = pupil(:,1:col);
     xgaze_signal = xgaze_event(:,1:col);
     ygaze_signal = ygaze_event(:,1:col);
-    col = size(pupil_signal);
+    col = size(zsc_pupil);
     col = col(2);
 end
 
 % REMOVE MISSED TRIALS
-pupil_signal(missedtrials_slider==1,:) = [];
+zsc_pupil(missedtrials_slider==1,:) = [];
 xgaze_signal(missedtrials==1,:) = [];
 ygaze_signal(missedtrials==1,:) = [];
 
 % IF RTs TO BE REGRESSED
 if regress_rt == 1
     for c = 1:col
-        pupil_signal(:,c) = remove_rt_effects(pupil_signal(:,c),log(behv_data.rt));
+        zsc_pupil(:,c) = remove_rt_effects(zsc_pupil(:,c),log(behv_data.rt));
     end
 end
 
@@ -104,8 +104,8 @@ end
 if baseline_mdl == 1
     fprintf('getting baseline pupil measures...\n');
     filename = strcat(base_dir,'\',subj_ids{i},'.mat');
-    base = importdata(filename);
-    base(missedtrials_slider==1,:) = [];
+    zsc_base = importdata(filename);
+    zsc_base(missedtrials_slider==1,:) = [];
 end
 
 % GET BEHAVIORAL PREDICTORS
@@ -114,7 +114,7 @@ preds = preds_all(preds_all.id == str2num(subj_ids{i}),:);
 preds(isnan(preds.slider),:) = []; % remove no slider responses
 validIndices = find(preds.pe == 0); % pe == 0
 preds(validIndices,:) = []; % delete pe == 0
-pupil_signal(validIndices,:) = [];
+zsc_pupil(validIndices,:) = [];
 xgaze_signal(validIndices,:) = [];
 ygaze_signal(validIndices,:) = [];
 behv_data(validIndices,:) = [];
@@ -130,13 +130,13 @@ for r = bins_array
 
     % GET RELEVANT DATA FOR EACH BIN
     if binned == 1
-        pupil_signal_bins = pupil_signal(preds.bin_columns == r,:);
+        pupil_signal_bins = zsc_pupil(preds.bin_columns == r,:);
         xgaze_signal_bins = xgaze_signal(preds.bin_columns == r,:);
         ygaze_signal_bins = ygaze_signal(preds.bin_columns == r,:);
         behv_data_bins = behv_data(preds.bin_columns == r,:);
         preds_bins = preds(preds.bin_columns == r,:);
     elseif binned_accuracy == 1
-        pupil_signal_bins = pupil_signal(preds.correct == r,:);
+        pupil_signal_bins = zsc_pupil(preds.correct == r,:);
         xgaze_signal_bins = xgaze_signal(preds.correct == r,:);
         ygaze_signal_bins = ygaze_signal(preds.correct == r,:);
         behv_data_bins = behv_data(preds.correct == r,:);
@@ -147,27 +147,27 @@ for r = bins_array
 
         % GET RID OF NaNs
         if binned == 1 || binned_accuracy == 1
-            y = nanzscore(pupil_signal_bins(:,c));
-            xgaze = nanzscore(xgaze_signal_bins(:,c));
-            ygaze = nanzscore(ygaze_signal_bins(:,c));
+            y = pupil_signal_bins(:,c);
+            zsc_xgaze = nanzscore(xgaze_signal_bins(:,c));
+            zsc_ygaze = nanzscore(ygaze_signal_bins(:,c));
             behv = behv_data_bins;
             predictors = preds_bins;
         else
-            y = nanzscore(pupil_signal(:,c));
-            xgaze = nanzscore(xgaze_signal(:,c));
-            ygaze = nanzscore(ygaze_signal(:,c));
+            y = zsc_pupil(:,c);
+            zsc_xgaze = nanzscore(xgaze_signal(:,c));
+            zsc_ygaze = nanzscore(ygaze_signal(:,c));
             behv = behv_data;
             predictors = preds;
             if baseline_mdl == 1
-                base_regressor = nanzscore(base);
+                base_regressor = zsc_base;
             end
         end
 
         % REMOVE ALL NANs
         validIndices = ~isnan(y);
         yValid = y(validIndices==1);
-        xgazeValid = xgaze(validIndices==1);
-        ygazeValid = ygaze(validIndices==1);
+        xgazeValid = zsc_xgaze(validIndices==1);
+        ygazeValid = zsc_ygaze(validIndices==1);
         preds_nan = predictors(validIndices==1,:);
         behv_nan = behv(validIndices==1,:);
 
@@ -186,7 +186,7 @@ for r = bins_array
             % for categorical vars, there should be enough trials with all
             % category information
 
-            % GET TABLE
+            % GET TABLE WITH REGRESSORS
             tbl = table(yValid,xgazeValid,ygazeValid,...
                 nanzscore(preds_nan.con_diff),nanzscore(preds_nan.pe),...
                 nanzscore(abs(preds_nan.pe)),nanzscore(abs(preds_nan.up)), ...

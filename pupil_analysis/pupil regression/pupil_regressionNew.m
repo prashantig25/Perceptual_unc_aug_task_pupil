@@ -61,7 +61,7 @@ mkdir(save_dir);
 safe_saveall(strcat(save_dir, filesep, betas_save,".mat"), betas_struct);
 safe_saveall(strcat(save_dir, filesep,perm_save,".mat"), perm);
 
-% RUN BINNED REGRESSION APPROACH (Figure 3c)
+%% RUN BINNED REGRESSION APPROACH (Figure 3c)
 
 bins_array = [1:2]; % number of bins
 num_bins = 2;
@@ -70,7 +70,7 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + rt';
 num_vars = 5; % number of predictor vars
 two_tailed = 1; % apply two-tailed permutation test
 pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'regression', filesep, 'knapen');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'regression', filesep, 'main');
 mkdir(save_dir)
 perm_save = "perm_pe_condiff2bins";
 betas_save = "pe_condiff2bins";
@@ -83,8 +83,7 @@ binned = 1;
 safe_saveall(strcat(save_dir, filesep, betas_save,".mat"), betas_struct);
 safe_saveall(strcat(save_dir, filesep,perm_save,".mat"), perm);
 
-% RUN REGRESSED RT MODEL (Figure S8)
-%%
+%% RUN REGRESSED RT MODEL (Figure S8)
 
 num_bins = 1;
 bins_array = num_bins;
@@ -105,7 +104,7 @@ regress_rt = 1; % regress RT effects
 safe_saveall(strcat(save_dir, filesep, betas_save,".mat"), betas_struct);
 safe_saveall(strcat(save_dir, filesep,perm_save,".mat"), perm);
 
-% RUN MODEL WITH BASELINE AS REGRESSOR (Figure S7)
+%% RUN MODEL WITH BASELINE AS REGRESSOR (Figure S7)
 
 num_bins = 1;
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up  + rt + zsc_condiff + pe:zsc_condiff + baseline';
@@ -125,7 +124,7 @@ regress_rt = 0;
 safe_saveall(strcat(save_dir, filesep, betas_save,".mat"), betas_struct);
 safe_saveall(strcat(save_dir, filesep,perm_save,".mat"), perm);
 
-% MODEL-BASED ANALYSES OF PATCH-LOCKED PUPIL DILATION
+%% MODEL-BASED ANALYSES OF PATCH-LOCKED PUPIL DILATION
 
 timewindow = 'patch'; % time-window on which regression needs to be applied
 col = 300; % number of samples on which the regression is applied
