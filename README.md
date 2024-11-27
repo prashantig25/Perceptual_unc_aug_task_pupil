@@ -7,10 +7,10 @@ To access all the raw pupillometry data (preprocessed versions also included), p
 1. Download Datalad (https://handbook.datalad.org/en/latest/intro/installation.html) to your computer.
 2. Next, you need a Datalad and GIN account.
 3. Following that, please add SSH keys to your GIN account. Go to Settings and then SSH keys in your GIN account to do so.
-2. Next, clone the repo with the data using this command (datalad clone git@gin.g-node.org:/prashantig25/pupil_dataset.git) using command prompt. 
+2. Next, clone the repo with the data using this command `datalad clone git@gin.g-node.org:/prashantig25/pupil_dataset.git` using command prompt. 
 3. If the cloned folder is NOT already inside the path of the repo ('Perceptual_unc_aug_task_pupil'), please move it inside the repo ('Perceptual_unc_aug_task_pupil') folder on your local path.
 4. Change the current directory on your command prompt to the directory of the cloned repo.
-5. Finally, to save the data use this command (datalad get .).
+5. Finally, to save the data use this command `datalad get .`.
 
 Please note, that accessing all the data can take up to 6-8 hours on a "normal" computer. Feel free to SKIP as you can still replicate all our results without the raw data.
 
@@ -19,7 +19,7 @@ Please note, that accessing all the data can take up to 6-8 hours on a "normal" 
 Please follow these steps to run all the main and supplementary analyses from our manuscript. 
 
 To reproduce our behavioral results, these are the required steps:
-1. To get descriptive data about participants' choices and learning, run `descriptive_behv.m`
+1. To get descriptive data about participants' choices and learning, run [descriptive_behv.m](./behavior analyses/descriptive_behv.m)
 2. Next to reproduce all our model-based analyses of participants' learning behavior, run `LR_analysis_pupil.m`.
 
 To reproduce our pupillometry results, please follow these steps. 
