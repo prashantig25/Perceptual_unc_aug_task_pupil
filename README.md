@@ -19,7 +19,7 @@ Please note, that accessing all the data can take up to 6-8 hours on a "normal" 
 Please follow these steps to run all the main and supplementary analyses from our manuscript. 
 
 To reproduce our behavioral results, these are the required steps:
-1. To get descriptive data about participants' choices and learning, run [descriptive_behv.m](./behavior analyses/descriptive_behv.m)
+1. To get descriptive data about participants' choices and learning, run `descriptive_behv.m`
 2. Next to reproduce all our model-based analyses of participants' learning behavior, run `LR_analysis_pupil.m`.
 
 To reproduce our pupillometry results, please follow these steps. 
