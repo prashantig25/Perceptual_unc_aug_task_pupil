@@ -1,4 +1,4 @@
-This repository contains the code required to reproduce all of the analyses and figures from [Pupil-linked arousal encodes uncertainty-weightedprediction errors](https://doi.org/10.31234/osf.io/c6ujk).
+This repository contains the code required to reproduce all of the analyses and figures from [Pupil-linked arousal encodes uncertainty-weighted prediction errors](https://doi.org/10.31234/osf.io/c6ujk).
 
 # Where can I get the data from?
 
