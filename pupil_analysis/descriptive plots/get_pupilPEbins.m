@@ -5,12 +5,8 @@ clc
 clearvars
 
 % INITIALISE VARS
-subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
-    '3376','4927','190','306','3391','5047','3922','659','421','3943',...
-    '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
-    '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
-    '3319','129','4684','3886','620','901','900'}; % subject IDs
-num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
 timewindow = 'feedback';
 col = 300;
 num_subs = length(subj_ids); % number of subjects
@@ -35,6 +31,8 @@ else
 end
 save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'descriptive'); 
 pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+% save_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/descriptive/Mathot";
+% pupil_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/pupil signal/Mathot/non-baseline corrected fb"; % directory to get preprocessed data
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 preds_all = readtable(strcat(desiredPath,filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 mkdir(save_dir);
@@ -123,4 +121,4 @@ condiffbin.pebin1_incorrect = subj_pupil_signal_pebin1incorrect;
 condiffbin.pebin2_correct = subj_pupil_signal_pebin2correct;
 condiffbin.pebin2_incorrect = subj_pupil_signal_pebin2incorrect;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
-safe_saveall(strcat(save_dir,filesep,"fb_PE2bins.mat"),condiffbin)
+safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_tonicSignal.mat"),condiffbin)
