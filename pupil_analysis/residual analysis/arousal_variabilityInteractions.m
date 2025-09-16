@@ -5,12 +5,8 @@ clearvars
 col = 300; % length of x-axis
 xaxis = linspace(-300,2700,col); % x-axis
 nsubjs = 47; % number of subjects
-subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
-    '3376','4927','190','306','3391','5047','3922','659','421','3943',...
-    '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
-    '3442','3571','4360','4522','4807','4943','594','379','4057','4813',...
-    '601','3319','129','4684','3886','620','901','900'};
-num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
 
 % USER-BASED PATH
 currentDir = cd; % current directory
@@ -26,10 +22,13 @@ end
 betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain.mat"));
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
 posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'post_absUP_predict.mat'));
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'residual'); 
+% pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+pupil_dir = '/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/pupil signal/Mathot/fb'; % directory to get preprocessed data
+% save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'residual'); 
+save_dir = '/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/arousal differences/Mathot'; 
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'preprocessed');
 betas_field = betas_pupil.with_intercept;
+mkdir(save_dir)
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
 subj_ids_num = [];

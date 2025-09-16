@@ -5,11 +5,8 @@ clc
 clearvars 
 
 % INITIALISE VARS
-subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
-    '3376','4927','190','306','3391','5047','3922','659','421','3943',...
-    '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
-    '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
-    '3319','129','4684','3886','620','901','900'}; % subject-IDs
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
 mdl = 'up~ pupil + pe:pupil:con_diff + pupil:pe + pupil:con_diff + post_up'; % residual-analysis model
 num_vars = 5; % number of predictors
 resp_var = {'up'}; % response var
@@ -17,7 +14,6 @@ cat_vars = {''}; % cell-array of categorical vars
 pred_vars = {'post_up','pe','pupil','con_diff'}; % cell array with predictor vars
 col = 300; % length of pupil signal
 num_subjs = length(subj_ids); % number of subjects
-num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
 timewindow = 'feedback'; % pupil signal from which window is used for residual analysis
 betas_pupil.with_intercept = NaN(1,num_vars+1,length(subj_ids),col); % initialised structure to store model-estimated betas
 residulalsAnalyse_SSE = NaN(length(subj_ids),col); % initialised structure to store model-estimated betas
@@ -34,8 +30,10 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, "post_absUP_predict.mat")); % posterior update
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'residual'); 
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+% save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'residual'); 
+% pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+save_dir = '/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/arousal differences/Mathot'; 
+pupil_dir = '/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/pupil signal/Mathot/fb'; % directory to get preprocessed data
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
