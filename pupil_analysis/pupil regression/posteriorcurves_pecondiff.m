@@ -17,18 +17,18 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-save_dir = strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected",...
-    filesep, "pupil", filesep, "regression", filesep, "main");
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected",...
-    filesep, "pupil", filesep, "regression", filesep, "main", filesep, "pe_condiff.mat"));
+save_dir = '/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected/pupil/regression/main';
+betas_struct = importdata('/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected/pupil/regression/main/pe_condiff_tonicSignal_nonBaselineCorrected_noBaselineRegressor.mat');
+
+% save_dir = strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected",...
+%     filesep, "pupil", filesep, "regression", filesep, "main");
+% betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected",...
+%     filesep, "pupil", filesep, "regression", filesep, "main", filesep, "pe_condiff.mat"));
 preds_all = readtable(strcat(desiredPath, filesep, "data", filesep, "GB data peak corrected",...
     filesep, "behavior", filesep, "LR analyses", filesep, "preprocessed_lr_pupil_no_zerope.xlsx"));
 betas_field = betas_struct.with_intercept;
-subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
-    '3376','4927','190','306','3391','5047','3922','659','421','3943',...
-    '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
-    '3442','3571','4360','4522','4807','4943','594','379','4057','4813',...
-    '601','3319','129','4684','3886','620','901','900'};
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
 highPU = -1.5; % high BS uncertainty
 midPU = 0.015; % medium BS uncertainty
 lowPU = 1.5; % low BS uncertainty
@@ -50,4 +50,4 @@ for s = 1:num_subjs
 end
 
 % SAVE
-safe_saveall(strcat(save_dir, filesep, "BSweightedPE_interactions.mat"),posterior);
+safe_saveall(strcat(save_dir, filesep, "BSweightedPE_interactions_nonbaselineCorrected_noBaselineregressor.mat"),posterior);
