@@ -1,4 +1,4 @@
-function [p_out,p_nans] = interp_nans(p_in,badsmps)
+function [p_out,p_nans] = interp_nans(p_in,badsmps,linearInt)
 
     % function INTERP_NANS innterpolates NaN values in the input data 
     % within specified blink windows.
@@ -7,6 +7,8 @@ function [p_out,p_nans] = interp_nans(p_in,badsmps)
     %   p_in: Input data vector containing pupil measurements.
     %   badsmps: Matrix specifying blink windows, where each row contains
     %             start and end indices of a blink window (size Nx2).
+    %   linearInt: if 1, implement linear interpolation for blinks and if
+    %              0, implement cubic-spline interpolation of blinks
     %
     % OUTPUT:
     %   p_out: Output data vector with NaN values interpolated and extrapolated.
@@ -22,8 +24,13 @@ function [p_out,p_nans] = interp_nans(p_in,badsmps)
     p_nans = find(isnan(p_in));
     
     % INTERPOLATE
-    p_in(isnan(p_in)) = interp1(find(~isnan(p_in)), ...
-        p_in(~isnan(p_in)), find(isnan(p_in)), 'linear');
+    if linearInt == 1
+        p_in(isnan(p_in)) = interp1(find(~isnan(p_in)), ...
+            p_in(~isnan(p_in)), find(isnan(p_in)), 'linear');
+    else
+        p_in(isnan(p_in)) = interp1(find(~isnan(p_in)), ...
+            p_in(~isnan(p_in)), find(isnan(p_in)), 'spline');
+    end
     
     % EXTERPOLATE ENDS
     p_in(isnan(p_in)) = interp1(find(~isnan(p_in)), ...

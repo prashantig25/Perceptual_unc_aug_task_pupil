@@ -1,4 +1,4 @@
-function [pupilcopy, Xgazecopy2, Ygazecopy2, blinksmp] = process_blinks(data_asc, data_matched, sampling_rate, coalesce1, padding1)
+function [pupilcopy, Xgazecopy2, Ygazecopy2, blinksmp] = process_blinks(data_asc, data_matched, sampling_rate, coalesce1, padding1, linearInt)
 
     % function PROCESS_BLINKS process and interpolate blinks in eye-tracking data
     % 
@@ -9,6 +9,8 @@ function [pupilcopy, Xgazecopy2, Ygazecopy2, blinksmp] = process_blinks(data_asc
     %   coalesce1: maximum distance in seconds to be considered before merging
     %   adjacent blinks into 1
     %   padding1: duration before and after a blink for padding
+    %   linearInt: if 1, implement linear interpolation for blinks and if
+    %              0, implement cubic-spline interpolation of blinks
     %
     % OUTPUTS:
     %   pupilcopy: Interpolated pupil diameter
@@ -53,9 +55,9 @@ function [pupilcopy, Xgazecopy2, Ygazecopy2, blinksmp] = process_blinks(data_asc
     Ygazecopy = data_matched.eye_y;
 
     % INTERPOLATE
-    [pupilcopy,~] = interp_nans(pupilcopy, padblinksmp); % pupil
-    [Xgazecopy2,~] = interp_nans(Xgazecopy, padblinksmp); % x gaze coordinates
-    [Ygazecopy2,~] = interp_nans(Ygazecopy, padblinksmp); % y gaze coordinates
+    [pupilcopy,~] = interp_nans(pupilcopy, padblinksmp, linearInt); % pupil
+    [Xgazecopy2,~] = interp_nans(Xgazecopy, padblinksmp, linearInt); % x gaze coordinates
+    [Ygazecopy2,~] = interp_nans(Ygazecopy, padblinksmp, linearInt); % y gaze coordinates
 
     % MAKE SURE ALL NaNs have been dealt with
     assert(~any(isnan(pupilcopy)));

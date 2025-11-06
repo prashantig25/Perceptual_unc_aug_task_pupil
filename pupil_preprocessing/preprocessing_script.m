@@ -1,33 +1,28 @@
 % preprocessing_script runs the preprocessing pipeline on the raw pupil
 % data, saves the preprocessed data with trial numbers and event names.
+% This script runs two pipelines: main (no filtering) and alternate (with filtering)
 
 clc
 clearvars
 
-% INITIALISE VARS AND DON'T CHANGE SUBJECT IDs and NUM_SESS
-subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
-    '3376','4927','190','306','3391','5047','3922','659','421','3943',...
-    '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
-    '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
-    '3319','129','4684','3886','620','901','900'}; % subject IDs
-num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
+rng(123);
+
+% COMMON PARAMETERS (shared across both pipelines)
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
 plot_steps = 0; % if you want to visualise data for each preprocessing step
-sampling_rate = 1000;% original sampling rate
-freqs = [0.01 10];% filter cutoffs [lo hi]
+sampling_rate = 1000; % original sampling rate
+freqs = [0.01 10]; % filter cutoffs [lo hi]
 downsample_rate = 100; % sampling rate after down sampling
 event_names = {'blinks','saccades'}; % event names
 deconv_time = [0,6]; % deconvolution time interval
-using_DAT = 0; % always set to 0 if you are preprocessing files for the first time. 
-% The DAT files would be saved during the first run and can be used the
-% next time onwards.
+using_DAT = 1; % always set to 0 if you are preprocessing files for the VERY (!!!) first time.
 
-% PATH STUFF (update accordingly)
-% Define the base directory
-
-% USER-BASED PATH
+% SETUP PATHS (common to both pipelines)
 currentDir = cd; % current directory
 reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
+
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
@@ -35,21 +30,53 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
+
 baseDir = strcat("pupil_dataset", filesep, "pupil_converted");
 
 % Use filesep for platform independence and strcat for concatenation
 currentDir_asc = strcat(desiredPath, filesep, baseDir, filesep, 'ASC'); % Construct ASC directory path
 currentDir_dat = strcat(desiredPath, filesep, baseDir, filesep, 'DAT'); % Construct DAT directory path
 
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'peak corrected'); 
-save_dirASC = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'asc2dat_converted'); 
-mkdir(save_dir);
+% Save directory for ASC to DAT conversion (shared)
+save_dirASC = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'asc2dat_converted'); 
 mkdir(save_dirASC);
 
-% PREPROCESS
-preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
-    downsample_rate, event_names, deconv_time, save_dir, currentDir_asc, currentDir_dat, ...
-    save_dirASC, using_DAT)
+% RUN MAIN PIPELINE (no filtering, cubic-spline interpolation)
+disp('===== RUNNING MAIN PIPELINE =====');
+noFiltering = 1; % no filter applied (main MS pipeline)
+linearInt = 0; % cubic-spline interpolation (main MS pipeline)
 
-% ADD EVENT NAMES AND TRIAL NUMBERS TO PREPROCESSED DATA
+% Set up save directory for main pipeline
+save_dir_main = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed'); 
+mkdir(save_dir_main);
+
+% Preprocess
+preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
+    downsample_rate, event_names, deconv_time, save_dir_main, currentDir_asc, currentDir_dat, ...
+    save_dirASC, using_DAT, noFiltering, linearInt)
+
+% Add event names and trial numbers
+preproc_dir = save_dir_main;
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed trials and events added'); 
 add_eventstrials;
+
+% RUN ALTERNATE PIPELINE (with filtering, linear interpolation)
+disp('===== RUNNING ALTERNATE PIPELINE =====');
+noFiltering = 0; % filter applied (supplement pipeline)
+linearInt = 1; % linear interpolation (supplement pipeline)
+
+% Set up save directory for alternate pipeline
+save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed'); 
+mkdir(save_dir_alt);
+
+% Preprocess
+preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
+    downsample_rate, event_names, deconv_time, save_dir_alt, currentDir_asc, currentDir_dat, ...
+    save_dirASC, using_DAT, noFiltering, linearInt)
+
+% Add event names and trial numbers
+preproc_dir = save_dir_alt;
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added'); 
+add_eventstrials;
+
+disp('===== PREPROCESSING COMPLETE =====');
