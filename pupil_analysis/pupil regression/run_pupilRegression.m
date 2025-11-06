@@ -1,4 +1,4 @@
-function [betas_struct,perm] = run_pupilRegression(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, ...
+function [betas_struct,perm,residuals_all,predicted_all] = run_pupilRegression(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, ...
     subj_ids, num_subs, num_sess, timewindow, regress_rt, baseline_mdl, ...
     preds_all, binned, bins, binned_accuracy, two_tailed, ~, ~, ~ ...
     ,base_dir, bins_array, col, num_vars, model_def, pred_vars, cat_vars, resp_var)
@@ -38,16 +38,22 @@ function [betas_struct,perm] = run_pupilRegression(behv_dir, pupil_dir, xgaze_di
 %   perm: results from the permutation test
 
 % LOOP OVER SUBJECTS
+residuals_all = cell(num_subs,1);
+predicted_all = cell(num_subs,1);
+
 for i = 1:num_subs
+
+    residuals_subj = [];
+    predicted_subj = [];
 
 % GET BEHAVIORAL DATA
 fprintf('reading in %s ...\n', subj_ids{i});
 behv_data = [];
 data_run = [];
 for j = 1:num_sess(i)
-    filename = strcat(behv_dir,'\',subj_ids{i},'_','main',num2str(j),'.xlsx');
+    filename = strcat(behv_dir,filesep,subj_ids{i},'_','main',num2str(j),'.xlsx');
     if strcmp(subj_ids{i},'4672') == 1
-        filename = strcat(behv_dir,'\',subj_ids{i},'_','main',num2str(j),'_red.xlsx');
+        filename = strcat(behv_dir,filesep,subj_ids{i},'_','main',num2str(j),'_red.xlsx');
     end
     data_run = readtable(filename);
     rt = table(data_run.choice_rt,'VariableNames',{'rt'});
@@ -65,14 +71,14 @@ behv_data(missedtrials == 1,:) = [];
 
 % GET PUPIL SIGNAL, X-GAZE, Y-GAZE
 fprintf('pupil signal...\n');
-filename = strcat(pupil_dir,'\',subj_ids{i},'.mat');
+filename = strcat(pupil_dir,filesep,subj_ids{i},'.mat');
 pupil = importdata(filename);
 size_pupil = size(pupil);
 
-filename = strcat(xgaze_dir,'\',subj_ids{i},'.mat');
+filename = strcat(xgaze_dir,filesep,subj_ids{i},'.mat');
 xgaze_event = importdata(filename);
 
-filename = strcat(ygaze_dir,'\',subj_ids{i},'.mat');
+filename = strcat(ygaze_dir,filesep,subj_ids{i},'.mat');
 ygaze_event = importdata(filename);
 
 if strcmp(timewindow,'patch') == 1
@@ -103,7 +109,7 @@ end
 % IF BASELINE MODEL IS BEING USED
 if baseline_mdl == 1
     fprintf('getting baseline pupil measures...\n');
-    filename = strcat(base_dir,'\',subj_ids{i},'.mat');
+    filename = strcat(base_dir,filesep,subj_ids{i},'.mat');
     zsc_base = importdata(filename);
     zsc_base(missedtrials_slider==1,:) = [];
 end
@@ -118,6 +124,7 @@ zsc_pupil(validIndices,:) = [];
 xgaze_signal(validIndices,:) = [];
 ygaze_signal(validIndices,:) = [];
 behv_data(validIndices,:) = [];
+zsc_base(validIndices,:) = []; % added to check what's going on here 
 
 % BINNED REGRESSION
 if binned == 1
@@ -190,9 +197,9 @@ for r = bins_array
             tbl = table(yValid,xgazeValid,ygazeValid,...
                 nanzscore(preds_nan.con_diff),nanzscore(preds_nan.pe),...
                 nanzscore(abs(preds_nan.pe)),nanzscore(abs(preds_nan.up)), ...
-                nanzscore(log(preds_nan.rt)),preds_nan.condition,preds_nan.ecoperf,preds_nan.correct,...
+                nanzscore(log(preds_nan.rt)),preds_nan.condition,preds_nan.ecoperf,preds_nan.correct,nanzscore(preds.pe_condiff),...
                 'VariableNames',{'pupil','xgaze','ygaze', ...
-                'zsc_condiff','signed_pe','pe','zsc_up','rt','condition','ecoperf','reward'});
+                'zsc_condiff','signed_pe','pe','zsc_up','rt','condition','ecoperf','reward','pe_condiff'});
 
             if baseline_mdl == 1
                 tbl.baseline = base_nan;
@@ -201,6 +208,9 @@ for r = bins_array
             % FIT THE MODEL
             [betas,rsquared,residuals,coeffs_name,lm] = linear_fit(tbl,model_def ...
                 ,pred_vars,resp_var,cat_vars,num_vars,0,0,0,0);
+            residuals_subj = [residuals_subj,residuals];
+            predicted = predict(lm,tbl);
+            predicted_subj = [predicted_subj,predicted];
             if binned_accuracy == 1
                 betas_struct.with_intercept(r+1,:,i,c) = betas(1:end);
             else
@@ -210,6 +220,8 @@ for r = bins_array
     end
     fprintf('storing beta coefficients...\n');
 end
+residuals_all{i,1} = residuals_subj;
+predicted_all{i,1} = predicted_subj;
 end
 
 % SAVE

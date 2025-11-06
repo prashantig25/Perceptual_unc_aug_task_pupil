@@ -29,12 +29,10 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'descriptive'); 
-pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
-% save_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/descriptive/Mathot";
-% pupil_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/pupil signal/Mathot/non-baseline corrected fb"; % directory to get preprocessed data
-behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-preds_all = readtable(strcat(desiredPath,filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
+save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive'); 
+pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+preds_all = readtable(strcat(desiredPath,filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 mkdir(save_dir);
 
 for i = 1:num_subs
@@ -121,4 +119,4 @@ condiffbin.pebin1_incorrect = subj_pupil_signal_pebin1incorrect;
 condiffbin.pebin2_correct = subj_pupil_signal_pebin2correct;
 condiffbin.pebin2_incorrect = subj_pupil_signal_pebin2incorrect;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
-safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_tonicSignal.mat"),condiffbin)
+safe_saveall(strcat(save_dir,filesep,"fb_PE2bins.mat"),condiffbin)

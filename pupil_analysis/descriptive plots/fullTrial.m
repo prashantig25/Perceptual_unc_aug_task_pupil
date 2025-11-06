@@ -5,7 +5,7 @@ clearvars
 
 % INITIALIZE VARS
 subj_ids = importdata("subj_ids.mat");
-snum_subjs = length(subj_ids);
+num_subjs = length(subj_ids);
 num_break = 30; % how long should the pupil signal be broken
 col_patch = 100; % how long should the patch-related pupil signal
 col_fb = 300; % how long should the patch-related pupil signal
@@ -24,27 +24,23 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-% save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'descriptive'); 
-save_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\NatCommns Revisions\Reviewer 2\pupil\descriptive\Mathot";
-fb_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\NatCommns Revisions\Reviewer 2\pupil\pupil signal\Mathot\fb full trial"; % directory to get preprocessed data
-patch_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\NatCommns Revisions\Reviewer 2\pupil\pupil signal\Mathot\patch"; % directory to get preprocessed data
-resp_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\NatCommns Revisions\Reviewer 2\pupil\pupil signal\Mathot\resp"; % directory to get preprocessed data
-% fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial'); % directory to get preprocessed data
-% patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch'); % directory to get preprocessed data
-% resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp'); % directory to get preprocessed data
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive'); 
+fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial'); % directory to get preprocessed data
+patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch'); % directory to get preprocessed data
+resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp'); % directory to get preprocessed data
 mkdir(save_dir);
 
 % LOOP OVER SUBJECTS
 for i = 1:num_subjs
 
     % IMPORT EVENT-RELATED DATA
-    filename = strcat(patch_dir,'\',subj_ids{i},'.mat');
+    filename = strcat(patch_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); patch = pupil(:,1:col_patch);
 
-    filename = strcat(resp_dir,'\',subj_ids{i},'.mat');
+    filename = strcat(resp_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); resp = pupil;
 
-    filename = strcat(fb_dir,'\',subj_ids{i},'.mat');
+    filename = strcat(fb_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); fb = pupil(:,1:col_fb);
 
     % INITIALIZE ARRAY FOR TIME POINT

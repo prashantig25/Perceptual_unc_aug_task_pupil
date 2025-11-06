@@ -2,7 +2,7 @@ classdef PupilRegression < pupilReg_Vars
     % Main class for pupil regression analysis, inheriting from pupilReg_Vars
     % Performs comprehensive pupil dilation analysis with behavioral predictors
     
-    properties (Access = private)
+    properties 
         % Results storage
         betas_struct     % Structure containing regression beta coefficients
         perm_results     % Permutation test results
@@ -25,6 +25,7 @@ classdef PupilRegression < pupilReg_Vars
             if nargin > 0 && isa(config, 'PupilRegressionConfig')
                 obj.copyFromConfig(config);
             end
+            obj.betas_struct = struct();
         end
         
         function copyFromConfig(obj, config)
@@ -53,6 +54,17 @@ classdef PupilRegression < pupilReg_Vars
             
             % Validate configuration before starting analysis
             obj.validateConfig();
+
+           % Pre-allocate betas_struct with correct dimensions
+           if obj.binned == 1
+               num_bins = length(obj.bins_array);
+           elseif obj.binned_accuracy == 1
+               num_bins = 2; % Assuming binary accuracy
+           else
+               num_bins = 1;
+           end
+
+           obj.betas_struct.with_intercept = nan(num_bins, obj.num_vars+1, obj.num_subs, obj.col);
             
             % Initialize output variables
             obj.residuals_all = cell(obj.num_subs, 1);

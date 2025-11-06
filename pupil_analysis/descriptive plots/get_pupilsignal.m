@@ -1,279 +1,199 @@
-% get_pupilsignal saves single-trial pupil response for feedback.
+% get_pupilsignal saves single-trial pupil response for feedback and other
+% specific events using both main and alternate pipelines
 
 clc
 clearvars
 
-% INITIALISE VARS and PATHS
+%% ========================================================================
+%  SHARED INITIALIZATION - USED BY BOTH PIPELINES
+%  ========================================================================
+
+% Load subject information
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
-num_subs = length(subj_ids); % number of subjects
+num_subs = length(subj_ids);
+
+% Shared parameters
 samp_rate = 100; % sampling rate in Hz after down-sampling
-pre_duration = 29; % set duration for start of pre-event signal (note: good idea to use some pre-event signal)
-base_duration = 9; % set duration for baseline signal
-base = 1; % baseline correct signal
+pre_duration = 29; % duration for start of pre-event signal
+base_duration = 9; % duration for baseline signal
 regress_rt = 0; % regress RT from pupil phasic signal
-time_pupil = 1000; % time duration of the pupil 1000
-time_base = 10; % time duration of the bases
-event_name = 'feedback'; % which event 'feedback'
-pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
-base_trialspecific = 1; % get baseline signal for that trial '1'
 
-% USER-BASED PATH
-currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+% Setup user-based path
+currentDir = cd;
+reqPath = 'Perceptual_unc_aug_task_pupil-main';
 pathParts = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
-    % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-% save_dir = strcat(desiredPath, filesep,'NatCommns Revisions', filesep, 'Reviewer 2', filesep, 'pupil', filesep, 'pupil signal', filesep, 'only high pass filter used', filesep, 'fb full trial'); 
-save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial'); 
-save_sliderOnset = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset'); 
-% preproc_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\NatCommns Revisions\Reviewer 2\pupil\preprocessing\only high pass filtering used and trials events added";
-preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'peak corrected after trials'); % directory to get preprocessed data
-behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-mkdir(save_dir);
-mkdir(save_sliderOnset);
+% Shared behavioral data directory
+behv_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'behavior', filesep, 'raw data');
 
-% FB-LOCKED PUPIL SIGNAL CORRECTED WITH TRIAL SPECIFIC BASELINE
+%% ========================================================================
+%  MAIN PIPELINE PROCESSING
+%  ========================================================================
 
-for s = 1:num_subs
-    % LOOP OVER SESSIONS
-    for ss = 1:num_sess(s)
-        [pupil,sliderOnset] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
-    end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
-    safe_saveall(strcat(save_sliderOnset,filesep,subj_ids{s},'.mat'),sliderOnset) % safe save
-end
+preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
+    filesep, 'preprocessed trials and events added');
 
-%% FB-LOCKED PUPIL SIGNAL CORRECTED WITH EVENT SPECIFIC BASELINE
+%% 1. FB-LOCKED PUPIL SIGNAL - TRIAL SPECIFIC BASELINE
 
-base_trialspecific = 0; % event specific baseline
-% save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); 
-save_dir = strcat(desiredPath, filesep,'NatCommns Revisions', filesep, 'Reviewer 2', filesep, 'pupil', filesep, 'pupil signal', filesep, 'only high pass filter used', filesep, 'fb'); 
-mkdir(save_dir);
-
-% LOOP OVER SUBJECTS
-for s = 1:num_subs
-    % LOOP OVER SESSIONS
-    for ss = 1:num_sess(s)
-        [pupil,~] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
-    end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
-end
-
-%% FB-LOCKED PUPIL SIGNAL NON-BASELINE CORRECTED
-
-base_trialspecific = 0; % event specific baseline
-base = 0; % don't correct for baseline
-% save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb'); 
-save_dir = strcat(desiredPath, filesep,'NatCommns Revisions', filesep, 'Reviewer 2', filesep, 'pupil', filesep, 'pupil signal', filesep, 'only high pass filter used', filesep, 'non-baseline corrected fb'); 
-mkdir(save_dir);
-
-% LOOP OVER SUBJECTS
-for s = [1:num_subs]
-    % LOOP OVER SESSIONS
-    for ss = 1:num_sess(s)
-        [pupil,~] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
-    end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
-end
-
-%% PATCH-LOCKED PUPIL SIGNAL
-
-time_pupil = 300; % time duration of the pupil
-time_base = 10; % time duration of the base
-event_name = 'choice'; % which event
-base_trialspecific = 0; % trial/event specific baseline
+time_pupil = 1000;
+time_base = 10;
+event_name = 'feedback';
 base = 1;
-% save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch'); 
-save_dir = strcat(desiredPath, filesep,'NatCommns Revisions', filesep, 'Reviewer 2', filesep, 'pupil', filesep, 'pupil signal', filesep, 'Mathot', filesep, 'patch'); 
-mkdir(save_dir);
+base_trialspecific = 1;
 
-% LOOP OVER SUBJECTS
-for s = [1:num_subs]
-    % LOOP OVER SESSIONS
-    for ss = 1:num_sess(s)
-        [pupil,~] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
-    end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
-end
-
-%% RESPONSE-LOCKED PUPIL SIGNAL
-
-time_pupil = 230; % time duration of the pupil
-time_base = 10; % time duration of the base
-event_name = 'response'; % which event
-base_trialspecific = 1; % trial/event specific baseline
-% save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp'); 
-save_dir = strcat(desiredPath, filesep,'NatCommns Revisions', filesep, 'Reviewer 2', filesep, 'pupil', filesep, 'pupil signal', filesep, 'Mathot', filesep, 'resp'); 
-mkdir(save_dir);
-
-% LOOP OVER SUBJECTS
-for s = [1:num_subs]
-    % LOOP OVER SESSIONS
-    for ss = 1:num_sess(s)
-        [pupil,~] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
-    end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
-end
-
-%% BASELINE BEFORE FB
-
-base = 0; % baseline correct signal
-regress_rt = 0; % regress RT from pupil phasic signal
-time_pupil = 200; % time duration of the pupil 1000
-time_base = 10; % time duration of the bases
-event_name = 'tonic_prefb'; % which event 'feedback'
-pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
-base_trialspecific = 1; % get baseline signal for that trial '1'
-
-% save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb'); 
-save_dir = strcat(desiredPath, filesep,'NatCommns Revisions', filesep, 'Reviewer 2', filesep, 'pupil', filesep, 'pupil signal', filesep, 'Mathot', filesep, 'baseline before fb'); 
-mkdir(save_dir);
-
-% BASELINE BEFORE FB MEAN PUPIL SIGNAL
-
-for s = 1:num_subs
-    % LOOP OVER SESSIONS
-    for ss = 1:num_sess(s)
-        [pupil,sliderOnset] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
-    end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),nanmean(pupil,2)) % safe save
-end
-
-%% TRIAL-SPECIFIC BASELINE
-
-base = 0; % baseline correct signal
-regress_rt = 0; % regress RT from pupil phasic signal
-time_pupil = 10; % time duration of the pupil 1000
-time_base = 10; % time duration of the bases
-event_name = 'tonic_pretrial'; % which event 'feedback'
-pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
-base_trialspecific = 1; % get baseline signal for that trial '1'
-
-% save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb'); 
-save_dir = strcat(desiredPath, filesep,'NatCommns Revisions', filesep, 'Reviewer 2', filesep, 'pupil', filesep, 'pupil signal', filesep, 'preprint pipeline', filesep, 'baseline before trial'); 
-mkdir(save_dir);
-
-% BASELINE BEFORE FB MEAN PUPIL SIGNAL
-
-for s = 1:num_subs
-    % LOOP OVER SESSIONS
-    for ss = 1:num_sess(s)
-        [pupil,sliderOnset] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
-    end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),nanmean(pupil,2)) % safe save
-end
-
-%% CALCULATING FB AND PSEUDOBASELINE FOR CORRECTION OF REVERSION TO MEAN
-
-pre_duration = 30; % set duration for start of pre-event signal (note: good idea to use some pre-event signal)
-base_duration = 9; % set duration for baseline signal
-base = 0; % baseline correct signal
-regress_rt = 0; % regress RT from pupil phasic signal
-time_pupil = 180; % time duration of the pupil 1000
-time_base = 10; % time duration of the bases
-event_name = 'reversionToMean'; % which event 'feedback'
-pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
-base_trialspecific = 1; % get baseline signal for that trial '1'
-
-% USER-BASED PATH
-currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
-pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
-    disp('Current directory is already the desired path. No need to run createSavePaths.');
-    desiredPath = currentDir;
-else
-    % Call the function to create the desired path
-    desiredPath = createSavePaths(currentDir, reqPath);
-end
-
-% save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial'); 
-save_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/pupil signal/preprint pipeline/fb for correction to reversion to mean new";
-save_pseudobaseline = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/NatCommns Revisions/Reviewer 2/pupil/pupil signal/preprint pipeline/pseudobaseline for correction to reversion to mean new";
-preproc_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected/pupil/preprocessed/peak corrected after trials"; % directory to get preprocessed data
-behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-mkdir(save_dir);
-mkdir(save_pseudobaseline);
-
-% FB-LOCKED PUPIL SIGNAL CORRECTED WITH TRIAL SPECIFIC BASELINE
-
-for s = 1:num_subs
-    % LOOP OVER SESSIONS
-    for ss = 1:num_sess(s)
-        [pupil,~,psuedobaseline] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
-    end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
-    safe_saveall(strcat(save_pseudobaseline,filesep,subj_ids{s},'.mat'),psuedobaseline) % safe save
-
-    fprintf('Participant number:... %d\n', s);
-end
-
-%% FB BASELINE-CORRECTED WITH TRIAL-SPECIFIC BASELINE
-
-% INITIALISE VARS and PATHS
-pre_duration = 29; % set duration for start of pre-event signal (note: good idea to use some pre-event signal)
-base_duration = 9; % set duration for baseline signal
-base = 1; % baseline correct signal
-regress_rt = 0; % regress RT from pupil phasic signal
-time_pupil = 1000; % time duration of the pupil 1000
-time_base = 10; % time duration of the bases
-event_name = 'feedback'; % which event 'feedback'
-pupil_cell = cell(1,num_subs); % empty cell array to store pupil signal
-base_trialspecific = 1; % get baseline signal for that trial '1'
-
-% USER-BASED PATH
-currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
-pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
-    disp('Current directory is already the desired path. No need to run createSavePaths.');
-    desiredPath = currentDir;
-else
-    % Call the function to create the desired path
-    desiredPath = createSavePaths(currentDir, reqPath);
-end
-
-save_dir = strcat(desiredPath, filesep,'NatCommns Revisions', filesep, 'Reviewer 2', filesep, 'pupil', filesep, 'pupil signal', filesep, 'only high pass filter used', filesep, 'fb full trial'); 
-% save_dir = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial'); 
-save_sliderOnset = strcat(desiredPath, filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset'); 
-% preproc_dir = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\NatCommns Revisions\Reviewer 2\pupil\preprocessing\only high pass filtering used and trials events added";
-preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed', filesep, 'peak corrected after trials'); % directory to get preprocessed data
-behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial');
+save_sliderOnset = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset');
 mkdir(save_dir);
 mkdir(save_sliderOnset);
-
-% FB-LOCKED PUPIL SIGNAL CORRECTED WITH TRIAL SPECIFIC BASELINE
+main = 1; % running analyses based on the main pipeline
 
 for s = 1:num_subs
-    % LOOP OVER SESSIONS
     for ss = 1:num_sess(s)
-        [pupil,sliderOnset] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-            preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name, ...
-            pre_duration,base_duration,base,base_trialspecific);
+        [pupil, sliderOnset] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
     end
-    safe_saveall(strcat(save_dir,filesep,subj_ids{s},'.mat'),pupil) % safe save
-    safe_saveall(strcat(save_sliderOnset,filesep,subj_ids{s},'.mat'),sliderOnset) % safe save
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+    safe_saveall(strcat(save_sliderOnset, filesep, subj_ids{s}, '.mat'), sliderOnset)
+end
+
+%% 2. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE
+
+base_trialspecific = 0;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+end
+
+%% 3. FB-LOCKED PUPIL SIGNAL - NON-BASELINE CORRECTED
+
+base = 0;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+end
+
+%% 4. PATCH-LOCKED PUPIL SIGNAL
+
+time_pupil = 300;
+time_base = 10;
+event_name = 'choice';
+base = 1;
+base_trialspecific = 0;
+main = 1;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+end
+
+%% 5. RESPONSE-LOCKED PUPIL SIGNAL
+
+time_pupil = 230;
+time_base = 10;
+event_name = 'response';
+base_trialspecific = 1;
+main = 1;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+end
+
+%% 6. BASELINE BEFORE FB
+
+time_pupil = 200;
+time_base = 10;
+event_name = 'tonic_prefb';
+base = 0;
+base_trialspecific = 1;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), nanmean(pupil, 2))
+end
+
+%% ========================================================================
+%  ALTERNATE PIPELINE PROCESSING
+%  ========================================================================
+
+% Reset parameters to defaults for alternate pipeline
+time_pupil = 1000;
+time_base = 10;
+event_name = 'feedback';
+base = 1;
+base_trialspecific = 0;
+main = 0;
+
+% ONLY DIFFERENCE: Use alternate preprocessing directory
+preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
+    filesep, 'preprocessed trials and events added');
+
+%% 7. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE (ALTERNATE PIPELINE)
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
