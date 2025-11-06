@@ -7,6 +7,7 @@ clearvars
 % INITIALISE VARS and PATHS
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
+num_subs = length(subj_ids);
 samp_rate = 100; % sampling rate in Hz after down-sampling
 pre_duration = 29; % set duration for start of pre-event signal (note: good idea to use some pre-event signal)
 base_duration = 9; % set duration for baseline signal
@@ -28,10 +29,10 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
-save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
-preproc_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep, 'peak corrected after trials'); % directory to get preprocessed data
-behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
+preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed trials and events added');
+behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_xgaze);
 mkdir(save_ygaze);
 

@@ -1,6 +1,6 @@
-function [pupil,sliderOnset] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
+function [pupil,sliderOnset,pupil_pseudobaseline] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
     preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name,pre_duration, ...
-    base_duration,base,base_trialspecific)
+    base_duration,base,base_trialspecific,main)
 % function run_PupilSignal gets event-specific pupil signal for each of the
 % specified events.
 % INPUTS:
@@ -20,6 +20,7 @@ function [pupil,sliderOnset] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
 %   base: if signal to be baseline corrected or now
 %   base_trialspecific: if trial-specific or event-specific baseline to be
 %   used
+%   main: if using preprocessed signal from the main analysis
 %
 % OUPUT:
 %   pupil: pupil signal
@@ -51,17 +52,23 @@ for j = 1:num_sess(s)
     data = [data; data_run];
 end
 
+% data.pupil_zsc = data.pupil_cleaned; % remove this if the preprociessing pipeline is not the one from Mathot
+
 trial_list = unique(data.trial); % number of trials
 trial_base = trial_list; % check this ??
 n = length(condition);
 missedtrials = ~isnan(behv_data.rt); % missed trials
 behv_data(missedtrials == 0,:) = []; % remove missed trials
+if main == 1
+    data.pupil_zsc = data.pupil_cleaned;
+end
 
 % GET EVENT-LOCKED PUPIL SIGNAL
 pupil_event = NaN(n,time_pupil); % initialise array to store pupil
+pupil_pseudobaseline = NaN(n,time_pupil); % initialise array to store pupil
 base_event = zeros(n,time_base); % initialise array to store baseline pupil
-[pupil_event,base_event,sliderOnset]= get_pupil_event(time_pupil,pupil_event,base_event,event_name, ...
-    n,data,trial_base,base_trialspecific,pre_duration,base_duration); % get pupil event
+[pupil_event,base_event,sliderOnset,pupil_pseudobaseline]= get_pupil_event(time_pupil,pupil_event,base_event,event_name, ...
+    n,data,trial_base,base_trialspecific,pre_duration,base_duration,pupil_pseudobaseline); % get pupil event
 
 % BASELINE CORRECTION
 base_event_mean = zeros(n,1); % initialise array to store mean of baseline pupil
@@ -77,6 +84,7 @@ else
     pupil = base_corrected;
 end
 pupil(missedtrials == 0,:) = []; % remove pupil response of missed trials
+pupil_pseudobaseline(missedtrials == 0,:) = []; 
 if regress_rt == 1 % regress out RT
     for c = 1:col
         pupil(:,c) = remove_rt_effects(pupil(:,c),log(behv_data.rt));
