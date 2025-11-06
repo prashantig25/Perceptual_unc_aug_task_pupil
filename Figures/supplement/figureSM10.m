@@ -25,25 +25,26 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
 xaxis = linspace(-0.3,9.7,1000);
+
 % LOOP OVER SUBJECTS
 figure("Position",[100,100,600,600],"Visible","on")
-participants = [1,26,3,35,15,11];
+participants = [1,26,31,35,15,43];
 for i = 1:length(participants)
 
-    filename = strcat(fb_dir,'\',subj_ids{participants(i)},'.mat');
+    filename = strcat(fb_dir,filesep,subj_ids{participants(i)},'.mat');
     fb = importdata(filename); 
 
     % CONCATANATE
-    trial_subj = nanmean(fb,1);
+    trial_subj = nanmean(fb(:,1:1000),1);
     hold on
     subplot(2,3,i)
     hold on
-    plot(xaxis,fb,"Color",[200,200,200]./255,'LineWidth',0.5)
+    plot(xaxis,fb(:,1:1000),"Color",[200,200,200]./255,'LineWidth',0.5)
     hold on
     plot(xaxis,trial_subj,"Color",'k','LineWidth',2)
-    xlim([-0.3,9.7])
+    xlim([-0.3,6])
     xline(0,'LineStyle','--','LineWidth',0.5)
     xlabel('Time from feedback onset (s)')
     title(strcat("Participant"," ",subj_ids{participants(i)}),'FontWeight','Normal')
@@ -51,4 +52,4 @@ end
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'fb_singleSubj.png', '-dpng', '-r600') 
+print(fig, 'fb_singleSubj_fullDuration_altPipeline1.png', '-dpng', '-r600') 

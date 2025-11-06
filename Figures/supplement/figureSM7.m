@@ -4,8 +4,8 @@
 clc
 clearvars
 
-betas_struct = importdata("pe_condiff_regressedbaseline.mat");
-perm = importdata("perm_pe_condiff_regressedbaseline.mat");
+betas_struct = importdata("pe_condiff_regressedbaseline_altPipeline1.mat");
+perm = importdata("perm_pe_condiff_regressedbaseline_altPipeline1.mat");
 x = linspace(-300,2700,300); % x-axis
 num_subjs = 47; % number of subjects
 neutral = [7, 53, 94]/255;
@@ -94,7 +94,7 @@ for a = 1:length(ncoeffs)
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
     xlim([-300,2700])
-    ylim([ylim_lower(a),ylim_upper(a)])
+    % ylim([ylim_lower(a),ylim_upper(a)])
     xline(0,'--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')
@@ -142,4 +142,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
  
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'mdl_regressedbaseline1.png', '-dpng', '-r600') 
+print(fig, 'mdl_regressedbaseline1_altPipeline1.png', '-dpng', '-r600') 

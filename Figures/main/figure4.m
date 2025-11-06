@@ -19,7 +19,7 @@ col = 300;
 
 % GET BETAS
 
-betas = importdata("pe_condiff.mat");
+betas = importdata("pe_condiff_mathot.mat");
 for s = 1:num_subs
     for c = 1:col
         coeffs.pe(s,c) = betas.with_intercept(1,5,s,c);
@@ -28,7 +28,8 @@ for s = 1:num_subs
     end
 end
 posterior = importdata("BSweightedPE_interactions.mat");
-perm = importdata("perm_pe_condiff.mat"); pe_pval = perm.mask(5,:);
+perm = importdata("perm_pe_condiff.mat"); 
+pe_pval = perm.mask(5,:);
 pecondiff_pval = perm.mask(8,:);
 
 %% INITIALIZE TILE LAYOUT
@@ -53,7 +54,8 @@ delete(ax1);
 
 % GET POSITION TO PLOT P-VALUE 
 
-ylim_axes = [-0.04,0.08];
+ylim_axes = [-0.04,0.05];
+%ylim_axes = [0,80];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
@@ -71,12 +73,12 @@ yline(0,'LineStyle','--','LineWidth',0.5);
 
 adjust_figprops(ax1_new,fontname,fontsize,linewidth_plot);
 hold on
-plot(xaxis(find(pe_pval==1)), -0.01*ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
+plot(xaxis(find(pe_pval==1)),pval_pos + -0.01*ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
-ylim(ylim_axes)
+% ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
-ylabel('Absolute PE modulated pupil','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
+ylabel('Absolute PE modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 text(mean(xaxis(pe_pval == 1)),pval_pos + -0.01,"\itp\rm < 0.001","FontName",fontname,"FontSize", ...
     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
@@ -87,7 +89,8 @@ text(mean(xaxis(pe_pval == 1)),pval_pos + -0.01,"\itp\rm < 0.001","FontName",fon
 new_pos = change_position(ax2,[0.015,0,0.002,0]);
 ax2_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax2);
-ylim_axes = [-0.01,0.025];
+ylim_axes = [-0.01,0.023];
+% ylim_axes = [-15,35];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
@@ -105,12 +108,13 @@ xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 adjust_figprops(ax2_new,fontname,fontsize,linewidth_plot);
 hold on
-plot(xaxis(find(pecondiff_pval==1)), -0.003*ones(1,length(pecondiff_pval(pecondiff_pval == 1))), '.', 'color', ...
+plot(xaxis(find(pecondiff_pval==1)), pval_pos + -0.003*ones(1,length(pecondiff_pval(pecondiff_pval == 1))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
-ylim(ylim_axes)
+% ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
-ylabel('BS-weighted-PE','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
+% ylabel('BS-weighted-PE (\beta_2)','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
+ylabel('BS-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.02","FontName",fontname,"FontSize", ...
     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
@@ -138,7 +142,7 @@ set(gca,'Color','none','FontName','Arial','FontSize',8)
 xline(0,'--','LineWidth',0.5)
 yline(0,'--','LineWidth',0.5)
 xlim([-300,2700])
-ylim([-0.03,0.09])
+% ylim([-0.03,0.09])
 xlabel('Time from feedback onset (ms)')
 ylabel('Posterior pupil dilation (a.u.)')
 hold on
@@ -167,4 +171,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'regression_pupil7.png', '-dpng', '-r600') 
+print(fig, 'regression_pupil8.png', '-dpng', '-r600') 

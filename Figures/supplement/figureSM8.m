@@ -3,8 +3,8 @@
 clc
 clearvars
 
-betas_struct = importdata("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\pupil\regression\main\pe_condiff_regressedRT.mat");
-perm = importdata("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\pupil\regression\main\perm_pe_condiff_regressedRT.mat");
+betas_struct = importdata("pe_condiff_regressedRT.mat"); %importdata("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\pupil\regression\main\pe_condiff_regressedRT.mat");
+perm = importdata("perm_pe_condiff_regressedRT.mat"); % importdata("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\pupil\regression\main\perm_pe_condiff_regressedRT.mat");
 x = linspace(-300,2700,300); % x-axis
 num_subjs = 47; % number of subjects
 neutral = [7, 53, 94]/255;
@@ -91,7 +91,7 @@ for a = 1:length(ncoeffs)
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
     xlim([-300,2700])
-    ylim([ylim_lower(a),ylim_upper(a)])
+    % ylim([ylim_lower(a),ylim_upper(a)])
     xline(0,'--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')
@@ -135,4 +135,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'mdl_regressedRT1.png', '-dpng', '-r600') 
+print(fig, 'mdl_regressedRT1_altPipeline1.png', '-dpng', '-r600') 

@@ -18,10 +18,10 @@ headlength_arrow = 5; % headlength for arrows
 
 % VARS FOR LRs PLOT
 
-colors_pu_all = [low_PU; mid_PU; high_PU]; % colors for low and high perceptual uncertainty data
+colors_pu_all = [low_PU; high_PU; gray_arrow(1,1:3); gray_arrow(1,1:3)]; % colors for low and high perceptual uncertainty data
 pe_vals = linspace(-1,1,10); % prediction error range
-neg_up = [-0.5,-0.325,-0.15]; % negative updates
-pos_up = [0.5,0.325,0.15]; % positive updates
+neg_up = [-0.5,-0.15,-0.325,-0.325]; % negative updates
+pos_up = [0.5,0.15,0.325,0.325]; % positive updates
 
 condiffbin = importdata("condiff_pebin2.mat"); % pupil regression
 num_subjs = 47; % number of subjects
@@ -50,7 +50,7 @@ ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arr
 ar1.X = [0.7 0.7];
 ar1.Y = [0.49,0.3];
 
-sgtitle('H1:Pupil-linked arousal encodes uncertainty-weighted prediction errors','FontName','Arial','FontSize',9)
+% sgtitle('H1:Pupil-linked arousal encodes uncertainty-weighted prediction errors','FontName','Arial','FontSize',9)
 
 %% PLOT LEARNING RATES
 
@@ -68,11 +68,26 @@ hold on
 plot(pe_vals,repelem(0,1,10),'LineStyle','--','Color','k','LineWidth',0.5)
 hold on
 plot(pe_vals,pe_vals,'LineStyle','--','Color','k','LineWidth',0.5)
-for i = [1,3]
-    hold on
-    plot(pe_vals,linspace(neg_up(i),pos_up(i),10),'LineStyle','-','Color', ...
-        colors_pu_all(i,:),'LineWidth',linewidth_line)
-end
+hold on
+plot(pe_vals,pe_vals,'LineStyle','none','Color','k','LineWidth',0.5)
+% for i = [1:3]
+%     hold on
+%     plot(pe_vals,linspace(neg_up(i),pos_up(i),10),'LineStyle','-','Color', ...
+%         colors_pu_all(i,:),'LineWidth',linewidth_line)
+% end
+
+hold on
+plot(pe_vals,linspace(neg_up(1),pos_up(1),10),'LineStyle','-','Color', ...
+    colors_pu_all(1,:),'LineWidth',linewidth_line)
+hold on
+plot(pe_vals,linspace(neg_up(2),pos_up(2),10),'LineStyle','-','Color', ...
+    colors_pu_all(2,:),'LineWidth',linewidth_line)
+hold on
+plot(pe_vals,linspace(neg_up(3),pos_up(3),10),'LineStyle','none','Color', ...
+    colors_pu_all(3,:),'LineWidth',linewidth_line)
+hold on
+plot(pe_vals,linspace(neg_up(4),pos_up(4),10),'LineStyle','-','Color', ...
+    colors_pu_all(4,:),'LineWidth',linewidth_line)
 
 % ADJUST FIGURE PROPERTIES
 
@@ -81,9 +96,33 @@ ylim_vals = [-1 1];
 adjust_figprops(ax3_new,font_name,font_size,line_width,xlim_vals,ylim_vals)
 ylabel('Update')
 xlabel({'Prediction error (PE)'})
-l1 = legend('','','Low state uncertainty','Medium state uncertainty','','Location','best','Color','none', ...
-    'EdgeColor','none','AutoUpdate','off','FontSize',7);
+% l1 = legend('','','Low state uncertainty','Classic RL account','','Location','best','Color','none', ...
+%     'EdgeColor','none','AutoUpdate','off','FontSize',7);
+% l1.ItemTokenSize = [7, 7];
+
+% Create legend with a header for uncertainty-aware account
+l1 = legend( ...
+    '', ...  % dummy for header
+    '',...
+    'u',...
+    'Low state uncertainty trials', ...
+    'High state uncertainty trials', ...
+    'u',...
+    'All trials', ...
+    'Location','best', ...
+    'Color','none', ...
+    'EdgeColor','none', ...
+    'AutoUpdate','off', ...
+    'FontSize',7);
+
+% Reduce marker size in legend
 l1.ItemTokenSize = [7, 7];
+box off
+
+% Now set the header text manually
+l1.String{1} = '\bfUncertainty-weighted RL account'; % bold header
+l1.String{4} = '\bfClassic RL account'; % bold header
+
 box off
 
 % ADD ROTATED TEXT BOXES
@@ -134,9 +173,9 @@ plot(xaxis,midPU_pupil,'LineWidth',2,'Color',gray_arrow)
 hold on
 plot(xaxis,lowPU_pupil,'LineWidth',2,'Color',high_PU)
 
-l1 = legend('','PE Signal','','Location','best','Color','none', ...
-    'EdgeColor','none','AutoUpdate','off','FontSize',7);
-l1.ItemTokenSize = [7, 7];
+% l1 = legend('','PE Signal','','Location','best','Color','none', ...
+%     'EdgeColor','none','AutoUpdate','off','FontSize',7);
+% l1.ItemTokenSize = [7, 7];
 
 hold on
 box off
@@ -145,7 +184,8 @@ ylabel('Arousal')
 xlim([-300,2700])
 ylim([-0.005,0.4])
 xticks([]); % Remove x-axis ticks
-title('Uncertainty-weighted PE','FontWeight','normal')
+yticks([]); % Remove x-axis ticks
+title('PE Encoding in Arousal Signal','FontWeight','normal')
 adjust_figprops(ax2_new,font_name,font_size,0.5);
 hold on
 
@@ -184,4 +224,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'hypothesis5.png', '-dpng', '-r600') 
+print(fig, 'hypothesis7.png', '-dpng', '-r600') 

@@ -38,8 +38,11 @@ num_vars = 5; % number of variables
 weight_y_n = 0; % weighted regression
 save_csv = 1; % save stats for 1(d) in CSV file for overleaf
 
-descriptive_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\descriptive";
-regression_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\LR analyses";
+% descriptive_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\descriptive";
+% regression_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\LR analyses";
+
+descriptive_path = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected/behavior/descriptive";
+regression_path = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected/behavior/LR analyses"; 
 
 % load all required data
 mix_curve = importdata(fullfile(descriptive_path,"mix_curve.mat")); % learning curves
@@ -260,6 +263,7 @@ bin_edges = prctile(binned_data, 0:10:100); % calculate percentile edges
 bins = discretize(binned_data, bin_edges); % bin contrast differences 
 data_subjs.lr = data_subjs.up./data_subjs.pe; % learning rates
 data_subjs.abs_lr = abs(data_subjs.lr); % absolute learning rates
+data_subjs.abs_up = abs(data_subjs.up); % absolute updates
 
 % GET RID OF TRIALS WHERE PE = 0 AND OUTLIER LRs
 run_id = data_subjs.id(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
@@ -295,9 +299,9 @@ xlabel("Contrast difference bins" + newline + "(1 bin = 0.01)")
 ylabel('Mean learning rate (LR)')
 
 % ADJUST FIGURE PROPERTIES
-xlim_vals = [0 10.3];
-ylim_vals = [-0.01 0.17];
-adjust_figprops(ax10_new,font_name,font_size,line_width,xlim_vals,ylim_vals);
+% xlim_vals = [0 10.3];
+% ylim_vals = [-0.01 0.17];
+% adjust_figprops(ax10_new,font_name,font_size,line_width,xlim_vals,ylim_vals);
 [rho,pval] = corr(avg_ydata,avg_binneddata, 'rows', 'pairwise');
 title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + "\itp\rm < 0.001", ...
     'FontWeight','normal','Interpreter','tex')
@@ -428,6 +432,18 @@ for n = 1:num_pngs
     pos_x = pos_x + adjust_x;
 end
 
+patch_dim = 0.03;
+pos_y = 0.488 + 0.03; pos_x = 0.354-0.006;
+image_png = {'lowcon_02.png','highcon.png'};
+num_pngs = 2;
+adjust_x = 0.0275;
+for n = 1:num_pngs
+    axes('pos',[pos_x pos_y patch_dim patch_dim]);
+    imshow(image_png{n});
+    hold on
+    pos_x = pos_x + adjust_x;
+end
+
 patch_dim = 0.02;
 pos_y = [0.68,0.615]-0.003; pos_x = [0.221,0.297]-0.001;
 num_pngs = 2;
@@ -508,4 +524,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'task_behavior9.png', '-dpng', '-r600') 
+print(fig, 'task_behavior_ReviewerResponse.png', '-dpng', '-r600') 

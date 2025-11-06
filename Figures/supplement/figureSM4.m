@@ -82,7 +82,7 @@ for a = 1:length(ncoeffs)
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
     xlim([-300,2700])
-    ylim([ylim_lower(a),ylim_upper(a)])
+    % ylim([ylim_lower(a),ylim_upper(a)])
     xline(0,'--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')
@@ -93,7 +93,7 @@ end
 
 ax1_pos = axes_new(a).Position;
 adjust_x = -0.06; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.115; % adjusted y-position for subplot label
+adjust_y = ax1_pos(4)+0.06; % adjusted y-position for subplot label
 [label_x,label_y] = change_plotlabel(axes_new(1),adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
@@ -118,4 +118,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'reg_full2.png', '-dpng', '-r600') 
+print(fig, 'reg_full2_altPipeline1.png', '-dpng', '-r600') 

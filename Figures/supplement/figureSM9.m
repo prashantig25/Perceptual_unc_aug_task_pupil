@@ -118,4 +118,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
  
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'patch_regression.png', '-dpng', '-r600') 
+print(fig, 'patch_regression_altPipeline1.png', '-dpng', '-r600') 

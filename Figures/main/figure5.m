@@ -48,7 +48,7 @@ coeffs = nanmean(data_plot,2);
 [avg,sd,coeffs] = prepare_betas(coeffs,1,num_subjs);
 h = bar_plots_pval(coeffs,avg,sd,num_subjs, ...
         1,1,{'','Example participant','Normative agent'}, ...
-        xticks,{'','',''},"\itp\rm < 0.001",'','Posterior update',0,1, ...
+        xticks,{'','',''},"\itp\rm < 0.001",'','Posterior update ({\bf\beta_1})',0,1, ...
         10,1,font_size,linewidth_plot,font_name,0,colors_name,{'*'},0.1);
 h.BarWidth = 0.4;
 ylim_vals = [0 0.85];
@@ -90,8 +90,8 @@ plot(xaxis(find(perm.mask(3,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(3
 xlim([-300,2700])
 ylim([-0.02,0.07])
 xlabel('Time since feedback onset (ms)')
-ylabel('Pupil dilation','FontWeight','normal','FontName',font_name,'FontSize',font_size)
-text(mean(xaxis(perm.mask(3,:) == 1)),pval_pos + -0.003,"\itp\rm = 0.008","FontName",font_name,"FontSize", ...
+ylabel('Pupil dilation ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
+text(mean(xaxis(perm.mask(3,:) == 1)),pval_pos + -0.003,"\itp\rm = 0.01","FontName",font_name,"FontSize", ...
     font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 %% ADD SUBPLOT LABELS
@@ -111,4 +111,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'residuals_pupil6.png', '-dpng', '-r600') 
+print(fig, 'residuals_pupil7_altPipeline1.png', '-dpng', '-r600') 

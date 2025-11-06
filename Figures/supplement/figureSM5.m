@@ -92,7 +92,7 @@ shadedErrorBar(xaxis,nanmean(smoothdata(posterior.higharousal_lowcondiff,2,"movm
 shadedErrorBar(xaxis,nanmean(smoothdata(posterior.higharousal_highcondiff,2,"movmean")),nanstd(smoothdata(posterior.higharousal_highcondiff,2,"movmean"))./sqrt(num_subjs),{'LineWidth',2,"Color",low_PU},1)
 
 % ADJUST FIGURE PROPERTIES
-l = legend('','','High arousal-high uncertainty','High arousal-low uncertainty','','','','Low arousal-high uncertainty','','','','Low arousal-low uncertainty','Location','best','EdgeColor', ...
+l = legend('','','High arousal-high uncertainty','High arousal-low uncertainty','','Low arousal-high uncertainty','','Low arousal-low uncertainty','','','','','','Location','best','EdgeColor', ...
     'none','AutoUpdate','off','Color','none','FontName',font_name,'FontSize',font_size);
 l.ItemTokenSize = [20, 20];
 xlabel('Time since feedback onset (ms)')
@@ -100,7 +100,7 @@ ylabel('Model predicted absolute UP')
 adjust_figprops(ax4_new,font_name,font_size,linewidth_plot);
 hold on
 xlim([-300,2700])
-ylim([-0.02,0.12])
+% ylim([-0.02,0.12])
 %% PLOT COEFFICIENTS
 
 % POSITION CHANGE
@@ -199,4 +199,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'absresiduals_full2.png', '-dpng', '-r600') 
+print(fig, 'absresiduals_full2_altPipeline1.png', '-dpng', '-r600') 
