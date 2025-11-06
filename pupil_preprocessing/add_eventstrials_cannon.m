@@ -1,30 +1,15 @@
-% add_eventstrials add trial number and event name to each time point of
-% the preprocessed pupil signal.
+clc
+clearvars
 
 % INITIALISE VARS and PATHS
-% subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
-%     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
-%     '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
-%     '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
-%     '3319','129','4684','3886','620','901','900'}; % subject IDs
+subj_ids = {'ec_00001'}; % subject IDs
 num_subs = length(subj_ids); % number of subjects
 % num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
+num_sess = [1]; % number of sessions
 
-% USER-BASED PATH
-currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
-pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
-    disp('Current directory is already the desired path. No need to run createSavePaths.');
-    desiredPath = currentDir;
-else
-    % Call the function to create the desired path
-    desiredPath = createSavePaths(currentDir, reqPath);
-end
+preproc_dir = '/home/rasmus/Dropbox/Anträge/Hamburg/pupil/preprocessed'; % directory to get preprocessed data
 
-save_dirASC = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep,'asc2dat_converted');
-behv_dir = strcat(desiredPath,filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
-mkdir(save_dir);
+behv_dir = 'C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\pupil_data\pre_preprocessed\behv\with_missed_trials'; % directory to get behavioral data
 prev_num_trials = 0; % number of trials from previous blocks 
 num_trials_sess = 0; % number of trials for participants with multiple sessions
 
@@ -36,10 +21,12 @@ for s = 1:num_subs
         if strcmp(subj_ids(s),'4672') == 1 % only for subj 4672 
             filename_asc = strcat(subj_ids{s},'_','m',num2str(ss),'_red.asc');
         else
-            filename_asc = strcat(subj_ids{s},'m',num2str(ss),'.asc'); 
+            % filename_asc = strcat(subj_ids{s},'m',num2str(ss),'.asc'); 
+            filename_asc = strcat(subj_ids{s},'.asc'); 
+
         end
-        filename_ascMAT = strcat(save_dirASC, filesep, subj_ids{s},'_DAT',num2str(ss),'.mat'); 
-        data_asc = importdata(filename_ascMAT);
+        [asc] = read_eyelink_ascNK_AU(filename_asc); % read ASC file
+        data_asc = asc2dat(asc); % convert asc to dat file
         events = data_asc.event; % get events information from the DAT file
 
         % GET EVENT NAMES AND THEIR TIMESTAMPS
@@ -59,8 +46,9 @@ for s = 1:num_subs
         
         % ADD ALL THE EVENTS RELEVANT FOR THE TASK (task_events should all 
         % relevant events for that particular task version don't forget to update it)
-        task_events = ["trial_start","patches_start","instructed_delay_start",...
-            "response_start","delay_start","feedback_start","delay1_start","slider_start"];       
+        % task_events = ["trial_start","patches_start","instructed_delay_start",...
+        %    "response_start","delay_start","feedback_start","delay1_start","slider_start"];       
+        task_events = ["1", "2", "3", "4", "5", "6", "7", "59", "50", "51", "90", "91"];       
         event_per_trial = length(task_events); % number of events in a trial
 
         % REMOVE ALL EVENT NAMES THAT DON'T MATCH THE ONES THAT ARE
@@ -78,16 +66,16 @@ for s = 1:num_subs
         events = events(not_event == 1,:); % only retain events which are part of task_events
 
         % GET BEHAVIOURAL DATA FOR THE PARTICIPANT
-        filename_behv = strcat(subj_ids{s},'_','main',num2str(ss),'.xlsx');
-        behv_data = readtable(strcat(behv_dir,filesep,filename_behv)); % import from participant's behavioural file
-        condition = behv_data.condition; % task conditions
-        num_trial = length(condition); % number of trials in one run of the main task
+        % filename_behv = strcat(subj_ids{s},'_','main',num2str(ss),'.xlsx');
+        % behv_data = readtable(strcat(behv_dir,'\',filename_behv)); % import from participant's behavioural file
+        % condition = behv_data.condition; % task conditions
+        % num_trial = length(condition); % number of trials in one run of the main task
+        num_trial = 50; % todo: read out from behavioral file
 
-        % GET PUPIL DATA FROM DIFFERENT SESSIONS
-        data = [];
-        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'_preprocessed.xlsx');
-        data_run = readtable(filename);
-        [data] = events_trialnums(data_run,events,event_per_trial,num_trial);
+        % GET PREPROCESSED DATA
+        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'.xlsx');
+        data = readtable(filename);
+        [data] = events_trialnums(data,events,event_per_trial,num_trial);
 
         % ADJUST TRIAL NUMBERS FOR PARTICIPANTS WITH MULTIPLE RECORDING
         % SESSIONS
@@ -98,10 +86,11 @@ for s = 1:num_subs
             data.trial = data.trial_num + prev_num_trials;
         end
         num_trials_sess = data.trial_num(end); % number of trials in previous block
-        
-        % SAVE FILE
-        filename = strcat(save_dir,filesep,subj_ids{s},'_main',num2str(ss),'.xlsx');
-        safe_saveall(filename,data);
-        prev_num_trials = 0;
+
     end
+
+    % SAVE FILE
+    filename = strcat(subj_ids{s},'_main',num2str(ss),'.xlsx');
+    writetable(data,filename);
+    prev_num_trials = 0;
 end
