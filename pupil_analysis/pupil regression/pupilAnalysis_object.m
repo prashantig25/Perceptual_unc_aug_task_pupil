@@ -44,9 +44,14 @@ PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, sa
 
 % Set model parameters
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars = {'condition','reward','ecoperf'};
-PupilRegression.setModel(model_def, pred_vars, cat_vars, 7);
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
 
 % Set analysis parameters
 PupilRegression.timewindow = 'feedback';
@@ -67,6 +72,90 @@ PupilRegression.setFileNames('pe_condiff', 'perm_pe_condiff', 'pe_condiff_residu
 [betas, perm, residuals, predicted] = PupilRegression.runAnalysis();
 PupilRegression.saveResults();
 
+%% RUN MULTIPLE MODEL VERSIONS FOR PUPIL REGRESSION
+% Assumes subj_ids, num_sess, desiredPath, behv_dir, xgaze_dir, ygaze_dir,
+% base_dir, and preds_all exist in the workspace.
+
+fprintf('\n=== Running Multiple Model Versions ===\n');
+
+% -------------------------------------------------------------------------
+% Define model versions
+% -------------------------------------------------------------------------
+model_defs = { ...
+    'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt',...
+    'pupil ~ xgaze + ygaze + pe + zsc_up + rt + zsc_condiff', ...                   % Version 2
+    'pupil ~ xgaze + ygaze + pe:zsc_condiff + rt + zsc_up', ...
+    'pupil ~ xgaze + ygaze + pe + rt + zsc_up',...
+    'pupil ~ xgaze + ygaze + zsc_condiff + rt + zsc_up',...
+    'pupil ~ xgaze + ygaze + rt + zsc_up',...
+    'pupil ~ xgaze + ygaze'};                                % Version 3
+
+model_names = { ...
+    'pe_condiff_noCondiff','no_interaction_fit', ...
+    'interaction_only','onlyPE','onlyCondiff','onlyControl','onlyGaze'};
+
+% -------------------------------------------------------------------------
+% Set shared paths
+% -------------------------------------------------------------------------
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb');
+save_root = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression');
+
+% Shared predictors and categorical variables
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars  = {'condition','reward','ecoperf'};
+
+vars = [6,6,5,5,5,4,2];
+
+% -------------------------------------------------------------------------
+% Loop through models
+% -------------------------------------------------------------------------
+for i = 1%:length(model_defs)
+
+    fprintf('\n=== Running Model Version %d: %s ===\n', i, model_names{i});
+
+    % Create a new regression object per model
+    PR = PupilRegression();
+    PR.setSubjects(subj_ids, num_sess);
+    
+    % Set paths (unique save dir per model to avoid overwriting)
+    save_dir = fullfile(save_root, model_names{i});
+    if ~exist(save_dir,'dir'); mkdir(save_dir); end
+    PR.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+    % Set model
+    PR.setModel(model_defs{i}, pred_vars, cat_vars, 7);
+
+    % Analysis settings (same as your original script)
+    PR.timewindow          = 'feedback';
+    PR.col                 = 300;
+    PR.regress_rt          = 0;
+    PR.baseline_mdl        = 0;
+    PR.binned              = 0;
+    PR.binned_accuracy     = 0;
+    PR.two_tailed          = 0;
+    PR.bins_array          = 1;
+    PR.preds_all           = preds_all;
+    PR.residuals_predicted = 1;
+    PR.num_vars = vars(i);
+
+    % Set output filenames using the human-readable model name as suffix
+    name_suffix = model_names{i};
+    PR.setFileNames( ...
+        sprintf('pe_condiff_%s', name_suffix), ...
+        sprintf('perm_pe_condiff_%s', name_suffix), ...
+        sprintf('pe_condiff_residuals_%s', name_suffix), ...
+        sprintf('pe_condiff_predicted_%s', name_suffix));
+
+    % Run and save
+    [betas, perm, residuals, predicted] = PR.runAnalysis();
+    PR.saveResults();
+
+    fprintf('--- Model %d (%s) Completed and Saved in %s ---\n', i, model_names{i}, save_dir);
+end
+
+fprintf('\n=== ALL MODEL VERSIONS COMPLETE ===\n');
+
+
 %% ANALYSIS 2: BINNED REGRESSION APPROACH (Figure 3c)
 fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) ===\n');
 
@@ -81,9 +170,14 @@ PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, sa
 
 % Set model parameters
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars = {'condition','reward','ecoperf'};
-PupilRegression.setModel(model_def, pred_vars, cat_vars, 5);
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
 
 % Set analysis parameters
 PupilRegression.timewindow = 'feedback';
@@ -119,9 +213,14 @@ PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, sa
 
 % Set model parameters
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + zsc_condiff + pe:zsc_condiff + rt';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars = {'condition','reward','ecoperf'};
-PupilRegression.setModel(model_def, pred_vars, cat_vars, 7);
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
 
 % Set analysis parameters
 PupilRegression.timewindow = 'feedback';
@@ -158,9 +257,14 @@ PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, sa
 
 % Set model parameters
 model_def = 'pupil ~ xgaze + ygaze + condition + zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf','condition'};
 cat_vars = {'condition','reward','ecoperf'};
-PupilRegression.setModel(model_def, pred_vars, cat_vars, 4);
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
 
 % Set analysis parameters
 PupilRegression.timewindow = 'patch';
@@ -199,9 +303,14 @@ PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, sa
 
 % Set model parameters
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars = {'condition','reward','ecoperf'};
-PupilRegression.setModel(model_def, pred_vars, cat_vars, 7);
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
 
 % Set analysis parameters
 PupilRegression.timewindow = 'feedback';
@@ -242,9 +351,14 @@ PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, sa
 
 % Set model parameters
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt + zsc_condiff + pe:zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars = {'condition','reward','ecoperf'};
-PupilRegression.setModel(model_def, pred_vars, cat_vars, 7);
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
 
 % Set analysis parameters
 PupilRegression.timewindow = 'feedback';

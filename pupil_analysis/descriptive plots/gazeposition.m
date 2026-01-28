@@ -29,8 +29,8 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze'); 
-save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze'); 
+save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze cleaned'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze cleaned'); 
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed trials and events added');
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_xgaze);
@@ -78,7 +78,9 @@ for s = 1:num_subs
         xgaze_event = NaN(n,time_pupil); % initialise array to store pupil
         ygaze_event = zeros(n,time_base); % initialise array to store baseline pupil
         [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
-            event_name,n,data,trial_list,pre_duration);        
+            event_name,n,data,trial_list,pre_duration);      
+        xgaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
+        ygaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
     end
 
     % SAVE

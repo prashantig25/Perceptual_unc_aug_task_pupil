@@ -8,6 +8,11 @@ classdef PupilRegression < pupilReg_Vars
         perm_results     % Permutation test results
         residuals_all    % Model residuals for all subjects
         predicted_all    % Model-predicted pupil responses for all subjects
+        aic_values
+        bic_values
+        logL_values
+        rsquaredOrdinary
+        rsquaredAdjusted
     end
     
     methods
@@ -72,7 +77,7 @@ classdef PupilRegression < pupilReg_Vars
             
             % Loop over subjects and process each individually
             for i = 1:obj.num_subs
-                [residuals_subj, predicted_subj] = obj.processSubject(i);
+                [residuals_subj, predicted_subj] = obj.processSubject(i,obj.binned);
                 obj.residuals_all{i, 1} = residuals_subj;
                 obj.predicted_all{i, 1} = predicted_subj;
             end
@@ -87,7 +92,7 @@ classdef PupilRegression < pupilReg_Vars
             predicted_all = obj.predicted_all;
         end
         
-        function [residuals_subj, predicted_subj] = processSubject(obj, subj_idx)
+        function [residuals_subj, predicted_subj] = processSubject(obj, subj_idx, binnedAnalysis)
             % Process a single subject through the complete analysis pipeline
             % Loads data, handles missing trials, applies preprocessing, and fits models
             %
@@ -97,10 +102,6 @@ classdef PupilRegression < pupilReg_Vars
             % Returns:
             %   residuals_subj - Model residuals for this subject
             %   predicted_subj - Model predictions for this subject
-            
-            % Initialize output variables
-            residuals_subj = [];
-            predicted_subj = [];
             
             fprintf('Reading in %s ...\n', obj.subj_ids{subj_idx});
             
@@ -119,11 +120,11 @@ classdef PupilRegression < pupilReg_Vars
             end
             
             % Load baseline pupil data if needed for model
-            zsc_base = obj.loadBaselineData(subj_idx, missedtrials_slider);
+            zsc_base = obj.loadBaselineData(subj_idx);
             
             % Extract behavioral predictors and align with pupil data
             [preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base] = ...
-                obj.getBehavioralPredictors(subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base);
+                obj.getBehavioralPredictors(subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, missedtrials_slider);
             
             % Apply binning to continuous variables if requested
             if obj.binned == 1
@@ -131,7 +132,7 @@ classdef PupilRegression < pupilReg_Vars
             end
             
             % Process data through bins and timepoints to fit regression models
-            [residuals_subj, predicted_subj] = obj.processBinsAndTimepoints(preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx);
+            [residuals_subj, predicted_subj] = obj.processBinsAndTimepoints(preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis);
         end
         
         function behv_data = loadBehavioralData(obj, subj_idx)
@@ -236,8 +237,10 @@ classdef PupilRegression < pupilReg_Vars
             
             % Remove trials with missing behavioral responses
             zsc_pupil(missedtrials_slider == 1, :) = [];
-            xgaze_signal(missedtrials, :) = [];
-            ygaze_signal(missedtrials, :) = [];
+            xgaze_signal(missedtrials_slider == 1, :) = [];
+            ygaze_signal(missedtrials_slider == 1, :) = [];
+            % xgaze_signal(missedtrials, :) = [];
+            % ygaze_signal(missedtrials, :) = [];
         end
         
         function zsc_pupil = regressRTEffects(obj, zsc_pupil, behv_data)
@@ -257,7 +260,7 @@ classdef PupilRegression < pupilReg_Vars
             end
         end
         
-        function zsc_base = loadBaselineData(obj, subj_idx, missedtrials_slider)
+        function zsc_base = loadBaselineData(obj, subj_idx)
             % Load baseline pupil measurements if required by the model
             % Baseline data is used as a covariate to control for individual differences
             %
@@ -277,7 +280,7 @@ classdef PupilRegression < pupilReg_Vars
             end
         end
         
-        function [preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base] = getBehavioralPredictors(obj, subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base)
+        function [preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base] = getBehavioralPredictors(obj, subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, missedtrials_slider)
             % Extract behavioral predictors and align with physiological data
             % Removes trials with invalid prediction errors and aligns data matrices
             %
@@ -303,7 +306,8 @@ classdef PupilRegression < pupilReg_Vars
             preds = obj.preds_all(obj.preds_all.id == str2double(obj.subj_ids{subj_idx}), :);
             
             % Remove trials with missing slider responses
-            preds(isnan(preds.slider), :) = [];
+            % preds(isnan(preds.slider), :) = [];
+            % preds(missedtrials_slider == 1, :) = [];
             
             % Remove trials with zero prediction error (invalid trials)
             validIndices = find(preds.pe == 0);
@@ -317,9 +321,28 @@ classdef PupilRegression < pupilReg_Vars
             if obj.baseline_mdl == 1
                 zsc_base(validIndices, :) = [];
             end
+
+            % List all variables you want to check
+            vars_to_check = {preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data};
+
+            % Add baseline if it exists
+            if obj.baseline_mdl == 1
+                vars_to_check{end+1} = zsc_base;
+            end
+
+            % Get the row count of the first variable to use as a reference
+            ref_rows = size(vars_to_check{1}, 1);
+
+            % Check all others against the reference
+            for i = 2:numel(vars_to_check)
+                assert(size(vars_to_check{i}, 1) == ref_rows, ...
+                    ['Dimension mismatch: Variable at index ', num2str(i), ' has different row count!']);
+            end
+
+            fprintf('Success: All %d variables have %d rows.\n', numel(vars_to_check), ref_rows);
         end
         
-        function [residuals_subj, predicted_subj] = processBinsAndTimepoints(obj, preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx)
+        function [residuals_subj, predicted_subj] = processBinsAndTimepoints(obj, preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis)
             % Process data through bins and timepoints to fit regression models
             % Handles binned analysis and fits models at each timepoint
             %
@@ -344,12 +367,19 @@ classdef PupilRegression < pupilReg_Vars
                 fprintf('Fitting model...\n');
                 
                 % Get data for current bin
-                [pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, behv_data_bins, preds_bins] = ...
-                    obj.getBinnedData(r, preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data);
+                if binnedAnalysis == 1
+                    [pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins] = ...
+                        obj.getBinnedData(r, preds, zsc_pupil, xgaze_signal, ygaze_signal);
+                else
+                    pupil_signal_bins = zsc_pupil;
+                    xgaze_signal_bins = xgaze_signal;
+                    ygaze_signal_bins = ygaze_signal;
+                    preds_bins = preds;
+                end
                 
                 % Fit model at each timepoint
                 for c = 1:obj.col
-                    [betas, residuals, predicted] = obj.fitModelAtTimepoint(c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, behv_data_bins, preds_bins, zsc_base, r, subj_idx);
+                    [betas, residuals, predicted] = obj.fitModelAtTimepoint(c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx);
                     
                     % Store residuals and predictions if requested
                     if obj.residuals_predicted == 1
@@ -362,7 +392,7 @@ classdef PupilRegression < pupilReg_Vars
             end
         end
         
-        function [pupil_bins, xgaze_bins, ygaze_bins, behv_bins, preds_bins] = getBinnedData(obj, r, preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data)
+        function [pupil_bins, xgaze_bins, ygaze_bins, preds_bins] = getBinnedData(obj, r, preds, zsc_pupil, xgaze_signal, ygaze_signal)
             % Extract data for a specific bin or condition
             % Supports binning by continuous variables or accuracy-based splitting
             %
@@ -397,11 +427,10 @@ classdef PupilRegression < pupilReg_Vars
             pupil_bins = zsc_pupil(idx, :);
             xgaze_bins = xgaze_signal(idx, :);
             ygaze_bins = ygaze_signal(idx, :);
-            behv_bins = behv_data(idx, :);
             preds_bins = preds(idx, :);
         end
         
-        function [betas, residuals, predicted] = fitModelAtTimepoint(obj, c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, behv_data_bins, preds_bins, zsc_base, r, subj_idx)
+        function [betas, residuals, predicted] = fitModelAtTimepoint(obj, c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx)
             % Fit regression model at a specific timepoint
             % Creates predictor matrix and fits linear model to pupil data
             %
@@ -425,6 +454,9 @@ classdef PupilRegression < pupilReg_Vars
             betas = [];
             residuals = [];
             predicted = [];
+            % Initialize NEW output variables
+            aic = nan;
+            bic = nan;
             
             % Extract dependent variable (pupil diameter at timepoint c)
             y = pupil_signal_bins(:, c);
@@ -435,9 +467,6 @@ classdef PupilRegression < pupilReg_Vars
             
             % Remove trials with NaN values
             validIdx = ~isnan(y) & ~isnan(preds_bins.up);
-            if sum(validIdx) <= obj.num_vars + 1
-                return; % Skip if insufficient valid trials
-            end
             
             % Extract valid data
             yValid = y(validIdx);
@@ -461,7 +490,43 @@ classdef PupilRegression < pupilReg_Vars
             % Fit linear regression model
             [betas, ~, residuals, ~, lm] = linear_fit(tbl, obj.model_def, ...
                 obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0, 0, 0, 0);
-            
+
+        % --- NEW (Manual AIC/BIC) ---
+            if ~isempty(lm)
+                % 1. Get Log-Likelihood and N (Number of Observations)
+                % Check if lm is a LinearModel object (as implied by the error)
+                if isa(lm, 'LinearModel')
+                    negLL = -lm.LogLikelihood;
+                    N = lm.NumObservations;
+                    
+                    % 2. Get k (Number of Free Parameters)
+                    % k = number of coefficients + 1 (for the variance/sigma parameter)
+                    k = lm.NumCoefficients + 1; 
+
+                    % 3. Calculate AIC and BIC
+                    aic = 2*k + 2*negLL;
+                    bic = k*log(N) + 2*negLL;
+
+                    residuals = lm.Residuals.Raw;
+                    sigma2 = var(residuals);
+                    n = lm.NumObservations;
+                    logL = -0.5*n*(log(2*pi*sigma2) + 1);
+                else
+                    warning('lm object is not a LinearModel. Cannot calculate AIC/BIC.');
+                end
+                % 4. Store results in class properties
+                % Determine the bin index (r) for storage
+                if obj.binned_accuracy == 1
+                    storage_r_idx = r + 1; % Assumes r is 0 or 1
+                else
+                    storage_r_idx = r;
+                end
+                
+                % Store the results
+                obj.aic_values(storage_r_idx, subj_idx, c) = aic;
+                obj.bic_values(storage_r_idx, subj_idx, c) = bic;
+                obj.logL_values(storage_r_idx, subj_idx, c) = logL;
+            end
             % Generate model predictions
             predicted = predict(lm, tbl);
             
@@ -471,6 +536,9 @@ classdef PupilRegression < pupilReg_Vars
             else
                 obj.betas_struct.with_intercept(r, :, subj_idx, c) = betas;
             end
+
+            obj.rsquaredAdjusted(r, :, subj_idx, c) = lm.Rsquared.Adjusted;
+            obj.rsquaredOrdinary(r, :, subj_idx, c) = lm.Rsquared.Ordinary;
         end
         
         function runPermutationTest(obj)
@@ -501,6 +569,13 @@ classdef PupilRegression < pupilReg_Vars
             safe_saveall(fullfile(obj.save_dir, [obj.perm_save, '.mat']), obj.perm_results);
             safe_saveall(fullfile(obj.save_dir, [obj.predicted_save, '.mat']), obj.predicted_all);
             safe_saveall(fullfile(obj.save_dir, [obj.residuals_save, '.mat']), obj.residuals_all);
+
+            % NEW: Save AIC and BIC values
+            safe_saveall(fullfile(obj.save_dir, ['AIC_', obj.betas_save, '.mat']), obj.aic_values);
+            safe_saveall(fullfile(obj.save_dir, ['BIC_', obj.betas_save, '.mat']), obj.bic_values);
+            safe_saveall(fullfile(obj.save_dir, ['logL_', obj.betas_save, '.mat']), obj.logL_values);
+            safe_saveall(fullfile(obj.save_dir, ['r2Ordinary_', obj.betas_save, '.mat']), obj.rsquaredOrdinary);
+            safe_saveall(fullfile(obj.save_dir, ['r2Adjusted_', obj.betas_save, '.mat']), obj.rsquaredAdjusted);
         end
     end
 end
