@@ -8,11 +8,11 @@ classdef PupilRegression < pupilReg_Vars
         perm_results     % Permutation test results
         residuals_all    % Model residuals for all subjects
         predicted_all    % Model-predicted pupil responses for all subjects
-        aic_values
-        bic_values
-        logL_values
-        rsquaredOrdinary
-        rsquaredAdjusted
+        aic_values       % AIC model fit
+        bic_values       % BIC model fit
+        logL_values      % Log-likelihood 
+        rsquaredOrdinary % ordinary R2
+        rsquaredAdjusted % adjusted R2
     end
     
     methods
@@ -98,6 +98,8 @@ classdef PupilRegression < pupilReg_Vars
             %
             % Parameters:
             %   subj_idx - Index of subject to process (1 to num_subs)
+            %   binnedAnalysis - Boolean indicating whether we run binned
+            %       or regular analysis 
             %
             % Returns:
             %   residuals_subj - Model residuals for this subject
@@ -354,11 +356,15 @@ classdef PupilRegression < pupilReg_Vars
             %   behv_data - Behavioral data
             %   zsc_base - Baseline data
             %   subj_idx - Current subject index
+            %   binnedAnalysis - Boolean indicating whether we run binned
+            %       or regular analysis 
             %
             % Returns:
             %   residuals_subj - Model residuals for this subject
             %   predicted_subj - Model predictions for this subject
+          
             
+            % todo: preallocation not properly done
             residuals_subj = [];
             predicted_subj = [];
             
@@ -462,10 +468,10 @@ classdef PupilRegression < pupilReg_Vars
             y = pupil_signal_bins(:, c);
             
             % Z-score gaze signals
+            % todo: is it still expected that nans are present?
+            % If not, make sure they are removed.
             zsc_xgaze = nanzscore(xgaze_signal_bins(:, c));
             zsc_ygaze = nanzscore(ygaze_signal_bins(:, c));
-            
-            % Remove trials with NaN values
             validIdx = ~isnan(y) & ~isnan(preds_bins.up);
             
             % Extract valid data
