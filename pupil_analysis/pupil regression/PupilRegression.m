@@ -13,6 +13,10 @@ classdef PupilRegression < pupilReg_Vars
         logL_values      % Log-likelihood 
         rsquaredOrdinary % ordinary R2
         rsquaredAdjusted % adjusted R2
+
+        % Default handle to the external function
+        % This allows obj.ExternalFitFcn(data) to work like a normal call.
+        externalFitFcn = @linear_fit
     end
     
     methods
@@ -168,7 +172,7 @@ classdef PupilRegression < pupilReg_Vars
             end
         end
         
-        function [behv_data, missedtrials, missedtrials_slider] = handleMissedTrials(obj, behv_data)
+        function [behv_data, missedtrials, missedtrials_slider] = handleMissedTrials(~, behv_data)
             % Identify and remove trials with missing behavioral responses
             % Creates indices for trials with missing RT or slider responses
             %
@@ -463,6 +467,7 @@ classdef PupilRegression < pupilReg_Vars
             % Initialize NEW output variables
             aic = nan;
             bic = nan;
+            logL = nan;
             
             % Extract dependent variable (pupil diameter at timepoint c)
             y = pupil_signal_bins(:, c);
@@ -494,7 +499,7 @@ classdef PupilRegression < pupilReg_Vars
             end
             
             % Fit linear regression model
-            [betas, ~, residuals, ~, lm] = linear_fit(tbl, obj.model_def, ...
+            [betas, ~, residuals, ~, lm] = obj.externalFitFcn(tbl, obj.model_def, ...
                 obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0, 0, 0, 0);
 
         % --- NEW (Manual AIC/BIC) ---
@@ -533,8 +538,9 @@ classdef PupilRegression < pupilReg_Vars
                 obj.bic_values(storage_r_idx, subj_idx, c) = bic;
                 obj.logL_values(storage_r_idx, subj_idx, c) = logL;
             end
+
             % Generate model predictions
-            predicted = predict(lm, tbl);
+            predicted = lm.predict(tbl);
             
             % Store beta coefficients in results structure
             if obj.binned_accuracy == 1

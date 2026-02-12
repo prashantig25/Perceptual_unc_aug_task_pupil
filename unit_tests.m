@@ -8,14 +8,13 @@ classdef unit_tests < matlab.mock.TestCase
     % 3. TestloadBaselineData function
     % 4. testGetBehavioralPredictors with baseline_mdl == 1
     % 5. testGetBinnedData with binning options
-    % 6. Test fitModelAtTimepoint
-    % 7. Test runPermutationTest
+    % 6. Test runPermutationTest (if used in future)
 
     % Further notes
-    % fitModelAtTimepoint -> mock out linear_fit and test results
-    % test if the right bins/subsets are taken
+
+    % Separate tests for AIC/BIC functions
     %
-    % Don't forget to test linearFit directly
+    % Don't forget to test linear_fit directly
     %
     % Same for functions doing permutation test like test get_permtest
     %
@@ -81,7 +80,6 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(analyzer.perm_save, [])
             testCase.verifyEqual(analyzer.residuals_save, [])
             testCase.verifyEqual(analyzer.predicted_save, [])
-
         end
 
         % ------------------------------------
@@ -101,7 +99,6 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(analyzer.subj_ids, subj_ids);
             testCase.verifyEqual(analyzer.num_sess, num_sess);
             testCase.verifyEqual(analyzer.num_subs, 3);
-
         end
 
         function testSetPaths(testCase)
@@ -125,10 +122,9 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(analyzer.ygaze_dir, ygaze_dir)
             testCase.verifyEqual(analyzer.base_dir, base_dir)
             testCase.verifyEqual(analyzer.save_dir, save_dir)
-
         end
 
-        
+
         function testSetModel(testCase)
             % Tests the setModel in pupilReg_Vars.
 
@@ -147,7 +143,6 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(analyzer.pred_vars, pred_vars)
             testCase.verifyEqual(analyzer.cat_vars, cat_vars)
             testCase.verifyEqual(analyzer.num_vars, num_vars)
-
         end
 
 
@@ -168,7 +163,6 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(analyzer.perm_save, perm_save);
             testCase.verifyEqual(analyzer.residuals_save, residuals_save);
             testCase.verifyEqual(analyzer.predicted_save, predicted_save);
-
         end
 
         % ------------------------------------
@@ -226,7 +220,6 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(betas.with_intercept, expected_betas)
             testCase.verifyEqual(residuals, expected_residuals_all)
             testCase.verifyEqual(predicted, expected_predicted)
-
         end
 
 
@@ -260,7 +253,6 @@ classdef unit_tests < matlab.mock.TestCase
 
             testCase.verifyEqual(residuals_subj, expected_residuals);
             testCase.verifyEqual(predicted_subj, expected_predicted);
-
         end
 
         function testLoadBehavioralData(testCase)
@@ -329,7 +321,6 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(behv_data, expected_behv_data);
             testCase.verifyEqual(missedtrials, expected_missedtrials);
             testCase.verifyEqual(missedtrials_slider, expected_missedtrials_slider);
-
         end
 
 
@@ -414,7 +405,6 @@ classdef unit_tests < matlab.mock.TestCase
             verifyTrue(testCase, all(size(xgaze_signal) == [7,10]));
             verifyTrue(testCase, all(size(ygaze_signal) == [7,10]));
             verifyTrue(testCase, analyzer.col == 10);
-
         end
 
 
@@ -457,7 +447,6 @@ classdef unit_tests < matlab.mock.TestCase
             verifyTrue(testCase, all(size(ygaze_signal) == [4,5]));
             verifyTrue(testCase, all(size(behv_data) == [4,5]));
             testCase.verifyEmpty(zsc_base);
-
         end
 
 
@@ -480,7 +469,6 @@ classdef unit_tests < matlab.mock.TestCase
             [residuals_subj, predicted_subj] = mockPupilRegression.processBinsAndTimepoints(1,2,3,4,5,6,7, true);
             verifyTrue(testCase, all(residuals_subj == [50, 50, 50]));
             verifyTrue(testCase, all(predicted_subj == [60, 60, 60]));
-
         end
 
 
@@ -502,14 +490,13 @@ classdef unit_tests < matlab.mock.TestCase
             [residuals_subj, predicted_subj] = mockPupilRegression.processBinsAndTimepoints(1,2,3,4,5,6,7, false);
             verifyTrue(testCase, all(residuals_subj == [50, 50, 50]));
             verifyTrue(testCase, all(predicted_subj == [60, 60, 60]));
-
         end
 
 
         function testGetBinnedData(testCase)
             % Test getBinnedData function.
 
-            % für standard input extra funktion?
+            % Input variable
             id = [1; 1; 1; 1; 1];
             rt = [nan; 0.61; 0.55; 0.80; 0.21];
             group = {'A'; 'B'; 'A'; 'B'; 'A'};
@@ -537,5 +524,82 @@ classdef unit_tests < matlab.mock.TestCase
             verifyTrue(testCase, all(size(ygaze_bins) == size(ygaze_signal)));
             verifyTrue(testCase, all(size(preds_bins) == size(preds)));
         end
+
+        function testFitModelAtTimepoint(testCase)
+            % Test fitModelAtTimepoint function
+
+            % Initialize analyzer
+            analyzer = PupilRegression();
+
+            % Define mock data
+            mockBetas = [2, 10, 7, 1];
+            mockResid = 40;
+            mockPrediction = 99;
+
+            % Create a mock prediction variable returned when LM predict is
+            % called in the class
+            mockLM = struct();
+            mockLM.predict = @(varargin) mockPrediction;
+
+            % Linear model mock R2
+            mockLM.Rsquared.Adjusted = 0.2;
+            mockLM.Rsquared.Ordinary = 0.3;
+
+            % Use mock function for linear_fit via new handle construction
+            analyzer.externalFitFcn = @(varargin) deal(mockBetas, [], mockResid, [], mockLM);
+
+            % Start defining and building the input variables
+            % -----------------------------------------------
+
+            % Current timepoint index
+            c = 1;
+
+            % Pupil and gaze data
+            n_bins = 5;
+            n_trials = 10;
+            pupil_signal_bins = ones(n_trials, n_bins);
+            xgaze_signal_bins = ones(n_trials, n_bins);
+            ygaze_signal_bins = ones(n_trials, n_bins);
+
+            % Behavioral data in "preds_bins"
+            pupil = ones(n_trials, 1);
+            xgaze = ones(n_trials, 1);
+            ygaze = ones(n_trials, 1);
+            con_diff = ones(n_trials, 1);
+            signed_pe = ones(n_trials, 1);
+            pe = ones(n_trials, 1);
+            up = ones(n_trials, 1);
+            rt = ones(n_trials, 1);
+            condition = {'A'; 'B'; 'A'; 'B'; 'A'; 'B'; 'A'; 'B'; 'A'; 'B'};
+            ecoperf = ones(n_trials, 1);
+            correct = ones(n_trials, 1);
+            pe_condiff = ones(n_trials, 1);
+            preds_bins = table(pupil, xgaze, ygaze, ...
+                con_diff, signed_pe, pe, up, rt, condition, ecoperf, correct, pe_condiff,...
+                'VariableNames', {'pupil', 'xgaze', 'ygaze', ...
+                'con_diff', 'signed_pe', 'pe', 'up', 'rt', 'condition', 'ecoperf', 'correct', 'pe_condiff'});
+
+            zsc_base = nan; % baseline data
+            r = 1; % current bin index
+            subj_idx = 1; % current subject index
+
+            % Define analyzer attributes
+            num_bins = size(pupil, 1);
+            analyzer.num_vars = 3;
+            analyzer.num_subs = 1;
+            analyzer.col = 1;
+            analyzer.betas_struct.with_intercept = nan(num_bins, analyzer.num_vars+1, analyzer.num_subs, analyzer.col);
+
+            % Run function
+            [betas, residuals, predicted] = analyzer.fitModelAtTimepoint(c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx);
+
+            % Test output and updated properties
+            testCase.verifyEqual(betas, mockBetas);
+            testCase.verifyEqual(residuals, mockResid);
+            testCase.verifyEqual(predicted, mockPrediction);
+            testCase.verifyEqual(analyzer.rsquaredAdjusted, mockLM.Rsquared.Adjusted)
+            testCase.verifyEqual(analyzer.rsquaredOrdinary, mockLM.Rsquared.Ordinary)
+        end
     end
+
 end
