@@ -32,8 +32,8 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected', filesep, 'behavior', filesep, 'preprocessed');
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'LR analyses'); 
+behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines', filesep, 'behavior', filesep, 'preprocessed');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses'); 
 mkdir(save_dir)
 
 % LOOP OVER ALL SUBJECTS
@@ -85,4 +85,5 @@ end
 
 save_file = strcat(save_dir,'\','pupilbehv_allNEW','.xlsx');
 safe_saveall(save_file,data_all);
+
 
