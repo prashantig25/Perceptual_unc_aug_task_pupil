@@ -162,9 +162,12 @@ classdef PupilRegression < pupilReg_Vars
                 end
                 
                 % Load session data and extract relevant columns
-                data_run = readtable(filename);
-                rt = table(data_run.choice_rt, 'VariableNames', {'rt'});
-                slider = table(data_run.slider_respond_response, 'VariableNames', {'slider'});
+                % data_run = readtable(filename);
+                data_run = readtable(filename, 'VariableNamingRule', 'preserve');
+                % rt = table(data_run.choice_rt, 'VariableNames', {'rt'});
+                rt = table(data_run.('choice.rt'), 'VariableNames', {'rt'});
+                % slider = table(data_run.slider_respond_response, 'VariableNames', {'slider'});
+                slider = table(data_run.('slider_respond.response'), 'VariableNames', {'slider'});
                 data_run = [data_run(:, 1:16), rt, slider];
                 
                 % Concatenate with previous sessions
