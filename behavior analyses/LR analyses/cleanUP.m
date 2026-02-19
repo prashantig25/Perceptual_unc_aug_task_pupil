@@ -12,6 +12,7 @@ subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
     '601','3319','129','4684','3886','620','901','900'};
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of recording sessions
 total_blocks = 8; % total number of blocks
+num_trials = 20; % number of trials
 task_name = '_main'; % file name
 format = '.xlsx';
 num_subjs = length(subj_ids); % number of subjects
@@ -69,7 +70,7 @@ for n = 1:num_subjs
 
     t = 0;
     for i = 1:height(data)
-        if t > 19
+        if t > num_trials - 1
             t = 1;
         else
             t = t + 1;
@@ -84,3 +85,4 @@ end
 
 save_file = strcat(save_dir,'\','pupilbehv_allNEW','.xlsx');
 safe_saveall(save_file,data_all);
+
