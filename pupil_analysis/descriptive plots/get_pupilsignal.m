@@ -4,6 +4,11 @@
 clc
 clearvars
 
+% Todo: is regress_rt used at all?
+% where do we used saved "sliderOnset"?
+% For each file: indicate which figure/code uses this
+% improve the "main" variable
+
 %% ========================================================================
 %  SHARED INITIALIZATION - USED BY BOTH PIPELINES
 %  ========================================================================
@@ -17,7 +22,6 @@ num_subs = length(subj_ids);
 samp_rate = 100; % sampling rate in Hz after down-sampling
 pre_duration = 29; % duration for start of pre-event signal
 base_duration = 9; % duration for baseline signal
-regress_rt = 0; % regress RT from pupil phasic signal
 
 % Setup user-based path
 currentDir = cd;
@@ -34,6 +38,12 @@ end
 behv_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'behavior', filesep, 'raw data');
 
+% Initialize object instance
+PupilDescriptive = PupilDescriptive();
+PupilDescriptive.num_sess = num_sess;
+PupilDescriptive.subj_ids = subj_ids;
+PupilDescriptive.behv_dir = behv_dir;
+
 %% ========================================================================
 %  MAIN PIPELINE PROCESSING
 %  ========================================================================
@@ -42,129 +52,176 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelin
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed trials and events added');
 
-%% 1. FB-LOCKED PUPIL SIGNAL - TRIAL SPECIFIC BASELINE
+PupilDescriptive.preproc_dir = preproc_dir;
 
-time_pupil = 1000;
-time_base = 10;
-event_name = 'feedback';
-base = 1;
-base_trialspecific = 1;
+%% 1. FEEDBACK-LOCKED PUPIL SIGNAL - TRIAL-SPECIFIC BASELINE
 
+% Basic regression attributes
+time_pupil = 1000; % time window of interest
+time_base = 10; % baseline length
+event_name = 'feedback'; % trial phase
+baseline = "trial-specific"; % "no baseline", "trial-specific", "event-specific"
+
+% Add relevant attributes to object instance
+PupilDescriptive.regress_rt = false;
+PupilDescriptive.time_base = time_base;
+PupilDescriptive.pre_duration = pre_duration;
+PupilDescriptive.base_duration = base_duration;
+
+% Save directories
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial');
 save_sliderOnset = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset');
-mkdir(save_dir);
-mkdir(save_sliderOnset);
-main = 1; % running analyses based on the main pipeline
 
+% Create directories if they don't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
+if ~exist(save_sliderOnset, 'dir')
+    mkdir(save_sliderOnset);
+end
+
+main = 1; % running analyses based on the main pipeline % todo why do we need this?
+
+% Cycle over subjects
+fprintf("\n1. Running feedback-locked with trial-specific baseline\n")
 for s = 1:num_subs
-    for ss = 1:num_sess(s)
-        [pupil, sliderOnset] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
-            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
-            pre_duration, base_duration, base, base_trialspecific, main);
-    end
+        [pupil, sliderOnset] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
+            event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
     safe_saveall(strcat(save_sliderOnset, filesep, subj_ids{s}, '.mat'), sliderOnset)
 end
 
-%% 2. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE
+%% 2. FEEDBACK-LOCKED PUPIL SIGNAL - EVENT-SPECIFIC BASELINE
 
-base_trialspecific = 0;
+% The saved files are used for the main regression analysis
+% (pupilAnalysis_object.m) 
 
+% Turn off trial-specific baseline
+baseline = "event-specific";
+
+% Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb');
-mkdir(save_dir);
 
+% Create directories if they don't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
+% Cycle over subjects
+fprintf("\n2. Running feedback-locked with event-specific baseline\n")
 for s = 1:num_subs
-    for ss = 1:num_sess(s)
-        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
-            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
-            pre_duration, base_duration, base, base_trialspecific, main);
-    end
+     [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
+             event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
-%% 3. FB-LOCKED PUPIL SIGNAL - NON-BASELINE CORRECTED
+%% 3. FEEDBACK-LOCKED PUPIL SIGNAL - NON-BASELINE CORRECTED
 
-base = 0;
+% The saved files are used for the non-baseline-corrected regression analysis
+% (pupilAnalysis_object.m) 
 
+% Turn off baseline correction
+baseline = "no correction";
+
+% Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb');
-mkdir(save_dir);
 
+% Create directory if it don't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
+% Cycle over subjects
+fprintf("\n3. Running feedback-locked without baseline\n")
 for s = 1:num_subs
-    for ss = 1:num_sess(s)
-        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
-            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
-            pre_duration, base_duration, base, base_trialspecific, main);
-    end
+    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
+              event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
-%% 4. PATCH-LOCKED PUPIL SIGNAL
+%% 4. PATCH-LOCKED PUPIL SIGNAL - EVENT-SPECIFIC BASELINE
 
-time_pupil = 300;
-time_base = 10;
-event_name = 'choice';
-base = 1;
-base_trialspecific = 0;
+% Update attributes for patch-locked analysis
+time_pupil = 300; % time window of interest   % todo: why so short?
+event_name = 'choice'; % trial phase
 main = 1;
 
+% Turn on event-specific baseline correction
+baseline = "event-specific";
+
+% Save path
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch');
-mkdir(save_dir);
 
+% Create directory if it doesn't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
+% Cycle over subjects
+fprintf("\n4. Running patch-locked with event-specific baseline\n")
 for s = 1:num_subs
-    for ss = 1:num_sess(s)
-        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
-            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
-            pre_duration, base_duration, base, base_trialspecific, main);
-    end
+    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
+              event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
-%% 5. RESPONSE-LOCKED PUPIL SIGNAL
+%% 5. RESPONSE-LOCKED PUPIL SIGNAL - TRIAL-SPECIFIC BASELINE
 
-time_pupil = 230;
-time_base = 10;
-event_name = 'response';
-base_trialspecific = 1;
+% Update attributes for response-locked analysis
+time_pupil = 230; % time window of interest   % todo: why so short?
+event_name = 'response';  % trial phase
 main = 1;
 
+% Trial-specific baseline
+baseline = "trial-specific";
+
+% Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp');
-mkdir(save_dir);
 
+% Create directory if it doesn't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
+% Cycle over subjects
+fprintf("\n5. Running response-locked with trial-specific baseline\n")
 for s = 1:num_subs
-    for ss = 1:num_sess(s)
-        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
-            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
-            pre_duration, base_duration, base, base_trialspecific, main);
-    end
+    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
+               event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
-%% 6. BASELINE BEFORE FB
-
-time_pupil = 200;
-time_base = 10;
-event_name = 'tonic_prefb';
-base = 0;
-base_trialspecific = 1;
-
-save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb');
-mkdir(save_dir);
-
-for s = 1:num_subs
-    for ss = 1:num_sess(s)
-        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
-            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
-            pre_duration, base_duration, base, base_trialspecific, main);
-    end
-    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), nanmean(pupil, 2))
-end
+% %% 6. BASELINE BEFORE Feedback - TRIAL-SPECIFIC BASELINE
+% 
+% time_pupil = 200; % time window of interest   % todo: why so short?
+% %time_base = 10;
+% event_name = 'tonic_prefb'; % trial phase
+% base = 0; % no general... wait, is this possible? it currently would just not take any baseline
+% base_trialspecific = 1; % but trial-specific baseline
+% 
+% % Save directory
+% save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+%     filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb');
+% 
+% % Create directory if it don't exist yet
+% if ~exist(save_dir, 'dir')
+%     mkdir(save_dir);
+% end
+% 
+% % Cycle over subjects
+% fprintf("\n6. Running tonic before feedback with trial-specific baseline\n")
+% for s = 1:num_subs
+%     [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
+%                event_name, base, base_trialspecific, main);
+%     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), nanmean(pupil, 2))
+% end
 
 %% ========================================================================
 %  ALTERNATE PIPELINE PROCESSING
@@ -172,9 +229,7 @@ end
 
 % Reset parameters to defaults for alternate pipeline
 time_pupil = 1000;
-time_base = 10;
 event_name = 'feedback';
-base = 1;
 base_trialspecific = 0;
 main = 0;
 
@@ -183,17 +238,22 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelin
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
     filesep, 'preprocessed trials and events added');
 
-%% 7. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE (ALTERNATE PIPELINE)
+%% 7. FEEDBACK-LOCKED PUPIL SIGNAL - EVENT-SPECIFIC BASELINE (ALTERNATE PIPELINE)
+
+% todo: doesn't seem to find pupil_zsc
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb');
-mkdir(save_dir);
 
+% Create directory if it doesn't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
+% Cycle over subjects
+fprintf("\n7. Running feedback-locked with event-specific baseline and XX alternate XX pipeline\n")
 for s = 1:num_subs
-    for ss = 1:num_sess(s)
-        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
-            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
-            pre_duration, base_duration, base, base_trialspecific, main);
-    end
+    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
+               event_name, base_trialspecific, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
