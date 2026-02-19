@@ -34,13 +34,11 @@ end
 behv_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'behavior', filesep, 'raw data');
 
-%% ========================================================================
-%  MAIN PIPELINE PROCESSING
-%  ========================================================================
+%% LINEAR INTERPOLATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
-    filesep, 'preprocessed trials and events added');
+    filesep, 'preprocessed linear int trials and events added');
 
 %% 1. FB-LOCKED PUPIL SIGNAL - TRIAL SPECIFIC BASELINE
 
@@ -51,7 +49,7 @@ base = 1;
 base_trialspecific = 1;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial linear int');
 save_sliderOnset = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset');
 mkdir(save_dir);
@@ -73,7 +71,7 @@ end
 base_trialspecific = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linear int');
 mkdir(save_dir);
 
 for s = 1:num_subs
@@ -90,7 +88,7 @@ end
 base = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb linearInt');
 mkdir(save_dir);
 
 for s = 1:num_subs
@@ -112,7 +110,7 @@ base_trialspecific = 0;
 main = 1;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int');
 mkdir(save_dir);
 
 for s = 1:num_subs
@@ -124,7 +122,29 @@ for s = 1:num_subs
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
-%% 5. RESPONSE-LOCKED PUPIL SIGNAL
+%% 5. PATCH-LOCKED PUPIL SIGNAL - NON BASELINE CORRECTED
+
+time_pupil = 300;
+time_base = 10;
+event_name = 'choice';
+base = 0;
+base_trialspecific = 0;
+main = 1;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch non-baseline corrected linear int');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+end
+
+%% 6. RESPONSE-LOCKED PUPIL SIGNAL
 
 time_pupil = 230;
 time_base = 10;
@@ -133,7 +153,7 @@ base_trialspecific = 1;
 main = 1;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int');
 mkdir(save_dir);
 
 for s = 1:num_subs
@@ -145,16 +165,17 @@ for s = 1:num_subs
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
-%% 6. BASELINE BEFORE FB
+%% 7. RESPONSE-LOCKED PUPIL SIGNAL - NON BASELINE CORRECTED
 
-time_pupil = 200;
+time_pupil = 230;
 time_base = 10;
-event_name = 'tonic_prefb';
-base = 0;
+event_name = 'response';
 base_trialspecific = 1;
+main = 1;
+base = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'baseline before fb');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp non-baseline corrected linear int');
 mkdir(save_dir);
 
 for s = 1:num_subs
@@ -163,11 +184,52 @@ for s = 1:num_subs
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
             pre_duration, base_duration, base, base_trialspecific, main);
     end
-    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), nanmean(pupil, 2))
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
+%% CUBIC-SPLINE INTERPOLATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
+    filesep, 'preprocessed cubic spline new trials and events added');
+
+%% 1. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE
+
+base_trialspecific = 0;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 cubic spline new');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+end
+
+%% 2. FB-LOCKED PUPIL SIGNAL - NON-BASELINE CORRECTED
+
+base = 0;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb cubic spline new');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+end
+
+
 %% ========================================================================
-%  ALTERNATE PIPELINE PROCESSING
+%  ALTERNATE PIPELINE PROCESSING - Deconvolution based
 %  ========================================================================
 
 % Reset parameters to defaults for alternate pipeline
@@ -183,10 +245,27 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelin
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
     filesep, 'preprocessed trials and events added');
 
-%% 7. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE (ALTERNATE PIPELINE)
+%% 7. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE (DECONVOLUTION PIPELINE)
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb');
+mkdir(save_dir);
+
+for s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
+    safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
+end
+
+%% 3. FB-LOCKED PUPIL SIGNAL - NON-BASELINE CORRECTED (DECONVOLUTION PIPELINE)
+
+base = 0;
+
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb');
 mkdir(save_dir);
 
 for s = 1:num_subs

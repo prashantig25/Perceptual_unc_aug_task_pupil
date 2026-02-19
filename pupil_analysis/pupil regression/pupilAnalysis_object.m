@@ -32,13 +32,16 @@ preds_all = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 %% ANALYSIS 1: MAIN MODEL (Figure 4)
-fprintf('\n=== Running Analysis 1: Main Model (Figure 4) ===\n');
+
+%%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%%%%%%%%
+
+fprintf('\n=== Running Analysis 1: Main Model (Figure 4) linear interpolation ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
 
 % Set paths
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
 save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
 
@@ -66,104 +69,154 @@ PupilRegression.preds_all = preds_all;
 PupilRegression.residuals_predicted = 1;
 
 % Set filenames for saving
-PupilRegression.setFileNames('pe_condiff', 'perm_pe_condiff', 'pe_condiff_residuals', 'pe_condiff_predicted');
+PupilRegression.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', 'pe_condiff_residuals_linearInt', 'pe_condiff_predicted_linearInt');
 
 % Run analysis and save
 [betas, perm, residuals, predicted] = PupilRegression.runAnalysis();
 PupilRegression.saveResults();
 
-%% RUN MULTIPLE MODEL VERSIONS FOR PUPIL REGRESSION
-% Assumes subj_ids, num_sess, desiredPath, behv_dir, xgaze_dir, ygaze_dir,
-% base_dir, and preds_all exist in the workspace.
+%%
 
-fprintf('\n=== Running Multiple Model Versions ===\n');
+%%%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%%%%%%%%
 
-% -------------------------------------------------------------------------
-% Define model versions
-% -------------------------------------------------------------------------
-model_defs = { ...
-    'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt',...
-    'pupil ~ xgaze + ygaze + pe + zsc_up + rt + zsc_condiff', ...                   % Version 2
-    'pupil ~ xgaze + ygaze + pe:zsc_condiff + rt + zsc_up', ...
-    'pupil ~ xgaze + ygaze + pe + rt + zsc_up',...
-    'pupil ~ xgaze + ygaze + zsc_condiff + rt + zsc_up',...
-    'pupil ~ xgaze + ygaze + rt + zsc_up',...
-    'pupil ~ xgaze + ygaze'};                                % Version 3
-
-model_names = { ...
-    'pe_condiff_noCondiff','no_interaction_fit', ...
-    'interaction_only','onlyPE','onlyCondiff','onlyControl','onlyGaze'};
-
-% -------------------------------------------------------------------------
-% Set shared paths
-% -------------------------------------------------------------------------
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb');
-save_root = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression');
-
-% Shared predictors and categorical variables
-pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
-cat_vars  = {'condition','reward','ecoperf'};
-
-vars = [6,6,5,5,5,4,2];
-
-% -------------------------------------------------------------------------
-% Loop through models
-% -------------------------------------------------------------------------
-for i = 1%:length(model_defs)
-
-    fprintf('\n=== Running Model Version %d: %s ===\n', i, model_names{i});
-
-    % Create a new regression object per model
-    PR = PupilRegression();
-    PR.setSubjects(subj_ids, num_sess);
-    
-    % Set paths (unique save dir per model to avoid overwriting)
-    save_dir = fullfile(save_root, model_names{i});
-    if ~exist(save_dir,'dir'); mkdir(save_dir); end
-    PR.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
-
-    % Set model
-    PR.setModel(model_defs{i}, pred_vars, cat_vars, 7);
-
-    % Analysis settings (same as your original script)
-    PR.timewindow          = 'feedback';
-    PR.col                 = 300;
-    PR.regress_rt          = 0;
-    PR.baseline_mdl        = 0;
-    PR.binned              = 0;
-    PR.binned_accuracy     = 0;
-    PR.two_tailed          = 0;
-    PR.bins_array          = 1;
-    PR.preds_all           = preds_all;
-    PR.residuals_predicted = 1;
-    PR.num_vars = vars(i);
-
-    % Set output filenames using the human-readable model name as suffix
-    name_suffix = model_names{i};
-    PR.setFileNames( ...
-        sprintf('pe_condiff_%s', name_suffix), ...
-        sprintf('perm_pe_condiff_%s', name_suffix), ...
-        sprintf('pe_condiff_residuals_%s', name_suffix), ...
-        sprintf('pe_condiff_predicted_%s', name_suffix));
-
-    % Run and save
-    [betas, perm, residuals, predicted] = PR.runAnalysis();
-    PR.saveResults();
-
-    fprintf('--- Model %d (%s) Completed and Saved in %s ---\n', i, model_names{i}, save_dir);
-end
-
-fprintf('\n=== ALL MODEL VERSIONS COMPLETE ===\n');
-
-
-%% ANALYSIS 2: BINNED REGRESSION APPROACH (Figure 3c)
-fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) ===\n');
+fprintf('\n=== Running Analysis 1: Main Model (Figure 4) cubic spline interpolation ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
 
 % Set paths
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 0;
+PupilRegression.baseline_mdl = 0;
+PupilRegression.binned = 0;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 0;
+PupilRegression.bins_array = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 1;
+
+% Set filenames for saving
+PupilRegression.setFileNames('pe_condiff_cubicSplineNew', 'perm_pe_condiff_cubicSplineNew', 'pe_condiff_residuals_CSnew', 'pe_condiff_predicted_CSnew');
+
+% Run analysis and save
+[betas, perm, residuals, predicted] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
+%% ANALYSIS: ADDITIVE MODEL 
+
+%%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%%%%%%%%
+
+fprintf('\n=== Running Analysis ADDITIVE MODEL linear interpolation ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt + zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 0;
+PupilRegression.baseline_mdl = 0;
+PupilRegression.binned = 0;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 0;
+PupilRegression.bins_array = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 0;
+
+% Set filenames for saving
+PupilRegression.setFileNames('additiveMdl_linearInt', 'perm_additiveMdl_linearInt', '', '');
+
+% Run analysis and save
+[betas, perm, residuals, predicted] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
+%% 
+%%%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%%%%%%%%
+
+fprintf('\n=== Running Analysis ADDITIVE MODEL cubic spline interpolation ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt + zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 0;
+PupilRegression.baseline_mdl = 0;
+PupilRegression.binned = 0;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 0;
+PupilRegression.bins_array = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 0;
+
+% Set filenames for saving
+PupilRegression.setFileNames('additiveMdl_CSnew', 'perm_additiveMdl_CSnew', '', '');
+
+% Run analysis and save
+[betas, perm, residuals, predicted] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
+%% ANALYSIS 2: BINNED REGRESSION APPROACH (Figure 3c)
+
+%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%
+
+fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) linear interpolation ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
 save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
@@ -193,20 +246,71 @@ PupilRegression.preds_all = preds_all;
 PupilRegression.residuals_predicted = 0;
 
 % Set filenames for saving
-PupilRegression.setFileNames('pe_condiff2bins', 'perm_pe_condiff2bins', '', '');
+PupilRegression.setFileNames('pe_condiff2bins_linearInt', 'perm_pe_condiff2bins_linearInt', '', '');
 
 % Run analysis and save
 [betas, perm, ~, ~] = PupilRegression.runAnalysis();
 PupilRegression.saveResults();
 
-%% ANALYSIS 3: REGRESSED RT MODEL (Figure S12)
-fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) ===\n');
+%%
+
+%%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%
+
+fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) cubic spline interpolation ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
 
 % Set paths
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
+if ~exist(save_dir, 'dir'), mkdir(save_dir); end
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 0;
+PupilRegression.baseline_mdl = 0;
+PupilRegression.binned = 1;
+PupilRegression.bins = prctile(preds_all.con_diff, 0:50:100);
+PupilRegression.bins_array = 1:2;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 0;
+
+% Set filenames for saving
+PupilRegression.setFileNames('pe_condiff2bins_cubicSplineNew', 'perm_pe_condiff2bins_cubicSplineNew', '', '');
+
+% Run analysis and save
+[betas, perm, ~, ~] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
+
+
+%% ANALYSIS 3: REGRESSED RT MODEL (Figure S12)
+
+%%%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%%
+
+fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) linear interpolation ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
 save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
@@ -235,23 +339,68 @@ PupilRegression.preds_all = preds_all;
 PupilRegression.residuals_predicted = 0;
 
 % Set filenames for saving
-PupilRegression.setFileNames('pe_condiff_regressedRT', 'perm_pe_condiff_regressedRT', '', '');
+PupilRegression.setFileNames('pe_condiff_regressedRT_linearInt', 'perm_pe_condiff_regressedRT_linearInt', '', '');
 
 % Run analysis and save
 [betas, perm, ~, ~] = PupilRegression.runAnalysis();
 PupilRegression.saveResults();
 
+%%
+
+%%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%
+
+fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) cubic spline interpolation ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
+if ~exist(save_dir, 'dir'), mkdir(save_dir); end
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + zsc_condiff + pe:zsc_condiff + rt';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 1;  % regress RT effects
+PupilRegression.baseline_mdl = 0;
+PupilRegression.binned = 0;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 0;
+PupilRegression.bins_array = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 0;
+
+% Set filenames for saving
+PupilRegression.setFileNames('pe_condiff_regressedRT_cubicSplineNew', 'perm_pe_condiff_regressedRT_cubicSplineNew', '', '');
+
+% Run analysis and save
+[betas, perm, ~, ~] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
+
 %% ANALYSIS 5: PATCH-LOCKED PUPIL DILATION (Figure S8)
+
 fprintf('\n=== Running Analysis 5: Patch-Locked Pupil Dilation (Figure S9) ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
 
 % Set paths
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'patch');
-save_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/" + ...
-    "Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected" + ...
-    "/pupil/regression/control analyses for revisions"; %fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'patch linear int');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
 
@@ -278,7 +427,7 @@ PupilRegression.bins_array = 1;
 PupilRegression.preds_all = preds_all;
 
 % Set filenames for saving
-PupilRegression.setFileNames('patch_condiff_altPipeline1', 'perm_patch_condiff', 'residuals_patch', 'predicted_patch');
+PupilRegression.setFileNames('patch_condiff_linearInt', 'perm_patch_linearInt', '', '');
 
 % Run analysis and save
 [betas, perm, ~, ~] = PupilRegression.runAnalysis();
@@ -290,13 +439,14 @@ PupilRegression.saveResults();
 % =======================================================================
 
 %% ANALYSIS 6: MAIN MODEL BUT ON NON-BASELINE CORRECTED SIGNAL + MATHOT et al., 2022 PIPELINE
-fprintf('\n=== Running Analysis 6: Main Model - Mathot Pipeline ===\n');
+
+fprintf('\n=== Running Analysis 6: Non-baseline corrected Linear Interpolation ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
 
 % Set paths
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb'); 
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb linear Int'); 
 save_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
@@ -325,7 +475,52 @@ PupilRegression.preds_all = preds_all;
 PupilRegression.residuals_predicted = 1;
 
 % Set filenames for saving
-PupilRegression.setFileNames('pe_condiff_mathot_nonBaselineCorrected', 'perm_pe_condiff_mathot_nonBaselineCorrected', 'pe_condiff_residuals_mathot_nonBaselineCorrected', 'pe_condiff_predicted_mathot_nonBaselineCorrected');
+PupilRegression.setFileNames('pe_condiff_mathot_nonBaselineCorrected_linearInt', 'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt', 'pe_condiff_residuals_mathot_nonBaselineCorrected_linearInt', 'pe_condiff_predicted_mathot_nonBaselineCorrected_linearInt');
+
+% Run analysis and save
+[betas, perm, ~, ~] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
+%%
+
+%%%%%%%%% CUBIC SPLINE INTERPOLATION %%%%%%%%
+
+fprintf('\n=== Running Analysis 6: Non-baseline corrected cubic spline interpolation ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb cubic spline new'); 
+save_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+if ~exist(save_dir, 'dir'), mkdir(save_dir); end
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 0;
+PupilRegression.baseline_mdl = 0;
+PupilRegression.binned = 0;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 0;
+PupilRegression.bins_array = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 1;
+
+% Set filenames for saving
+PupilRegression.setFileNames('pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'pe_condiff_residuals_mathot_nonBaselineCorrected_cubicSplineNew', 'pe_condiff_predicted_mathot_nonBaselineCorrected_cubicSplineNew');
 
 % Run analysis and save
 [betas, perm, ~, ~] = PupilRegression.runAnalysis();
@@ -338,7 +533,7 @@ PupilRegression.saveResults();
 % =======================================================================
 
 %% ANALYSIS 10: Figure S11
-fprintf('\n=== Running Analysis 10: Main Model - Preprint Pipeline ===\n');
+fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
@@ -364,7 +559,7 @@ PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
 PupilRegression.timewindow = 'feedback';
 PupilRegression.col = 300;
 PupilRegression.regress_rt = 0;
-PupilRegression.baseline_mdl = 1;  % non-baseline corrected signal
+PupilRegression.baseline_mdl = 0;  
 PupilRegression.binned = 0;
 PupilRegression.binned_accuracy = 0;
 PupilRegression.two_tailed = 0;
@@ -373,10 +568,140 @@ PupilRegression.preds_all = preds_all;
 PupilRegression.residuals_predicted = 0;
 
 % Set filenames for saving
-PupilRegression.setFileNames('pe_condiff_deconvolution', 'perm_pe_condiff_deconvolution', '', '');
+PupilRegression.setFileNames('pe_condiff_deconvolution_updatedClusterStat', 'perm_pe_condiff_deconvolution_updatedClusterStat', '', '');
 
 % Run analysis and save
 [betas, perm, ~, ~] = PupilRegression.runAnalysis();
 PupilRegression.saveResults();
+
+%% ANALYSIS 10: Figure S11 but w/o baseline correction
+fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+if ~exist(save_dir, 'dir'), mkdir(save_dir); end
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt + zsc_condiff + pe:zsc_condiff';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 0;
+PupilRegression.baseline_mdl = 0;  
+PupilRegression.binned = 0;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 0;
+PupilRegression.bins_array = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 0;
+
+% Set filenames for saving
+PupilRegression.setFileNames('pe_condiff_deconvolution_nonBaselineCorrected', 'perm_pe_condiff_deconvolution_nonBaselineCorrected', '', '');
+
+% Run analysis and save
+[betas, perm, ~, ~] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
+%% ANALYSIS 3: REGRESSED RT MODEL BUT WITH DECONVOLUTION
+
+fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+if ~exist(save_dir, 'dir'), mkdir(save_dir); end
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + zsc_condiff + pe:zsc_condiff + rt';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 1;  % regress RT effects
+PupilRegression.baseline_mdl = 0;
+PupilRegression.binned = 0;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 0;
+PupilRegression.bins_array = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 0;
+
+% Set filenames for saving
+PupilRegression.setFileNames('pe_condiff_regressedRT_deconvolution', 'perm_pe_condiff_regressedRT_deconvolution', '', '');
+
+% Run analysis and save
+[betas, perm, ~, ~] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
+%% ANALYSIS: BINNED REGRESSION APPROACH (Figure 3c) BUT WITH DECONVOLUTION-BASED
+
+fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) ===\n');
+
+PupilRegression = PupilRegression();
+PupilRegression.setSubjects(subj_ids, num_sess);
+
+% Set paths
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+if ~exist(save_dir, 'dir'), mkdir(save_dir); end
+PupilRegression.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+
+% Set model parameters
+model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt';
+vars = unique(regexp(model_def, '\w+', 'match'), 'stable'); % This regex finds all words, excluding the '~', '+', and ':' operators
+dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars); % Using 'VariableNames' ensures the table matches your model_def
+tmpMdl = fitlm(dummyData, model_def); % 3. Fit a "thin" model to get the structure
+numBetas = tmpMdl.NumCoefficients; % 4. Get the count 
+num_vars = numBetas - 1;
+pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
+cat_vars = {'condition','reward','ecoperf'};
+PupilRegression.setModel(model_def, pred_vars, cat_vars, num_vars);
+
+% Set analysis parameters
+PupilRegression.timewindow = 'feedback';
+PupilRegression.col = 300;
+PupilRegression.regress_rt = 0;
+PupilRegression.baseline_mdl = 0;
+PupilRegression.binned = 1;
+PupilRegression.bins = prctile(preds_all.con_diff, 0:50:100);
+PupilRegression.bins_array = 1:2;
+PupilRegression.binned_accuracy = 0;
+PupilRegression.two_tailed = 1;
+PupilRegression.preds_all = preds_all;
+PupilRegression.residuals_predicted = 0;
+
+% Set filenames for saving
+PupilRegression.setFileNames('pe_condiff2bins_deconv', 'perm_pe_condiff2bins_deconv', '', '');
+
+% Run analysis and save
+[betas, perm, ~, ~] = PupilRegression.runAnalysis();
+PupilRegression.saveResults();
+
 
 fprintf('\n=== All analyses completed successfully ===\n');
