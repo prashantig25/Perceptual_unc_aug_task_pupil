@@ -104,7 +104,7 @@ baseline = "event-specific";
 
 % Save directories
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linear int');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
 
 % Create directories if they don't exist yet
 if ~exist(save_dir, 'dir')
