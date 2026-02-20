@@ -1,11 +1,17 @@
 classdef preprocess_LR < preprocess_vars
-% PREPROCESS_LR initialises, computes and preprocesses required regressors for
-% model based analyses.
-        methods
-            function obj = preprocess_LR()
-            % The contructor methods initialises all other properties of
-            % the class that are computed based on exisitng static properties of
-            % the class.
+    % PREPROCESS_LR initialises, computes and preprocesses required regressors for
+    % model based analyses.
+    methods
+
+        function obj = preprocess_LR()
+            % The contructor methods initialises the class.
+        end
+
+        function get_data(obj)
+            % This function gets all relevant data.
+            %
+            % INPUT:
+            %   obj: current object
 
             obj.data = readtable(obj.filename);
             obj.data(isnan(obj.data.slider),:) = [];
@@ -18,10 +24,12 @@ classdef preprocess_LR < preprocess_vars
             obj.recoded_reward = NaN(height(obj.data),1);
             obj.mu_t = NaN(height(obj.data),1);
             obj.mu_t_1 = NaN(height(obj.data),1);
+            
+            % todo: why is this necessary?
             if ~ismember('trials',obj.data.Properties.VariableNames)
                 obj.data.trials = obj.data.trial;
             end
-            end
+        end
 
         function flip_mu(obj)
             % function flip_mu computes the reported contingency parameter, after
@@ -31,11 +39,11 @@ classdef preprocess_LR < preprocess_vars
             %   obj: current object
 
             incongruent_idx = obj.data.congruence == 0; % incongruent trials index
-            obj.flipped_mu(incongruent_idx) = 1 - obj.mu(incongruent_idx); % for incongruent 
-            obj.flipped_mu(~incongruent_idx) = obj.mu(~incongruent_idx); % for congruent 
+            obj.flipped_mu(incongruent_idx) = 1 - obj.mu(incongruent_idx); % for incongruent
+            obj.flipped_mu(~incongruent_idx) = obj.mu(~incongruent_idx); % for congruent
         end
 
-        function compute_action_dep_rew(obj)       
+        function compute_action_dep_rew(obj)
             % function compute_action_dep_rew recodes task generated reward
             % contingent on action.
             %
@@ -45,10 +53,12 @@ classdef preprocess_LR < preprocess_vars
             recoding = obj.action .* ((-1) .^ (2 + obj.obtained_reward)); % recoding for action = 0
             obj.recoded_reward = obj.obtained_reward + recoding; % storing recoded values
         end
-        
+
         function compute_mu(obj)
             % function compute_mu computes the reported contingency parameter,
             % depending on if actual mu < 0.5.
+            %
+            % TODO: consider adding a sentence on this to methods (in context of eq. 4.)
             %
             % INPUTS:
             %   obj: current object
@@ -64,9 +74,9 @@ classdef preprocess_LR < preprocess_vars
             end
         end
 
-        function [pe,up] = compute_state_dep_pe(obj)    
+        function [pe,up] = compute_state_dep_pe(obj)
             % function compute_state_dep_pe computes prediction error, using recoded
-            % reward and contingent on state
+            % reward and contingent on state (eq. 6)
             %
             % INPUTS:
             %   obj: current object
@@ -76,14 +86,18 @@ classdef preprocess_LR < preprocess_vars
             % COMPUTE PE
             obj.data.pe(state_zero_idx) = obj.recoded_reward(state_zero_idx) - obj.mu_t_1(state_zero_idx); % state = 0
             obj.data.pe(~state_zero_idx) = (1 - obj.recoded_reward(~state_zero_idx)) - obj.mu_t_1(~state_zero_idx); % state = 1
-            
+
             % COMPUTE UP
             obj.data.up = NaN(height(obj.data),1);
-            obj.data.up(2:end) = obj.mu_t(2:height(obj.data)) - obj.mu_t_1(2:height(obj.data));
+            obj.data.up(2:end) = obj.mu_t(2:height(obj.data)) - obj.mu_t_1(2:height(obj.data)); % todo: ":end" instead of height(...)
+            
+            % Set first trial of each block (and subject) to zero to avoid
+            % spillover effect across blocks. PE = zero is excluded
+            % from the regression model
             obj.data.pe(obj.data.trials == 1,1) = 0;
         end
 
-        function compute_confirm(obj)            
+        function compute_confirm(obj)
             % function compute_confirm checks whether the outcome confirms the
             % choice.
             %
@@ -92,29 +106,29 @@ classdef preprocess_LR < preprocess_vars
 
             % High contrast trials
             contrast_one_idx = obj.data.contrast == 1;
-            
+
             % actual mu < 0.5
             obj.data.confirm_rew(contrast_one_idx & (obj.state == obj.action)) = 1 - obj.obtained_reward(contrast_one_idx & (obj.state == obj.action)); % less rewarding state-action
             obj.data.confirm_rew(contrast_one_idx & (obj.state ~= obj.action)) = obj.obtained_reward(contrast_one_idx & (obj.state ~= obj.action));
-            
+
             % actual mu > 0.5
             obj.data.confirm_rew(~contrast_one_idx & (obj.state ~= obj.action)) = 1 - obj.obtained_reward(~contrast_one_idx & (obj.state ~= obj.action)); % less rewarding state-action
             obj.data.confirm_rew(~contrast_one_idx & (obj.state == obj.action)) = obj.obtained_reward(~contrast_one_idx & (obj.state == obj.action));
         end
 
-        function remove_conditions(obj)        
+        function remove_conditions(obj)
             % function remove_conditions removes conditions that are not wanted for
             % further analysis.
             %
             % INPUTS:
             %   obj: current object
-            
+
             obj.data = obj.data(obj.condition ~= obj.removed_cond,:);
             obj.condition = obj.data.choice_cond;
         end
 
         function zscored = compute_nanzscore(var_zscore)
-            % function compute_nanzscore computes the z-score for a given 
+            % function compute_nanzscore computes the z-score for a given
             % variable.
             %
             % INPUTS:
@@ -123,7 +137,7 @@ classdef preprocess_LR < preprocess_vars
             zscored = nanzscore(var_zscore);
         end
 
-        function normalised = compute_normalise(~,var_normalise)       
+        function normalised = compute_normalise(~,var_normalise)
             % function compute_normalise normalises a given variable.
             %
             % INPUTS:
@@ -131,12 +145,12 @@ classdef preprocess_LR < preprocess_vars
             %
             % OUTPUTS:
             %   normalised: normalised variable
-            
-            norm_data = NaN(height(var_normalise),1);
-            normalised = normalise_zero_one(var_normalise,norm_data);
+
+            norm_data = NaN(height(var_normalise), 1);
+            normalised = normalise_zero_one(var_normalise, norm_data);
         end
 
-        function compute_ru(obj)        
+        function compute_ru(obj)
             % function compute_ru checks if reward uncertainty is high or low, given
             % the experimental condition.
             %
@@ -146,23 +160,23 @@ classdef preprocess_LR < preprocess_vars
             obj.data.ru = obj.condition ~= 1; % Set ru to 0 where condition is 1, and to 1 otherwise
         end
 
-        function add_vars(obj,var,varname)        
+        function add_vars(obj,var,varname)
             % function add_vars adds array as table columns.
             %
             % INPUTS:
             %   obj: current object
             %   var: array to be added
             %   varname: table column name to be used
-            
+
             obj.data = addvars(obj.data,var,'NewVariableNames',varname);
         end
 
-        function remove_zero_pe(obj) 
+        function remove_zero_pe(obj)
             % function remove_zero_pe gets rid of trials with PE = 0
             %
             % INPUTS:
             %   obj: current object
-            
+
             obj.data = obj.data(obj.data.pe ~= 0,:);
         end
 
