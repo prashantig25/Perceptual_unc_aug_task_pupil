@@ -299,7 +299,6 @@ PupilRegression.setFileNames('pe_condiff2bins_cubicSplineNew', 'perm_pe_condiff2
 PupilRegression.saveResults();
 
 
-
 %% ANALYSIS 3: REGRESSED RT MODEL (Figure S12)
 
 %%%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%%
@@ -391,7 +390,7 @@ PupilRegression.setFileNames('pe_condiff_regressedRT_cubicSplineNew', 'perm_pe_c
 PupilRegression.saveResults();
 
 
-%% ANALYSIS 5: PATCH-LOCKED PUPIL DILATION (Figure S8)
+%% ANALYSIS 4: PATCH-LOCKED PUPIL DILATION (Figure S8)
 
 fprintf('\n=== Running Analysis 5: Patch-Locked Pupil Dilation (Figure S9) ===\n');
 
@@ -438,9 +437,9 @@ PupilRegression.saveResults();
 %    Excludes high-pass filtering and only has baseline correction
 % =======================================================================
 
-%% ANALYSIS 6: MAIN MODEL BUT ON NON-BASELINE CORRECTED SIGNAL + MATHOT et al., 2022 PIPELINE
+%% ANALYSIS 5: MAIN MODEL BUT ON NON-BASELINE CORRECTED SIGNAL + MATHOT et al., 2022 PIPELINE
 
-fprintf('\n=== Running Analysis 6: Non-baseline corrected Linear Interpolation ===\n');
+fprintf('\n=== Running Analysis 5: Non-baseline corrected Linear Interpolation ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
@@ -485,7 +484,7 @@ PupilRegression.saveResults();
 
 %%%%%%%%% CUBIC SPLINE INTERPOLATION %%%%%%%%
 
-fprintf('\n=== Running Analysis 6: Non-baseline corrected cubic spline interpolation ===\n');
+fprintf('\n=== Running Analysis 5: Non-baseline corrected cubic spline interpolation ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
@@ -532,8 +531,8 @@ PupilRegression.saveResults();
 %       Deconvolution-based correction for blinks and saccades
 % =======================================================================
 
-%% ANALYSIS 10: Figure S11
-fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
+%% ANALYSIS 6: Figure S11
+fprintf('\n=== Running Analysis 6: Main Model - Deconvolution Pipeline ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
@@ -574,8 +573,8 @@ PupilRegression.setFileNames('pe_condiff_deconvolution_updatedClusterStat', 'per
 [betas, perm, ~, ~] = PupilRegression.runAnalysis();
 PupilRegression.saveResults();
 
-%% ANALYSIS 10: Figure S11 but w/o baseline correction
-fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
+%% ANALYSIS 6: Figure S11 but w/o baseline correction
+fprintf('\n=== Running Analysis 6: Main Model - Deconvolution Pipeline ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
@@ -616,9 +615,9 @@ PupilRegression.setFileNames('pe_condiff_deconvolution_nonBaselineCorrected', 'p
 [betas, perm, ~, ~] = PupilRegression.runAnalysis();
 PupilRegression.saveResults();
 
-%% ANALYSIS 3: REGRESSED RT MODEL BUT WITH DECONVOLUTION
+%% ANALYSIS 7: REGRESSED RT MODEL BUT WITH DECONVOLUTION
 
-fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) ===\n');
+fprintf('\n=== Running Analysis 7: Regressed RT Model (Figure S8) ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
@@ -661,7 +660,7 @@ PupilRegression.saveResults();
 
 %% ANALYSIS: BINNED REGRESSION APPROACH (Figure 3c) BUT WITH DECONVOLUTION-BASED
 
-fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) ===\n');
+fprintf('\n=== Running Analysis 8: Binned Regression Approach (Figure 3c) ===\n');
 
 PupilRegression = PupilRegression();
 PupilRegression.setSubjects(subj_ids, num_sess);
