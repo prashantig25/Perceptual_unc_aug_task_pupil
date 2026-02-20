@@ -102,9 +102,14 @@ end
 % Turn off trial-specific baseline
 baseline = "event-specific";
 
-% Save directory
+% Save directories
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linear int');
+
+% Create directories if they don't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
 % Create directories if they don't exist yet
 if ~exist(save_dir, 'dir')
