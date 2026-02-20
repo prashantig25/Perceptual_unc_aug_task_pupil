@@ -25,7 +25,7 @@ classdef preprocess_LR < preprocess_vars
 
         function flip_mu(obj)
             % function flip_mu computes the reported contingency parameter, after
-            % correcting for incongruent blocks (eq. 16).
+            % correcting for incongruent blocks (eq. 4).
             %
             % INPUTS:
             %   obj: current object

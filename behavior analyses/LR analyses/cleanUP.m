@@ -44,7 +44,7 @@ for n = 1:num_subjs
 
     % LOOP OVER NUMBER OF SESSIONS FOR THAT PARTICIPANT
 
-    filename = strcat(behv_dir,'\',subj_ids{n},format); % filename
+    filename = strcat(behv_dir, filesep, subj_ids{n},format); % filename
     data = readtable(filename); % read file
 
     % REMOVE MISSED SLIDER TRIALS
@@ -53,14 +53,14 @@ for n = 1:num_subjs
         missed_trials = []; % initialize array for index of missed trials
         for i = 1:height(data)
             if isnan(data.slider(i,:)) % check if participant has not responded
-                missed_trials = [missed_trials;i];
+                missed_trials = [missed_trials; i];
             end
         end
         if num_sess(n) > 1
             if j == 2
-                missed_trials_all = [missed_trials_all;missed_trials+sess_trials(1)];
+                missed_trials_all = [missed_trials_all; missed_trials+sess_trials(1)];
             else
-                missed_trials_all = [missed_trials_all;missed_trials];
+                missed_trials_all = [missed_trials_all; missed_trials];
             end
         end
         data(missed_trials,:) = []; % delete such trials
@@ -83,7 +83,7 @@ for n = 1:num_subjs
     data_subj = [];
 end
 
-save_file = strcat(save_dir,'\','pupilbehv_allNEW','.xlsx');
+save_file = strcat(save_dir, filesep, 'pupilbehv_allNEW','.xlsx');
 safe_saveall(save_file,data_all);
 
 
