@@ -16,8 +16,8 @@ function stat = clusterStat(data1, data2, nsubj)
 %     cfgstats.minnbchan        = 1; % average over chans
     cfgstats.tail             = 0; % two-tailed!
     cfgstats.clustertail      = 0; % two-tailed!
-    cfgstats.alpha            = 0.05;
-    cfgstats.numrandomization = 500; % make sure this is large enough
+    cfgstats.alpha            = 0.025;
+    cfgstats.numrandomization = 1000; % make sure this is large enough
     cfgstats.randomseed       = 1; % make the stats reproducible!
     
     % use only our preselected sensors for the time being

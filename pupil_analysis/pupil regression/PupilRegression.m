@@ -198,7 +198,7 @@ classdef PupilRegression < pupilReg_Vars
             missedtrials = isnan(behv_data.rt) | isnan(behv_data.slider);
             
             % Remove all missed trials from behavioral data
-            behv_data(missedtrials == 1, :) = [];
+            behv_data(missedtrials == 1, :) = []; %%%%%%%%%% 
         end
         
         function [zsc_pupil, xgaze_signal, ygaze_signal] = loadPupilGazeData(obj, subj_idx, missedtrials, missedtrials_slider)
@@ -245,11 +245,9 @@ classdef PupilRegression < pupilReg_Vars
             end
             
             % Remove trials with missing behavioral responses
-            zsc_pupil(missedtrials_slider == 1, :) = [];
-            xgaze_signal(missedtrials_slider == 1, :) = [];
-            ygaze_signal(missedtrials_slider == 1, :) = [];
-            % xgaze_signal(missedtrials, :) = [];
-            % ygaze_signal(missedtrials, :) = [];
+            zsc_pupil(missedtrials_slider == 1, :) = []; %%%%%%%
+            xgaze_signal(missedtrials_slider == 1, :) = []; %%%%%%%
+            ygaze_signal(missedtrials_slider == 1, :) = []; %%%%%%%
         end
         
         function zsc_pupil = regressRTEffects(obj, zsc_pupil, behv_data)
@@ -314,10 +312,6 @@ classdef PupilRegression < pupilReg_Vars
             % Extract predictors for current subject
             preds = obj.preds_all(obj.preds_all.id == str2double(obj.subj_ids{subj_idx}), :);
             
-            % Remove trials with missing slider responses
-            % preds(isnan(preds.slider), :) = [];
-            % preds(missedtrials_slider == 1, :) = [];
-            
             % Remove trials with zero prediction error (invalid trials)
             validIndices = find(preds.pe == 0);
             preds(validIndices, :) = [];
@@ -332,7 +326,7 @@ classdef PupilRegression < pupilReg_Vars
             end
 
             % List all variables you want to check
-            vars_to_check = {preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data};
+            vars_to_check = {preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data}; %%%%%%%
 
             % Add baseline if it exists
             if obj.baseline_mdl == 1
