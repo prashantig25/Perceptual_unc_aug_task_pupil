@@ -71,7 +71,7 @@ end
 base_trialspecific = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linear int');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
 mkdir(save_dir);
 
 for s = 1:num_subs
@@ -151,6 +151,7 @@ time_base = 10;
 event_name = 'response';
 base_trialspecific = 1;
 main = 1;
+base = 1;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int');
@@ -195,6 +196,10 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelin
 
 %% 1. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE
 
+time_pupil = 1000;
+time_base = 10;
+event_name = 'feedback';
+base = 1;
 base_trialspecific = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
