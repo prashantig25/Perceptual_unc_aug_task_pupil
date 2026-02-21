@@ -41,13 +41,14 @@ currentDir_dat = strcat(desiredPath, filesep, baseDir, filesep, 'DAT'); % Constr
 save_dirASC = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'asc2dat_converted'); 
 mkdir(save_dirASC);
 
-% RUN MAIN PIPELINE (no filtering, cubic-spline interpolation)
-disp('===== RUNNING MAIN PIPELINE =====');
+%% RUN MAIN PIPELINE (no filtering, linear interpolation)
+
+disp('===== RUNNING MAIN PIPELINE WITH LINEAR INTERPOLATION =====');
 noFiltering = 1; % no filter applied (main MS pipeline)
-linearInt = 0; % cubic-spline interpolation (main MS pipeline)
+linearInt = 1; % cubic-spline interpolation (main MS pipeline)
 
 % Set up save directory for main pipeline
-save_dir_main = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed'); 
+save_dir_main = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed linear int'); 
 mkdir(save_dir_main);
 
 % Preprocess
@@ -57,10 +58,31 @@ preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
 
 % Add event names and trial numbers
 preproc_dir = save_dir_main;
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed trials and events added'); 
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed linear int trials and events added'); 
 add_eventstrials;
 
-% RUN ALTERNATE PIPELINE (with filtering, linear interpolation)
+%% RUN MAIN PIPELINE (no filtering, cubic-spline interpolation)
+
+disp('===== RUNNING MAIN PIPELINE WITH CUBIC SPLINE INTERPOLATION =====');
+noFiltering = 1; % no filter applied (main MS pipeline)
+linearInt = 0; % cubic-spline interpolation (main MS pipeline)
+
+% Set up save directory for main pipeline
+save_dir_main = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed cubic spline new'); 
+mkdir(save_dir_main);
+
+% Preprocess
+preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
+    downsample_rate, event_names, deconv_time, save_dir_main, currentDir_asc, currentDir_dat, ...
+    save_dirASC, using_DAT, noFiltering, linearInt)
+
+% Add event names and trial numbers
+preproc_dir = save_dir_main;
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed cubic spline new trials and events added'); 
+add_eventstrials;
+
+%% RUN ALTERNATE PIPELINE (with filtering, deconvolution-based)
+
 disp('===== RUNNING ALTERNATE PIPELINE =====');
 noFiltering = 0; % filter applied (supplement pipeline)
 linearInt = 1; % linear interpolation (supplement pipeline)
