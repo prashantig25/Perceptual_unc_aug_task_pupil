@@ -217,6 +217,7 @@ time_base = 10;
 event_name = 'response';
 base_trialspecific = 1;
 main = 1;
+base = 1;
 
 % Trial-specific baseline
 baseline = "trialspecific";
@@ -278,8 +279,10 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelin
 
 %% 1. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE
 
-% not working for me
-
+time_pupil = 1000;
+time_base = 10;
+event_name = 'feedback';
+base = 1;
 base_trialspecific = 0;
 base = 1;
 

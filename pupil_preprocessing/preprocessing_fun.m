@@ -20,11 +20,32 @@ function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs,
 sample_num = sampling_rate/downsample_rate;
 num_subs = length(subj_ids);
 
+% Build a human-readable pipeline label from input flags
+if noFiltering == 1 && linearInt == 0
+    pipeline_label = 'Main pipeline | No filter | Cubic spline';
+elseif noFiltering == 1 && linearInt == 1
+    pipeline_label = 'Main pipeline | No filter | Linear interp';
+elseif noFiltering == 0 && linearInt == 1
+    pipeline_label = 'Alternate pipeline | Bandpass filter | Linear interp';
+else
+    pipeline_label = 'Custom pipeline';
+end
+
+% Create subject-level waitbar
+wb = waitbar(0, sprintf('[%s]\nStarting...', pipeline_label), ...
+    'Name', 'Pupil Preprocessing');
+cleanupWB = onCleanup(@() close(wb)); % auto-close on error or completion
+
 % LOOP OVER PARTICIPANTS
 for s = 1:num_subs
 
     % LOOP OVER SESSIONS
     for ss = 1:num_sess(s)
+
+        % Update waitbar: show pipeline, subject, and session
+        progress = ((s-1) * num_sess(s) + ss) / (num_subs * num_sess(s));
+        waitbar(progress, wb, sprintf('[%s]\nSubject %s (%d/%d) — Session %d/%d', ...
+            pipeline_label, subj_ids{s}, s, num_subs, ss, num_sess(s)));
 
         % READ DAT AND ASC FILES
         % DAT FOR PUPIL SIZE AND GAZE COORDINATES
