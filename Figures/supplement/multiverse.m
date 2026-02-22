@@ -13,14 +13,21 @@ xaxis = linspace(-300,2700,300);
 num_subs = 47;
 col = 300;
 
-main_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/" + ...
-    "Perceptual_unc_aug_task_pupil-main/data/GB data two pipelines/pupil/regression/main";
-alt_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/" + ...
-    "Perceptual_unc_aug_task_pupil-main/data/GB data two pipelines/pupil/regression/control analyses for revisions"; % for all deconvolution and het-based analysis
+currentDir = cd;
+reqPath    = 'Perceptual_unc_aug_task_pupil-main';
+pathParts  = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    desiredPath = currentDir;
+else
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+
+main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
+alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 
 % Load OLS coefficient names and find pe:zsc_condiff index dynamically
-ols_coeff_names = importdata(fullfile(main_dir, 'coeffNames_pe_condiff_linearInt.mat'));
-pe_condiff_idx  = find(strcmp(ols_coeff_names, 'pe:zsc_condiff'));
+ols_coeff_names = importdata(fullfile(main_dir, 'pe_condiff_linearInt_coeffNames.mat'));
+pe_condiff_idx  = find(strcmp(ols_coeff_names, 'zsc_condiff:pe'));
 
 % Load hetero coefficient names and find PExCondiff index dynamically
 het_coeff_names    = importdata(fullfile(alt_dir, 'coeff_names_hetero.mat'));
@@ -56,9 +63,9 @@ betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE
 fprintf('Running permutation tests for heteroskedasticity analyses...\n');
 
 % Heteroskedastic permutation test
-perm_linear_het = get_permtest(1:size(betas_linear_het.with_intercept,2), num_subs, col, betas_linear_hetero.with_intercept, [], 0, 1);
-perm_cubic_het = get_permtest(1:size(betas_cubic_het.with_intercept,2), num_subs, col, betas_cubic_hetero.with_intercept, [], 0, 1);
-perm_deconv_het = get_permtest(1:size(betas_deconv_het.with_intercept,2), num_subs, col, betas_deconv_hetero.with_intercept, [], 0, 1);
+perm_linear_het = get_permtest(1:size(betas_linear_het.with_intercept,2), num_subs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_cubic_het = get_permtest(1:size(betas_cubic_het.with_intercept,2), num_subs, col, betas_cubic_het.with_intercept, [], 0, 1);
+perm_deconv_het = get_permtest(1:size(betas_deconv_het.with_intercept,2), num_subs, col, betas_deconv_het.with_intercept, [], 0, 1);
 
 fprintf('Permutation tests complete!\n');
 
@@ -137,9 +144,9 @@ pecondiff_pval_cubicSpline_noBL = perm_cubicSpline_noBL.mask(pe_condiff_idx,:);
 pecondiff_pval_deconv_noBL = perm_deconv_noBL.mask(pe_condiff_idx,:);
 
 % Heteroskedasticity
-pecondiff_pval_linear_hetero = perm_linear_hetero.mask(pe_condiff_idx_hetero,:);
-pecondiff_pval_cubic_hetero = perm_cubic_hetero.mask(pe_condiff_idx_hetero,:);
-pecondiff_pval_deconv_hetero = perm_deconv_hetero.mask(pe_condiff_idx_hetero,:);
+pecondiff_pval_linear_het = perm_linear_het.mask(pe_condiff_idx_het,:);
+pecondiff_pval_cubic_het = perm_cubic_het.mask(pe_condiff_idx_het,:);
+pecondiff_pval_deconv_het = perm_deconv_het.mask(pe_condiff_idx_het,:);
 
 % P-values - original 9
 pecondiff_prob_linearInt = min(unique(perm_linearInt.prob(pe_condiff_idx,:)));
@@ -153,9 +160,9 @@ pecondiff_prob_cubicSpline_noBL = min(unique(perm_cubicSpline_noBL.prob(pe_condi
 pecondiff_prob_deconv_noBL = min(unique(perm_deconv_noBL.prob(pe_condiff_idx,:)));
 
 % P-values - heteroskedasticity
-pecondiff_prob_linear_hetero = min(unique(perm_linear_hetero.prob(pe_condiff_idx_hetero,:)));
-pecondiff_prob_cubic_hetero = min(unique(perm_cubic_hetero.prob(pe_condiff_idx_hetero,:)));
-pecondiff_prob_deconv_hetero = min(unique(perm_deconv_hetero.prob(pe_condiff_idx_hetero,:)));
+pecondiff_prob_linear_het = min(unique(perm_linear_het.prob(pe_condiff_idx_het,:)));
+pecondiff_prob_cubic_het = min(unique(perm_cubic_het.prob(pe_condiff_idx_het,:)));
+pecondiff_prob_deconv_het = min(unique(perm_deconv_het.prob(pe_condiff_idx_het,:)));
 
 %% DEFINE 12 COLORS IN 4 HARMONIZING FAMILIES (BY ANALYSIS TYPE)
 
@@ -237,9 +244,9 @@ plot(xaxis(pecondiff_pval_deconv_RT==1), y_positions(7)*ones(1,sum(pecondiff_pva
 plot(xaxis(pecondiff_pval_linearInt_noBL==1), y_positions(6)*ones(1,sum(pecondiff_pval_linearInt_noBL==1)), '.', 'color', color_linear_noBL, 'markersize', marker_size);
 plot(xaxis(pecondiff_pval_cubicSpline_noBL==1), y_positions(5)*ones(1,sum(pecondiff_pval_cubicSpline_noBL==1)), '.', 'color', color_cubic_noBL, 'markersize', marker_size);
 plot(xaxis(pecondiff_pval_deconv_noBL==1), y_positions(4)*ones(1,sum(pecondiff_pval_deconv_noBL==1)), '.', 'color', color_deconv_noBL, 'markersize', marker_size);
-plot(xaxis(pecondiff_pval_linear_hetero==1), y_positions(3)*ones(1,sum(pecondiff_pval_linear_hetero==1)), '.', 'color', color_linear_hetero, 'markersize', marker_size);
-plot(xaxis(pecondiff_pval_cubic_hetero==1), y_positions(2)*ones(1,sum(pecondiff_pval_cubic_hetero==1)), '.', 'color', color_cubic_hetero, 'markersize', marker_size);
-plot(xaxis(pecondiff_pval_deconv_hetero==1), y_positions(1)*ones(1,sum(pecondiff_pval_deconv_hetero==1)), '.', 'color', color_deconv_hetero, 'markersize', marker_size);
+plot(xaxis(pecondiff_pval_linear_het==1), y_positions(3)*ones(1,sum(pecondiff_pval_linear_het==1)), '.', 'color', color_linear_hetero, 'markersize', marker_size);
+plot(xaxis(pecondiff_pval_cubic_het==1), y_positions(2)*ones(1,sum(pecondiff_pval_cubic_het==1)), '.', 'color', color_cubic_hetero, 'markersize', marker_size);
+plot(xaxis(pecondiff_pval_deconv_het==1), y_positions(1)*ones(1,sum(pecondiff_pval_deconv_het==1)), '.', 'color', color_deconv_hetero, 'markersize', marker_size);
 
 xlim(xlim_axes)
 ylim([0,1])
@@ -257,7 +264,7 @@ hold on
 p_values = [pecondiff_prob_linearInt, pecondiff_prob_cubicSpline, pecondiff_prob_deconv, ...
             pecondiff_prob_linearInt_RT, pecondiff_prob_cubicSpline_RT, pecondiff_prob_deconv_RT, ...
             pecondiff_prob_linearInt_noBL, pecondiff_prob_cubicSpline_noBL, pecondiff_prob_deconv_noBL, ...
-            pecondiff_prob_linear_hetero, pecondiff_prob_cubic_hetero, pecondiff_prob_deconv_hetero];
+            pecondiff_prob_linear_het, pecondiff_prob_cubic_het, pecondiff_prob_deconv_het];
 
 colors_all = [color_linear; color_cubic; color_deconv; ...
               color_linear_RT; color_cubic_RT; color_deconv_RT; ...
@@ -273,8 +280,8 @@ disp(medianPvalues)
 
 medianMultiverse = table(round(medianPvalues, 3), ...
     'VariableNames', {'median'});
-stats_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data two pipelines/pupil/stats";
-safe_saveall(strcat(stats_dir, filesep, 'medianMultiversePval.csv'), medianMultiverse);
+stats_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'stats');
+safe_saveall(fullfile(stats_dir, 'medianMultiversePval.csv'), medianMultiverse);
 
 yline(0.025, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1, 'HandleVisibility', 'off');
 yline(0.05, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1, 'HandleVisibility', 'off');
