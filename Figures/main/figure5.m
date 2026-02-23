@@ -16,8 +16,36 @@ font_name = 'Arial'; % font name
 neutral = [7, 53, 94]/255;
 
 colors_name = darkblue_muted;
-betas_pupil = importdata("betas_behvresidual_abs_pecondiff_nomain.mat");
-perm = importdata("perm_betas_behvresidual_abs_pecondiff_nomain.mat");
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+data_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
+coeffs_name = importdata(fullfile(data_dir,"coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % import coeff names
+pupil_idx = find(strcmp(coeffs_name, 'pupil')); % GET INDEX OF PUPIL COEFFICIENT
+postUP_idx = find(strcmp(coeffs_name, 'post_up')); % GET INDEX OF PUPIL COEFFICIENT
+betas_pupil = importdata(fullfile(data_dir,"betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+perm = importdata(fullfile(data_dir,"perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+
+% GET P-VALUE FOR PUPIL COEFFICIENT
+pupil_pval = perm.prob(pupil_idx,:);
+pupil_min_pval = round(min(pupil_pval), 3);
+
+% FORMAT P-VALUE STRING
+if pupil_min_pval < 0.001
+    pval_str = "\itp\rm < 0.001";
+elseif pupil_min_pval < 0.01
+    pval_str = sprintf("\\itp\\rm = %.3f", pupil_min_pval);
+else
+    pval_str = sprintf("\\itp\\rm = %.2f", pupil_min_pval);
+end
 
 %% TILE LAYOUT
 
@@ -41,14 +69,14 @@ delete(ax1); % delete old axis
 % PLOT
 for s = 1:num_subjs
     for c = 1:col
-        data_plot(s,c) = betas_pupil.with_intercept(1,2,s,c);
+        data_plot(s,c) = betas_pupil.with_intercept(1,postUP_idx,s,c);
     end
 end
 coeffs = nanmean(data_plot,2);
 [avg,sd,coeffs] = prepare_betas(coeffs,1,num_subjs);
 h = bar_plots_pval(coeffs,avg,sd,num_subjs, ...
         1,1,{'','Example participant','Normative agent'}, ...
-        xticks,{'','',''},"\itp\rm < 0.001",'','Posterior update ({\bf\beta_1})',0,1, ...
+        xticks,{'','',''},"\itp\rm < 0.001",'','Posterior update ({\bf\beta_1})',0,1, ...s
         10,1,font_size,linewidth_plot,font_name,0,colors_name,{'*'},0.1);
 h.BarWidth = 0.4;
 ylim_vals = [0 0.85];
@@ -69,16 +97,16 @@ ylim_axes = [-0.02,0.07];
 
 for s = 1:num_subjs
     for c = 1:col
-        data_plot(s,c) = betas_pupil.with_intercept(1,3,s,c);
+        data_plot(s,c) = betas_pupil.with_intercept(1,pupil_idx,s,c);
     end
 end
 coeffs = data_plot;
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(smoothdata(coeffs,2,"movmean")),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(smoothdata(coeffs,2,"movmean")),nanstd(smoothdata(coeffs,2,"movmean"))./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 xline(0,'LineStyle','--','LineWidth',0.5);
@@ -88,17 +116,17 @@ hold on
 plot(xaxis(find(perm.mask(3,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(3,:)==1)))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
-ylim([-0.02,0.07])
+ylim([-0.02,0.08])
 xlabel('Time since feedback onset (ms)')
 ylabel('Pupil dilation ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
-text(mean(xaxis(perm.mask(3,:) == 1)),pval_pos + -0.003,"\itp\rm = 0.01","FontName",font_name,"FontSize", ...
-    font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(xaxis(perm.mask(pupil_idx,:) == 1)),pval_pos + -0.003, pval_str, ...
+    "FontName",font_name,"FontSize",font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 %% ADD SUBPLOT LABELS
 
 ax1_pos = ax1_new.Position;
 adjust_x = -0.095; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.04; % adjusted y-position for subplot label
+adjust_y = ax1_pos(4)+0.03; % adjusted y-position for subplot label
 [label_x,label_y] = change_plotlabel(ax1_new,adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center','VerticalAlignment','top')
@@ -111,4 +139,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'residuals_pupil7_altPipeline1.png', '-dpng', '-r600') 
+print(fig, 'residuals_pupil7_linearInt1.png', '-dpng', '-r600') 

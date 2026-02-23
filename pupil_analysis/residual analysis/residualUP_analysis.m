@@ -30,7 +30,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, "post_absUP_predict.mat")); % posterior update
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
 save_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
 
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
@@ -100,8 +100,11 @@ for n = 1:num_subjs
     end
 end
 
+% SAVE COEFF NAMES
+safe_saveall(strcat(save_dir, filesep, "coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat"), coeffs_name);
+
 % SAVE BETAS
-safe_saveall(strcat(save_dir,filesep,"betas_behvresidual_abs_pecondiff_nomain.mat"), betas_pupil);
+safe_saveall(strcat(save_dir,filesep,"betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"), betas_pupil);
 
 % RUN PERM TEST
 num_vars = 1:num_vars+1; % number of variables
@@ -110,4 +113,4 @@ var2 = betas_pupil.with_intercept;
 betas = 1; % permutation test on regression data
 two_tailed = 0; % run one-tailed permutation test 
 perm = get_permtest(num_vars, num_subjs, col, var1, var2, two_tailed, betas);
-safe_saveall(strcat(save_dir,filesep,"perm_betas_behvresidual_abs_pecondiff_nomain.mat"), perm);
+safe_saveall(strcat(save_dir,filesep,"perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"), perm);
