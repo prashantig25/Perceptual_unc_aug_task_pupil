@@ -84,7 +84,7 @@ classdef PupilDescriptive
                 for i = 1:nTrials
                     base_event_mean(i) = mean(base_event(i,:));
                 end
-                pupil = base_correction(pupil_event, base_event_mean, time_pupil); %base_corrected;
+                pupil = base_correction(pupil_event, base_event_mean, time_pupil); 
 
             else
                 error('Variable "baseline" is undefined. Please initialize properly before running this script.');
@@ -254,7 +254,7 @@ classdef PupilDescriptive
                     pupil_pre_fb = pupil_pre_fb(end-obj.pre_duration:end);
 
                     % Post-feedback time course
-                    pupil_post_fb = [pupil_delay1; pupil_slider];
+                    % pupil_post_fb = [pupil_delay1; pupil_slider];
 
                     % Add pre-feedback to feedback-locked time course
                     pupil_fb_event = [pupil_pre_fb; pupil_fb_event];
@@ -305,7 +305,7 @@ classdef PupilDescriptive
 
             % Loop through all sessions for this subject
             for j = 1:obj.num_sess(subj_idx)
-                
+
                 % Construct filename (special case for subject 4672)
                 filename = fullfile(obj.behv_dir, [obj.subj_ids{subj_idx}, '_main', num2str(j), '.xlsx']);
                 if strcmp(obj.subj_ids{subj_idx}, '4672')
@@ -327,13 +327,13 @@ classdef PupilDescriptive
 
         function pupilData = loadPupilData(obj, subj_idx)
             %LOADPUPILDATA Loas the pupl data
-            % 
-            % INPUT: 
+            %
+            % INPUT:
             %   subj_idx: Subject IDs
             %
             % OUTPUT:
             %   pupilData: Loaded subject data
-            
+
             % GET PUPIL DATA FROM DIFFERENT SESSIONS
             pupilData = [];
             for j = 1:obj.num_sess(subj_idx)
