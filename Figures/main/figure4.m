@@ -17,24 +17,52 @@ neutral = [7, 53, 94]/255;
 num_subs = 47;
 col = 300;
 
-% GET BETAS
-
-betas = importdata("pe_condiff_mathot.mat");
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+betas = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt.mat")); % add PE bin curves
+coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat")); % add PE bin curves
+pe_idx = find(strcmp(coeff_names,'pe'));
+up_idx = find(strcmp(coeff_names,'zsc_up'));
+peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
 for s = 1:num_subs
     for c = 1:col
-        coeffs.pe(s,c) = betas.with_intercept(1,5,s,c);
-        coeffs.pe_condiff(s,c) = betas.with_intercept(1,8,s,c);
-        coeffs.up(s,c) = betas.with_intercept(1,6,s,c);
+        coeffs.pe(s,c) = betas.with_intercept(1,pe_idx,s,c);
+        coeffs.pe_condiff(s,c) = betas.with_intercept(1,peCondiff_idx,s,c);
+        coeffs.up(s,c) = betas.with_intercept(1,up_idx,s,c);
     end
 end
-posterior = importdata("BSweightedPE_interactions.mat");
-perm = importdata("perm_pe_condiff.mat"); 
-pe_pval = perm.mask(5,:);
-pecondiff_pval = perm.mask(8,:);
+posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"BSweightedPE_interactions_linearInt.mat"));
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat")); % add PE bin curves
+pe_pval = perm.mask(pe_idx,:);
+pecondiff_pval = perm.prob(peCondiff_idx,:);
+
+% Compute summary p-values (minimum across timepoints), rounded to 3 decimal places
+pe_min_pval       = round(min(perm.prob(pe_idx,:)), 3);
+pecondiff_min_pval = round(min(pecondiff_pval), 3);
+
+% Format as strings
+if pe_min_pval <= 0.001
+    pe_pval_str = "\itp\rm < 0.001";
+end
+
+if pecondiff_min_pval < 0.001
+    pecondiff_pval_str = "\itp\rm < 0.001";
+else
+    pecondiff_pval_str = sprintf("\\itp\\rm = %.3f", pecondiff_min_pval);
+end
 
 %% INITIALIZE TILE LAYOUT
 
-figure("Position",[200,200,600,200])
+figure(Position=[200,200,450,175])
 hold on
 t = tiledlayout(1,3,"Padding","compact","TileSpacing","compact");
 ax1 = nexttile(1,[1,1]);
@@ -61,9 +89,9 @@ ylim_axes = [-0.04,0.05];
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(smoothdata(coeffs.pe,2,"movmean")),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,nanmean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(smoothdata(coeffs.pe,2,"movmean")),nanstd(smoothdata(coeffs.pe,2,"movmean"))./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,nanmean(coeffs.pe),nanstd(coeffs.pe)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 xline(0,'LineStyle','--','LineWidth',0.5);
@@ -79,9 +107,11 @@ xlim([-300,2700])
 % ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
 ylabel('Absolute PE modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-text(mean(xaxis(pe_pval == 1)),pval_pos + -0.01,"\itp\rm < 0.001","FontName",fontname,"FontSize", ...
-    fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
-
+% text(mean(xaxis(pe_pval == 1)),pval_pos + -0.01,"\itp\rm < 0.001","FontName",fontname,"FontSize", ...
+%     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(xaxis(pe_pval == 1)), pval_pos + -0.01, pe_pval_str, ...
+    "FontName", fontname, "FontSize", fontsize, ...
+    "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 %% PLOT BS-WEIGHTED PE
 
 % POSITION CHANGE
@@ -96,9 +126,9 @@ ylim_axes = [-0.01,0.023];
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(smoothdata(coeffs.pe_condiff,2,"movmean")),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,nanmean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(smoothdata(coeffs.pe_condiff,2,"movmean")),nanstd(smoothdata(coeffs.pe_condiff,2,"movmean"))./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,nanmean(coeffs.pe_condiff),nanstd(coeffs.pe_condiff)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 
@@ -108,15 +138,18 @@ xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 adjust_figprops(ax2_new,fontname,fontsize,linewidth_plot);
 hold on
-plot(xaxis(find(pecondiff_pval==1)), pval_pos + -0.003*ones(1,length(pecondiff_pval(pecondiff_pval == 1))), '.', 'color', ...
+plot(xaxis(find(pecondiff_pval < 0.05)), pval_pos + -0.003*ones(1,length(pecondiff_pval(pecondiff_pval < 0.05))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
 % ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
 % ylabel('BS-weighted-PE (\beta_2)','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 ylabel('BS-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.02","FontName",fontname,"FontSize", ...
-    fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
+% text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.024","FontName",fontname,"FontSize", ...
+%     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + -0.003, pecondiff_pval_str, ...
+    "FontName", fontname, "FontSize", fontsize, ...
+    "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 
 %% ADD POSTERIOR CURVES
 
@@ -129,9 +162,9 @@ delete(ax3);
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(smoothdata(posterior.highPU,2,"movmean")),'Color',high_PU,'LineWidth',1.5)
-plot(xaxis,nanmean(smoothdata(posterior.midPU,2,"movmean")),'Color',mid_PU,'LineWidth',1.5)
-plot(xaxis,nanmean(smoothdata(posterior.lowPU,2,"movmean")),'Color',low_PU,'LineWidth',1.5)
+plot(xaxis,nanmean(posterior.highPU),'Color',high_PU,'LineWidth',1.5)
+plot(xaxis,nanmean(posterior.midPU),'Color',mid_PU,'LineWidth',1.5)
+plot(xaxis,nanmean(posterior.lowPU),'Color',low_PU,'LineWidth',1.5)
 
 % ADJUST FIGURE PROPERTIES
 
@@ -171,4 +204,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'regression_pupil8.png', '-dpng', '-r600') 
+print(fig, 'regression_pupil_linearInt1.png', '-dpng', '-r600') 
