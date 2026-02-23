@@ -14,10 +14,11 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-condiffbin = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "descriptive", filesep, "fb_PE2bins.mat")); % add PE bin curves
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins.mat")); % add PE bin curves
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff2bins.mat")); % add PE bin curves
-trial_all = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "descriptive", filesep, "full_trial.mat")); % add PE bin curves
+condiffbin = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "descriptive", filesep, "fb_PE2bins_linearInt.mat")); % add PE bin curves
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt.mat")); % add PE bin curves
+coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff2bins_linearInt.mat")); % add PE bin curves
+trial_all = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "descriptive", filesep, "full_trial_linearInt.mat")); % add PE bin curves
 
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
@@ -30,7 +31,7 @@ mid_violet = [88, 86, 138]./255;
 light_violet = [158, 172, 206]./255;
 %% TILED LAYOUT
 
-figure(Position=[200,200,600,200])
+figure(Position=[200,200,450,175])
 hold on
 tiledlayout(1,3,"Padding","compact","TileSpacing","compact");
 ax1 = nexttile(1,[1,1]);
@@ -114,14 +115,14 @@ sem_bin2 = nanstd(condiffbin.pebin2)./sqrt(num_subjs);
 
 % PLOT
 hold on
-plot(x,smoothdata(avg_bin1,2,"movmean"),'LineStyle','-','Color',light_violet,'LineWidth',2)
+plot(x,avg_bin1,'LineStyle','-','Color',light_violet,'LineWidth',2)
 hold on
-plot(x,smoothdata(avg_bin2,2,"movmean"),'LineStyle','-','Color',mid_violet,'LineWidth',2)
+plot(x,avg_bin2,'LineStyle','-','Color',mid_violet,'LineWidth',2)
 
 hold on
-shadedErrorBar(x,smoothdata(avg_bin1,2,"movmean"),sem_bin1,{'LineWidth',2,'Color',light_violet},1)
+shadedErrorBar(x,avg_bin1,sem_bin1,{'LineWidth',2,'Color',light_violet},1)
 hold on
-shadedErrorBar(x,smoothdata(avg_bin2,2,"movmean"),sem_bin2,{'LineWidth',2,'Color',mid_violet},1)
+shadedErrorBar(x,avg_bin2,sem_bin2,{'LineWidth',2,'Color',mid_violet},1)
 hold on
 
 % ADJUST PLOT PROPERTIES
@@ -155,7 +156,7 @@ delete(ax3); % delete old axis
 ylim_axes = [-0.05,0.1];
 [pval_pos] = create_pvalpos(ylim_axes);
 
-ncoeffs = 4;
+ncoeffs  = find(strcmp(coeff_names, 'pe'));
 ncats = repelem(2,1,9);
 xlabel_name = 'Time since feedback onset';
 cats = [1,2];
@@ -172,7 +173,7 @@ for j = cats
     end
     hold on
     color = color_cell;
-    ySmoothed = smoothdata(nanmean(data_plot,1));
+    ySmoothed = nanmean(data_plot,1);
     plot(x,ySmoothed,"Color",color{j,:},'LineWidth',2)
     hold on
     m = m + num_subjs;
@@ -186,7 +187,7 @@ for j = cats
             data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs,s,c);
         end
     end
-    ySmoothed = smoothdata(nanmean(data_plot,1));
+    ySmoothed = nanmean(data_plot,1);
     color = cell2mat(color_cell);
     shadedErrorBar(x,ySmoothed,nanstd(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
     hold on
@@ -198,7 +199,7 @@ if disp_perm == 1
     plot(x(find(perm.mask(ncoeffs,:) == 1)), -0.02*ones(1, length(find(perm.mask(ncoeffs,:) == 1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,"\itp\rm = 0.01","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,"\itp\rm = 0.02","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax5_new,'Arial',7,0.5)
@@ -251,4 +252,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'descriptive_pupil8.png', '-dpng', '-r600') 
+print(fig, 'descriptive_pupil_linearInt1.png', '-dpng', '-r600') 

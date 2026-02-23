@@ -22,7 +22,7 @@ end
 save_dir = strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
     filesep, "pupil", filesep, "regression", filesep, "main");
 betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
-    filesep, "pupil", filesep, "regression", filesep, "main", filesep, "pe_condiff.mat"));
+    filesep, "pupil", filesep, "regression", filesep, "main", filesep, "pe_condiff_linearInt.mat"));
 preds_all = readtable(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
     filesep, "behavior", filesep, "LR analyses", filesep, "preprocessed_lr_pupil_no_zerope.xlsx"));
 betas_field = betas_struct.with_intercept;
@@ -49,4 +49,4 @@ for s = 1:num_subjs
 end
 
 % SAVE
-safe_saveall(strcat(save_dir, filesep, "BSweightedPE_interactions.mat"),posterior);
+safe_saveall(strcat(save_dir, filesep, "BSweightedPE_interactions_linearInt.mat"),posterior);

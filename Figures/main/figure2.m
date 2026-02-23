@@ -38,11 +38,19 @@ num_vars = 5; % number of variables
 weight_y_n = 0; % weighted regression
 save_csv = 1; % save stats for 1(d) in CSV file for overleaf
 
-% descriptive_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\descriptive";
-% regression_path = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\Perceptual_unc_aug_task_pupil-main\data\GB data peak corrected\behavior\LR analyses";
+% Path setup
+currentDir = cd;
+reqPath = 'Perceptual_unc_aug_task_pupil-main';
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
 
-descriptive_path = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected/behavior/descriptive";
-regression_path = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected/behavior/LR analyses"; 
+descriptive_path = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'descriptive');
+regression_path  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses');
 
 % load all required data
 mix_curve = importdata(fullfile(descriptive_path,"mix_curve.mat")); % learning curves
@@ -56,7 +64,7 @@ id_subjs = unique(data_subjs.id); % subject IDs
 %% INITIALISE TILE LAYOUT
 
 figure
-set(gcf,'Position',[100 100 600 400])
+set(gcf,'Position',[100 100 500 300])
 t = tiledlayout(3,8);
 t.Padding = 'compact';
 t.TileSpacing = 'compact';
@@ -168,7 +176,7 @@ end
 
 % ADD TEXT BOXES
 all_strings = {'Right stronger','Left stronger'};
-text_xpos = text_xpos - 0.07;
+text_xpos = [text_xpos(1) - 0.075, text_xpos(2) - 0.065];
 text_ypos = text_ypos - 0.06;
 box_width = 0.25; 
 box_height = 0.08;
@@ -295,13 +303,13 @@ hold('on')
 errorbar(1:nbins,avg_ydata, sem_ydata, 'k', 'LineWidth',line_width,'LineStyle','none');
 hold on
 s1 = scatter(1:nbins,avg_ydata,"filled",'MarkerEdgeColor',"k",'MarkerFaceColor',binned_dots);
-xlabel("Contrast difference bins" + newline + "(1 bin = 0.01)")
+xlabel("Contrast-difference bins" + newline + "(1 bin = 0.01)")
 ylabel('Mean learning rate (LR)')
 
 % ADJUST FIGURE PROPERTIES
-% xlim_vals = [0 10.3];
-% ylim_vals = [-0.01 0.17];
-% adjust_figprops(ax10_new,font_name,font_size,line_width,xlim_vals,ylim_vals);
+xlim_vals = [0 10.3];
+ylim_vals = [-0.01 0.17];
+adjust_figprops(ax10_new,font_name,font_size,line_width,xlim_vals,ylim_vals);
 [rho,pval] = corr(avg_ydata,avg_binneddata, 'rows', 'pairwise');
 title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + "\itp\rm < 0.001", ...
     'FontWeight','normal','Interpreter','tex')
@@ -323,7 +331,7 @@ adjust_position = 0.015;
 ylim_lower = [-0.1,-0.1,-0.2]; % lower y-axis limit for each regressor
 ylim_upper = [0.5,0.35,0.6]; % upper y-axis limit for each regressor
 xlabelname = {''}; % x-axis label
-ylabelname = {'Fixed LR','Belief-state-adapted LR','Confirmation bias'}; % y-axis label name for each regressor
+ylabelname = {'Fixed LR','Uncertainty-adapted LR','Confirmation bias'}; % y-axis label name for each regressor
 disp_pval = 0; % if p-val stars should be displayed on top of bars
 scatter_dots = 1; % if single participant data should be scattered on top of bar
 dot_size = 10; % scatter dot size
@@ -400,7 +408,7 @@ xlabel('Prediction error')
 title('Update','FontWeight','normal')
 ylabel('')
 adjust_figprops(ax15_new,font_name,font_size,line_width);
-l = legend('Contrast difference','0','0.5','1','Location','best','AutoUpdate','off');
+l = legend('Contrast-difference','0','0.5','1','Location','best','AutoUpdate','off');
 l.EdgeColor = 'none';
 l.Color = 'none';
 l.ItemTokenSize = [7 7];
@@ -410,12 +418,12 @@ yline(0,"LineWidth",0.5,LineStyle="--")
 %% ADD EXTERNAL PNGs
 
 patch_dim = 0.035; % dimensions for patch
-pos_y = 0.7825 + 0.03; % position of patches on y-axis
+pos_y = 0.7825 + 0.033; % position of patches on y-axis
 pos_x = [0.65,0.605,0.84,0.795]; % position of patches on x-axis
 image_png = {'highcon.png','lowcon_02.png','lowcon_02.png','highcon.png'};
 num_pngs = 4;
 for n = 1:num_pngs
-    axes('pos',[pos_x(n) pos_y patch_dim patch_dim]);
+    axes('pos',[pos_x(n) - 0.005 pos_y patch_dim patch_dim]);
     imshow(image_png{n});
     hold on
 end
@@ -524,4 +532,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'task_behavior_ReviewerResponse.png', '-dpng', '-r600') 
+print(fig, 'task_behavior_ReviewerResponse1.png', '-dpng', '-r600') 
