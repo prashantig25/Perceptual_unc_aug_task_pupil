@@ -2,12 +2,9 @@ clc
 clearvars
 
 % INITIALIZE VARS
-subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
-    '3376','4927','190','306','3391','5047','3922','659','421','3943',...
-    '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
-    '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
-    '3319','129','4684','3886','620','901','900'};
-num_subjs = length(subj_ids);
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
+num_subjs = length(num_sess);
 num_break = 30; % how long should the pupil signal be broken
 col_patch = 100; % how long should the patch-related pupil signal
 col_fb = 300; % how long should the patch-related pupil signal
@@ -25,11 +22,11 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
 xaxis = linspace(-0.3,9.7,1000);
 
 % LOOP OVER SUBJECTS
-figure("Position",[100,100,600,600],"Visible","on")
+figure("Position",[100,100,400,400],"Visible","on")
 participants = [1,26,31,35,15,43];
 for i = 1:length(participants)
 
@@ -48,8 +45,9 @@ for i = 1:length(participants)
     xline(0,'LineStyle','--','LineWidth',0.5)
     xlabel('Time from feedback onset (s)')
     title(strcat("Participant"," ",subj_ids{participants(i)}),'FontWeight','Normal')
+    set(gca,'FontName','Arial','FontSize',7)
 end
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'fb_singleSubj_fullDuration_altPipeline1.png', '-dpng', '-r600') 
+print(fig, 'fb_singleSubj_fullDuration_linearInt1.png', '-dpng', '-r600') 

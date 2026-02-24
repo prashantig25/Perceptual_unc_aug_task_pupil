@@ -64,7 +64,7 @@ hold on
 xlabel('')
 % ylim([-0.3,0])
 set(gca,'Color','none')
-ylabel('Mean partial-\itr^2\rm values','Interpreter','tex')
+ylabel('Mean partial-\itR^2\rm values','Interpreter','tex')
 title('Model fit','FontWeight','normal')
 %% PLOT POSTERIOR DISTRIBUTION
 

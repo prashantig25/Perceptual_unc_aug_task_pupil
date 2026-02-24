@@ -51,7 +51,7 @@ y = [avg_ydata_bins(1,:).';avg_ydata_bins(2,:).'];
 figure("Position",[100,100,200,200])
 hold on
 bar_plots_pval(y,avg_ydata,sem_ydata,num_subjs,2,1,{'',''},[1,2],{'High','Low'},'', ...
-    'Belief-state uncertainty','Mean absolute prediction error (PE)',0,1,10,1,7,0.5,'Arial',0,darkblue_muted,'p = 0.3',0.55)
+    'State uncertainty','Mean absolute prediction error',0,1,10,1,7,0.5,'Arial',0,darkblue_muted,'p = 0.3',0.55)
 hold on 
 plot([1.1, 1.9], ...
         [0.5 0.5], '-','LineWidth', 0.3,'Color','k');

@@ -2,8 +2,21 @@ clc
 clearvars
 
 % Create figure with specified dimensions
-figure('Position', [100, 100, 550, 175]);
+figure(Position=[200,200,400,125])
 binned_dots = [159, 210, 235]./255; % bluish green color for binned analysis data
+
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+
 %% SUBPLOT A - Human Data Belief State Analysis
 subplot(1,3,1)
 
@@ -41,36 +54,27 @@ for n = 1:numSubjs
     end
 end
 
-% Plot individual subjects
-% for n = 1:numSubjs
-%     plot(1:nbins, BS_binned(n,:), 'Color', [0.5,0.5,0.5], 'LineWidth', 0.25);
-%     hold on
-% end
-
 % Plot group mean and error bars
 scatter(1:nbins, nanmean(BS_binned), 50,"white");
-% hold on
-% plot(1:nbins, nanmean(BS_binned), 'Color', 'k');
 hold on
 ls = lsline;
-% errorbar(1:nbins, nanmean(BS_binned), nanstd(BS_binned)./sqrt(numSubjs), 'Color', 'k');
 hold on
 scatter(1:nbins, nanmean(BS_binned), 50, binned_dots, 'filled','MarkerEdgeColor','k');
-% lsline
 
 % Calculate correlation
 x_data_a = 1:nbins;
 y_data_a = nanmean(BS_binned);
 [rho_a, pval_a] = corr(x_data_a', y_data_a', 'rows', 'pairwise');
 xlim([2,10])
-xlabel('Contrast difference bins');
-ylabel('Belief state difference (Agent)');
+xlabel('Contrast-difference bins');
+ylabel('Belief-state difference (Agent)');
 title(strcat("\itr\rm =",{' '},num2str(round(rho_a,2)),{' '}) + newline + "\itp\rm < 0.001", ...
  'FontWeight','normal','Interpreter','tex');
 % Add subplot label A
-text(-0.03, 1.07, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
+text(-0.03, 1.11, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 box off
 hold off
+set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
 
 %% SUBPLOT B - Agent Data Learning Analysis
 subplot(1,3,2)
@@ -129,16 +133,17 @@ ylabel('Mean learning rate (Agent)');
 title(strcat("\itr\rm =",{' '},num2str(round(rho_b(1,2),2)),{' '}) + newline + "\itp\rm < 0.001", ...
  'FontWeight','normal','Interpreter','tex');
 % Add subplot label B
-text(-0.03, 1.07, 'b', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
+text(-0.03, 1.11, 'b', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 
 hold off
+set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
 
 %% SUBPLOT C - Human Data Learning Rate Analysis
 subplot(1,3,3)
 
 % Load and process human learning rate data
-regression_path = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/GB data peak corrected/behavior/LR analyses";
-data_subjs = readtable(fullfile(regression_path,"preprocessed_lr_pupil_no_zerope.xlsx"));
+regression_path = "data/GB data peak corrected/behavior/LR analyses";
+data_subjs = readtable(fullfile(desiredPath,regression_path,"preprocessed_lr_pupil_no_zerope.xlsx"));
 
 % Initialize variables
 binned_data = abs(data_subjs.con_diff);
@@ -183,22 +188,19 @@ errorbar(1:nbins, avg_ydata, sem_ydata, 'k', 'LineWidth', 1, 'LineStyle', 'none'
 hold on
 scatter(1:nbins, avg_ydata, 50, binned_dots, 'filled', 'MarkerEdgeColor', 'k');
 
-% ls.Color = 'k';
 
 % Calculate correlation
 [rho_c, pval_c] = corrcoef(avg_ydata.', avg_binneddata.');
 
-xlabel('Contrast difference bins');
+xlabel('Contrast-difference bins');
 ylabel('Mean learning rate (Participants)');
 title(strcat("\itr\rm =",{' '},num2str(round(rho_c(1,2),2)),{' '}) + newline + "\itp\rm < 0.001", ...
  'FontWeight','normal','Interpreter','tex');
 % Add subplot label C
-text(-0.03, 1.07, 'c', 'Units', 'normalized', 'FontSize', 14, 'FontWeight','normal');
+text(-0.03, 1.11, 'c', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 
 hold off
-
-% Adjust overall figure properties
-% sgtitle('Learning Analysis Across Contrast Difficulty');
+set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
 
 % Make sure subplots are properly spaced
 set(gcf, 'PaperPositionMode', 'auto');

@@ -15,9 +15,9 @@ font_name = 'Arial'; % font name
     reg_color,~,~,~,~] = colors_rgb(); % colors
 neutral = [7, 53, 94]/255;
 
-betas_pupil = importdata("betas_behvresidual_abs_pecondiff_nomain.mat");
-perm = importdata("perm_betas_behvresidual_abs_pecondiff_nomain.mat");
-posterior = importdata("BSarousal_interactions.mat");
+betas_pupil = importdata("betas_behvresidual_abs_pecondiff_nomain_linearInt.mat");
+perm = importdata("perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat");
+posterior = importdata("BSarousal_interactions_linearInt.mat");
 
 %% TILED LAYOT
 
@@ -51,9 +51,9 @@ coeffs = data_plot;
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(smoothdata(coeffs,2,"movmean")),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(smoothdata(coeffs,2,"movmean")),nanstd(smoothdata(coeffs,2,"movmean"))./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 plot(xaxis(find(perm.mask(5,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(5,:)==1)))), '.', 'color', ...
@@ -83,17 +83,19 @@ delete(ax4); % delete old axis
 hold on 
 plot(xaxis,nanmean(posterior.lowarousal_lowcondiff),"LineWidth",2,'LineStyle','--','Color','none')
 plot(xaxis,nanmean(posterior.lowarousal_highcondiff),"LineWidth",2,'LineStyle','--','Color','none')
-plot(xaxis,nanmean(smoothdata(posterior.higharousal_lowcondiff,2,"movmean")),"LineWidth",1,'LineStyle','-','Color',high_PU)
-plot(xaxis,nanmean(smoothdata(posterior.higharousal_highcondiff,2,"movmean")),"LineWidth",1,'LineStyle','-','Color',low_PU)
+plot(xaxis,nanmean(posterior.higharousal_lowcondiff),"LineWidth",1,'LineStyle','-','Color',high_PU)
+plot(xaxis,nanmean(posterior.higharousal_highcondiff),"LineWidth",1,'LineStyle','-','Color',low_PU)
 
 shadedErrorBar(xaxis,nanmean(posterior.lowarousal_lowcondiff),nanstd(posterior.lowarousal_lowcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",high_PU,'LineStyle','--'},1)
 shadedErrorBar(xaxis,nanmean(posterior.lowarousal_highcondiff),nanstd(posterior.lowarousal_highcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",low_PU,'LineStyle','--'},1)
-shadedErrorBar(xaxis,nanmean(smoothdata(posterior.higharousal_lowcondiff,2,"movmean")),nanstd(smoothdata(posterior.higharousal_lowcondiff,2,"movmean"))./sqrt(num_subjs),{'LineWidth',2,"Color",high_PU},1)
-shadedErrorBar(xaxis,nanmean(smoothdata(posterior.higharousal_highcondiff,2,"movmean")),nanstd(smoothdata(posterior.higharousal_highcondiff,2,"movmean"))./sqrt(num_subjs),{'LineWidth',2,"Color",low_PU},1)
+shadedErrorBar(xaxis,nanmean(posterior.higharousal_lowcondiff),nanstd(posterior.higharousal_lowcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",high_PU},1)
+shadedErrorBar(xaxis,nanmean(posterior.higharousal_highcondiff),nanstd(posterior.higharousal_highcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",low_PU},1)
 
 % ADJUST FIGURE PROPERTIES
-l = legend('','','High arousal-high uncertainty','High arousal-low uncertainty','','Low arousal-high uncertainty','','Low arousal-low uncertainty','','','','','','Location','best','EdgeColor', ...
-    'none','AutoUpdate','off','Color','none','FontName',font_name,'FontSize',font_size);
+% l = legend('','','High arousal-high uncertainty','High arousal-low uncertainty','','Low arousal-high uncertainty','','Low arousal-low uncertainty','','','','','','Location','best','EdgeColor', ...
+%     'none','AutoUpdate','off','Color','none','FontName',font_name,'FontSize',font_size);
+l = legend('','','High arousal-high uncertainty','High arousal-low uncertainty','','Low arousal-high uncertainty','','Low arousal-low uncertainty','','','','','', ...
+    'Location','best','EdgeColor','none','AutoUpdate','off','Color','none','FontName',font_name,'FontSize',font_size);
 l.ItemTokenSize = [20, 20];
 xlabel('Time since feedback onset (ms)')
 ylabel('Model predicted absolute UP')
@@ -119,9 +121,9 @@ coeffs = data_plot;
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(smoothdata(coeffs,2,"movmean")),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(smoothdata(coeffs,2,"movmean")),nanstd(smoothdata(coeffs,2,"movmean"))./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 plot(xaxis(find(perm.mask(4,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(4,:)==1)))), '.', 'color', ...
@@ -156,9 +158,9 @@ coeffs = data_plot;
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(smoothdata(coeffs,2,"movmean")),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(smoothdata(coeffs,2,"movmean")),nanstd(smoothdata(coeffs,2,"movmean"))./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 plot(xaxis(find(perm.mask(6,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(6,:)==1)))), '.', 'color', ...
@@ -199,4 +201,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'absresiduals_full2_altPipeline1.png', '-dpng', '-r600') 
+print(fig, 'absresiduals_full2_linearInt1.png', '-dpng', '-r600') 
