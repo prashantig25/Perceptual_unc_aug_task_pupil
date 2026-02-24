@@ -1,0 +1,11 @@
+term,pval
+additivePE,0.001
+peCondiff_hetLinearInt,0.011
+peCondiff_hetCS,0.021
+peCondiff_hetDeconv,0.026
+patchResidual,0.005
+peMain_hetLinearInt,0.001
+peCondiff_NBC_linearIntmean,0.024
+peBinned,0.016
+peBinned_CS,0.06
+peBinned_deconv,0.007
