@@ -335,6 +335,16 @@ annotation('textbox', [label_x label_y .05 .05], 'String', 'b', ...
     'FontSize', 12, 'LineStyle', 'none', ...
     'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
 
+perm = perm_results{1};
+pupil_idx = 1;
+
+% Initialize results table
+results = table({}, [], 'VariableNames', {'term', 'pval'});
+results = [results; table({'pupil_choicePhase'},    round(min(perm.prob(pupil_idx, perm.mask(pupil_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
+results = [results; table({'condiff_choicePhase'},  round(pVals(1), 3), 'VariableNames', {'term', 'pval'})];
+results = [results; table({'condition_choicePhase'}, round(pVals(2), 3), 'VariableNames', {'term', 'pval'})];
+results = [results; table({'muZsc_choicePhase'},    round(pVals(3), 3), 'VariableNames', {'term', 'pval'})];
+writetable(results, fullfile('patchResidual_stats.csv'));
 %% 
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
