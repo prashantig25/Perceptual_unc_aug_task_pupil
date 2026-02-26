@@ -90,10 +90,10 @@ t = tiledlayout(1, 2, 'Padding', 'compact', 'TileSpacing','compact');
 nexttile;
 hold on;
 plot_with_error(data_alt, muted_red, num_subjs, "Alternate pre-processing pipeline 1");
-text(-0.15, 1, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight', 'normal');
+text(-0.16, 1, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight', 'normal');
 hold on
-text(length(patch_tp), 5000+25, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
-text(length(patch_tp) + length(resp_tp), 5000+25, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+text(length(patch_tp), 5000 + 125, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+text(length(patch_tp) + length(resp_tp), 5000 + 125, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
 hold on
 xlabel("Time since patch onset (ms)", 'FontSize', 7);
 ylabel("Pupil signal", 'FontSize', 7);

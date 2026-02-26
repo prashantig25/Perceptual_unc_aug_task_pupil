@@ -106,9 +106,9 @@ ylim_vals = [5200, 5800];
 adjust_figprops(ax1_new, font_name, font_size, line_width, xlim_vals, ylim_vals);
 
 % Labels and formatting
-title('Alternate pre-processing pipeline 1', 'FontSize', font_size + 2, 'FontWeight', 'normal');
-xlabel('Time since feedback onset (ms)', 'FontSize', font_size + 3);
-ylabel('Pupil signal', 'FontSize', font_size + 3);
+title('Alternate pre-processing pipeline 1', 'FontSize', font_size, 'FontWeight', 'normal');
+xlabel('Time since feedback onset (ms)', 'FontSize', font_size);
+ylabel('Pupil signal', 'FontSize', font_size);
 
 % X-axis ticks
 set(ax1_new, 'XTick', [0, 50, 130, 230, 360, 460, 560], ...
@@ -140,9 +140,9 @@ ylim_vals = [-50, 200];
 adjust_figprops(ax2_new, font_name, font_size, line_width, xlim_vals, ylim_vals);
 
 % Labels and formatting
-title('Main pre-processing pipeline', 'FontSize', font_size + 2, 'FontWeight', 'normal');
-xlabel('Time since feedback onset (ms)', 'FontSize', font_size + 3);
-ylabel('Pupil dilation', 'FontSize', font_size + 3);
+title('Main pre-processing pipeline', 'FontSize', font_size, 'FontWeight', 'normal');
+xlabel('Time since feedback onset (ms)', 'FontSize', font_size);
+ylabel('Pupil dilation', 'FontSize', font_size);
 
 % X-axis ticks
 set(ax2_new, 'XTick', [0, 50, 130, 230, 360, 460, 560], ...
