@@ -144,7 +144,7 @@ xlim([-300,2700])
 % ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
 % ylabel('BS-weighted-PE (\beta_2)','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-ylabel('BS-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
+ylabel('Uncertainty-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 % text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.024","FontName",fontname,"FontSize", ...
 %     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
 text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + -0.003, pecondiff_pval_str, ...

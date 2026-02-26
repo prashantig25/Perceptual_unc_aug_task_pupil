@@ -47,7 +47,7 @@ axes_old = [ax1,ax2,ax3,ax4,ax5,ax6];
 
 %% PLOT COEFFICIENT CURVES
 
-ylabel_strings = [{"BS-modulated";"pupil (a.u.)"},{"PE-modulated";"pupil (a.u.)"},{"x-gaze-modulated";"pupil (a.u.)"},{"y-gaze-modulated";"pupil (a.u.)"},{"UP-modulated";"pupil (a.u.)"},{"RT-modulated";"pupil (a.u.)"}];
+ylabel_strings = [{"Uncertainty-modulated";"pupil (a.u.)"},{"PE-modulated";"pupil (a.u.)"},{"x-gaze-modulated";"pupil (a.u.)"},{"y-gaze-modulated";"pupil (a.u.)"},{"UP-modulated";"pupil (a.u.)"},{"RT-modulated";"pupil (a.u.)"}];
 pe_idx = find(strcmp(coeff_names,'pe'));
 condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
 ygaze_idx = find(strcmp(coeff_names,'ygaze'));

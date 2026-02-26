@@ -68,7 +68,7 @@ adjust_figprops(ax3_new,font_name,font_size,linewidth_plot);
 hold on
 xlim([-300,2700])
 xlabel('Time since feedback onset (ms)')
-ylabel('BS-modulated pupil','FontWeight','normal','FontName',font_name,'FontSize',font_size)
+ylabel('Uncertainty-modulated pupil','FontWeight','normal','FontName',font_name,'FontSize',font_size)
 
 %% PLOT INTERACTIONS
 
@@ -175,7 +175,7 @@ adjust_figprops(ax2_new,font_name,font_size,linewidth_plot);
 hold on
 xlim([-300,2700])
 xlabel('Time since feedback onset (ms)')
-ylabel('BS and PE-modulated pupil','FontWeight','normal','FontName',font_name,'FontSize',font_size)
+ylabel('Uncertainty and PE-modulated pupil','FontWeight','normal','FontName',font_name,'FontSize',font_size)
 
 %% ADD SUBPLOT LABELS
 

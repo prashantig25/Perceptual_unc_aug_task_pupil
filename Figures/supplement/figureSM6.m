@@ -117,7 +117,7 @@ box off
 
 ax1_pos = ax2_new.Position;
 adjust_x = [- 0.06,-0.075]; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.05; % adjusted y-position for subplot label
+adjust_y = ax1_pos(4)+0.02; % adjusted y-position for subplot label
 
 all_axes = [ax1_new,ax2_new];
 subplot_labels = {'a','b'};
