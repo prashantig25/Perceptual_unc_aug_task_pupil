@@ -429,7 +429,7 @@ for n = 1:num_pngs
 end
 
 patch_dim = 0.03;
-pos_y = 0.768 + 0.03; pos_x = 0.123-0.006;
+pos_y = 0.768 + 0.035; pos_x = 0.123-0.006;
 image_png = {'lowcon.png','highcon.png'};
 num_pngs = 2;
 adjust_x = 0.0275;
@@ -441,7 +441,7 @@ for n = 1:num_pngs
 end
 
 patch_dim = 0.03;
-pos_y = 0.488 + 0.03; pos_x = 0.354-0.006;
+pos_y = 0.488 + 0.043; pos_x = 0.354-0.0072;
 image_png = {'lowcon_02.png','highcon.png'};
 num_pngs = 2;
 adjust_x = 0.0275;
@@ -453,7 +453,7 @@ for n = 1:num_pngs
 end
 
 patch_dim = 0.02;
-pos_y = [0.68,0.615]-0.003; pos_x = [0.221,0.297]-0.001;
+pos_y = [0.68,0.615] + 0.0073; pos_x = [0.221,0.297] - 0.004;
 num_pngs = 2;
 adjust_x = 0.025;
 for n = 2%:num_pngs

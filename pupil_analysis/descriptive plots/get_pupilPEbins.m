@@ -16,7 +16,7 @@ subj_pupil_signal_pebin2correct = NaN(num_subs,col); % initialised array for PE 
 subj_pupil_signal_pebin1correct = NaN(num_subs,col); % initialised array for PE bin = 1
 subj_pupil_signal_pebin2incorrect = NaN(num_subs,col); % initialised array for PE bin = 2
 subj_pupil_signal_pebin1incorrect = NaN(num_subs,col); % initialised array for PE bin = 1
-plot_accuracy = 1; % get PE bins for accuracy
+plot_accuracy = 0; % get PE bins for accuracy
 
 % USER-BASED PATH
 currentDir = cd; % current directory
@@ -30,7 +30,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive'); 
-pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb'); % directory to get preprocessed data
+pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 preds_all = readtable(strcat(desiredPath,filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 mkdir(save_dir);
@@ -62,10 +62,12 @@ for i = 1:num_subs
     % MISSED TRIALS
     missed_trials = []; % initialize array for index of missed trials
     for b = 1:height(behv_data)
-        if isnan(behv_data.rt(b,:)) || isnan(behv_data.slider(b,:)) % check if participant has not responded
+        if isnan(behv_data.rt(b,:)) % || isnan(behv_data.slider(b,:)) % check if participant has not responded
             missed_trials = [missed_trials;b];
         end
     end
+    behv_data(missed_trials,:) = [];
+    missedSlider = isnan(behv_data.slider);
 
     % GET PE DATA
     preds = preds_all(preds_all.id == str2num(subj_ids{i}),:);
@@ -79,6 +81,7 @@ for i = 1:num_subs
         pupil_signal = pupil;
     elseif strcmp(timewindow,'feedback') == 1
         pupil_signal = pupil(:,1:col);
+        pupil_signal(missedSlider == 1,:) = [];
     end
     pe_binedges = [0,0.5,1]; % set bin edges
     preds.bins = discretize(abs(preds.pe),pe_binedges); % bin data
@@ -119,4 +122,4 @@ condiffbin.pebin1_incorrect = subj_pupil_signal_pebin1incorrect;
 condiffbin.pebin2_correct = subj_pupil_signal_pebin2correct;
 condiffbin.pebin2_incorrect = subj_pupil_signal_pebin2incorrect;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
-safe_saveall(strcat(save_dir,filesep,"fb_PE2bins.mat"),condiffbin)
+safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_linearInt.mat"),condiffbin)
