@@ -4,7 +4,7 @@ clearvars
 % INITIALIZE VARS
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
-num_subjs = length(num_sess);
+num_subjs = length(subj_ids); % number of subjects
 num_break = 30; % how long should the pupil signal be broken
 col_patch = 100; % how long should the patch-related pupil signal
 col_fb = 300; % how long should the patch-related pupil signal

@@ -34,7 +34,8 @@ rsquared_full = importdata(rsquared_full_path); % r-squared values
 rsquared_signed = importdata(rsquared_signedpath); % r-squared values
 posterior_up_subjs = importdata(posterior_up_subjs_path); % posterior updates
 data_subjs = readtable(data_subjs_path); % single-trial updates, prediction errors
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 %% INITIALISE TILE LAYOUT
 
 figure

@@ -4,17 +4,29 @@
 clc
 clearvars
 
-coeffs_name = importdata("patch_condiff_linearInt_coeffNames.mat");
-betas_struct = importdata("patch_condiff_linearInt.mat");
-perm = importdata("perm_patch_linearInt.mat");
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"patch_condiff_linearInt.mat")); % add PE bin curves
+coeffs_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"patch_condiff_linearInt_coeffNames.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_patch_linearInt.mat")); % add PE bin curves
 
-xgaze_idx = find(strcmp(coeffs_name, 'xgaze')); 
-ygaze_idx = find(strcmp(coeffs_name, 'ygaze')); 
-condiff_idx = find(strcmp(coeffs_name, 'zsc_condiff')); 
-condition_idx = find(strcmp(coeffs_name, 'condition_2')); 
+xgaze_idx = find(strcmp(coeffs_names, 'xgaze')); 
+ygaze_idx = find(strcmp(coeffs_names, 'ygaze')); 
+condiff_idx = find(strcmp(coeffs_names, 'zsc_condiff')); 
+condition_idx = find(strcmp(coeffs_names, 'condition_2')); 
 
 x = linspace(-300,2700,300); % x-axis
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 neutral = [7, 53, 94]/255;
 font_name = 'Arial'; % font name
 font_size = 7; % font size

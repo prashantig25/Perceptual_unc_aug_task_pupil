@@ -68,7 +68,12 @@ y_data_a = nanmean(BS_binned);
 xlim([2,10])
 xlabel('Contrast-difference bins');
 ylabel('Belief-state difference (Agent)');
-title(strcat("\itr\rm =",{' '},num2str(round(rho_a,2)),{' '}) + newline + "\itp\rm < 0.001", ...
+if pval_a < 0.001
+    pval_str_a = "\itp\rm < 0.001";
+else
+    pval_str_a = "\itp\rm = " + num2str(round(pval_a,3));
+end
+title(strcat("\itr\rm =",{' '},num2str(round(rho_a,2)),{' '}) + newline + pval_str_a, ...
  'FontWeight','normal','Interpreter','tex');
 % Add subplot label A
 text(-0.03, 1.11, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
@@ -130,7 +135,12 @@ y_data_b = avg_ydataAbsLR(2:end)';
 
 xlabel('Contrast-difference bins');
 ylabel('Mean learning rate (Agent)');
-title(strcat("\itr\rm =",{' '},num2str(round(rho_b(1,2),2)),{' '}) + newline + "\itp\rm < 0.001", ...
+if pval_b(1,2) < 0.001
+    pval_str_b = "\itp\rm < 0.001";
+else
+    pval_str_b = "\itp\rm = " + num2str(round(pval_b(1,2),3));
+end
+title(strcat("\itr\rm =",{' '},num2str(round(rho_b(1,2),2)),{' '}) + newline + pval_str_b, ...
  'FontWeight','normal','Interpreter','tex');
 % Add subplot label B
 text(-0.03, 1.11, 'b', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
@@ -194,7 +204,12 @@ scatter(1:nbins, avg_ydata, 50, binned_dots, 'filled', 'MarkerEdgeColor', 'k');
 
 xlabel('Contrast-difference bins');
 ylabel('Mean learning rate (Participants)');
-title(strcat("\itr\rm =",{' '},num2str(round(rho_c(1,2),2)),{' '}) + newline + "\itp\rm < 0.001", ...
+if pval_c(1,2) < 0.001
+    pval_str_c = "\itp\rm < 0.001";
+else
+    pval_str_c = "\itp\rm = " + num2str(round(pval_c(1,2),3));
+end
+title(strcat("\itr\rm =",{' '},num2str(round(rho_c(1,2),2)),{' '}) + newline + pval_str_c, ...
  'FontWeight','normal','Interpreter','tex');
 % Add subplot label C
 text(-0.03, 1.11, 'c', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');

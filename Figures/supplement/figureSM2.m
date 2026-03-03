@@ -21,7 +21,8 @@ perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pip
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 x = linspace(-300,2700,300); % x-axis 
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 font_name = 'Arial'; % font name
 font_size = 7; % font size
 fontsize_label = 12; % font size for subplot labels
@@ -106,7 +107,19 @@ for a = 1:length(ncoeffs)
         plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 0.095*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
             [119, 119, 119]./255, 'markersize', 4);
     end
-    text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.095 ,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+
+    % Compute dynamic p-value string for this coefficient
+    if any(perm.mask(ncoeffs(a),:) == 1)
+        perm_prob_a = perm.prob(ncoeffs(a),:);
+        perm_mask_a = perm.mask(ncoeffs(a),:);
+        pval_a = min(perm_prob_a(perm_mask_a == 1));
+        if pval_a < 0.001
+            pval_str_a = "\itp\rm < 0.001";
+        else
+            pval_str_a = sprintf("\\itp\\rm = %.3f", pval_a);
+        end
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.095, pval_str_a, "FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+    end
     
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
@@ -147,4 +160,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'binnedreg_full2_linearInt1.png', '-dpng', '-r600') 
+print(fig, 'binnedreg_full2_linearInt1.png', '-dpng', '-r600')

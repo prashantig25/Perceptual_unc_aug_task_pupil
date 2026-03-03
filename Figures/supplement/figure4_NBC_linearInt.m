@@ -14,7 +14,8 @@ num_subjs = 47; % number of subjects
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 neutral = [7, 53, 94]/255;
-num_subs = 47;
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 col = 300;
 
 % USER-BASED PATH

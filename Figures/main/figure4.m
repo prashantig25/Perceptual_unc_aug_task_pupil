@@ -14,7 +14,8 @@ num_subjs = 47; % number of subjects
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 neutral = [7, 53, 94]/255;
-num_subs = 47;
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 col = 300;
 
 % USER-BASED PATH
@@ -52,6 +53,8 @@ pecondiff_min_pval = round(min(pecondiff_pval), 3);
 % Format as strings
 if pe_min_pval <= 0.001
     pe_pval_str = "\itp\rm < 0.001";
+else
+    pe_pval_str = sprintf("\\itp\\rm = %.3f", pe_min_pval);
 end
 
 if pecondiff_min_pval < 0.001

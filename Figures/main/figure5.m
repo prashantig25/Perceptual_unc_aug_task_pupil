@@ -6,7 +6,8 @@ clearvars
 linewidth_plot = 0.5; % line-width for plot
 linewidth_curves = 2; % line-width for curves
 xaxis = linspace(-300,2700,300); % x-axis
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 col = 300; % length of x-axis
 line_width = 0.5; % line width for axes
 font_size = 7; % font size

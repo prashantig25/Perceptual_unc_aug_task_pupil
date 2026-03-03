@@ -10,7 +10,8 @@ fontname = 'Arial';
 fontsize = 7;
 linewidth_plot = 0.5; % line width for plot
 xaxis = linspace(-300,2700,300);
-num_subs = 47;
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 col = 300;
 
 currentDir = cd;

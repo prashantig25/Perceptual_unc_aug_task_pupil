@@ -16,6 +16,7 @@ function [betas,rsquared,residuals,coeffs_name,lm,SSE] = linear_fit(tbl,mdl,pred
     %   num_vars: number of predictor variables in the model
     %   weight_y_n: if the function should run a weighted/non-weighted
     %   regression
+    %   varargin{1}: weights for weighted regression
     %
     % OUTPUT:
     %   betas: array containing beta value for each predictor by fitlm

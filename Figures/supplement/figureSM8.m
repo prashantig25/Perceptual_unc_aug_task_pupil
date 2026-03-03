@@ -27,7 +27,8 @@ rt_idx = find(strcmp(coeff_names,'rt'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
 
 x = linspace(-300,2700,300); % x-axis
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 neutral = [7, 53, 94]/255;
 font_name = 'Arial'; % font name
 font_size = 7; % font size

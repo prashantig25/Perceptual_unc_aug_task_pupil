@@ -23,7 +23,8 @@ trial_all = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data tw
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 x = linspace(-300,2700,300); % x-axis
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 neutral = [7, 53, 94]/255;
 bin_edges = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1];
 dark_violet = [17, 0, 70]./255;
