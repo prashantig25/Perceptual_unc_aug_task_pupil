@@ -23,7 +23,8 @@ trial_all = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data tw
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 x = linspace(-300,2700,300); % x-axis
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 neutral = [7, 53, 94]/255;
 bin_edges = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1];
 dark_violet = [17, 0, 70]./255;
@@ -143,7 +144,16 @@ if disp_perm == 1
     plot(x(find(condiffbin.stat==1)), -0.05*ones(1, length(find(condiffbin.stat==1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(condiffbin.stat == 1)),-0.1,"\itp\rm = 0.004","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+permPE_prob = condiffbin.prob(1,:);
+permPE_mask = condiffbin.stat(1,:);
+pval = min(permPE_prob(1,permPE_mask == 1));
+if pval < 0.001
+    pval_str = "\itp\rm < 0.001";
+else
+    pval_str = sprintf("\\itp\\rm = %.3f", pval);
+end
+
+text(mean(x(condiffbin.stat == 1)),-0.1,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 %% PLOT BINNED REGRESSION RESULTS
 
 % POSITION CHANGE
@@ -157,6 +167,14 @@ ylim_axes = [-0.05,0.1];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 ncoeffs  = find(strcmp(coeff_names, 'pe'));
+permPE_prob = perm.prob(ncoeffs,:);
+permPE_mask = perm.mask(ncoeffs,:);
+pval = min(permPE_prob(1,permPE_mask == 1));
+if pval < 0.001
+    pval_str = "\itp\rm < 0.001";
+else
+    pval_str = sprintf("\\itp\\rm = %.3f", pval);
+end
 ncats = repelem(2,1,9);
 xlabel_name = 'Time since feedback onset';
 cats = [1,2];
@@ -199,7 +217,7 @@ if disp_perm == 1
     plot(x(find(perm.mask(ncoeffs,:) == 1)), -0.02*ones(1, length(find(perm.mask(ncoeffs,:) == 1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,"\itp\rm = 0.02","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax5_new,'Arial',7,0.5)

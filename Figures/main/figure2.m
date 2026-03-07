@@ -25,7 +25,8 @@ fontsize_label = 12; % font size for subplot labels
 line_style = '-'; % line style
 [~,high_PU,mid_PU,low_PU,color_screen,fb_green,darkblue_muted,mix,perc,rew,~,~,binned_dots,~,...
     ~,~,~,~,~] = colors_rgb(); % colors
-num_subjs = 46; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 line_width = 0.5; % line width for plots 
 example_participant = 20; % example participant for plots
 model3 = 'up ~ pe + pe:contrast_diff + pe:congruence + pe:pe_sign + pe:salience';
@@ -311,7 +312,14 @@ xlim_vals = [0 10.3];
 ylim_vals = [-0.01 0.17];
 adjust_figprops(ax10_new,font_name,font_size,line_width,xlim_vals,ylim_vals);
 [rho,pval] = corr(avg_ydata,avg_binneddata, 'rows', 'pairwise');
-title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + "\itp\rm < 0.001", ...
+
+if pval < 0.001
+    pval_str = "\itp\rm < 0.001";
+else
+    pval_str = "\itp\rm = " + num2str(round(pval,3));
+end
+
+title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + pval_str, ...
     'FontWeight','normal','Interpreter','tex')
 if save_csv == 1
     save_figures = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\stats\behavior";
@@ -429,7 +437,7 @@ for n = 1:num_pngs
 end
 
 patch_dim = 0.03;
-pos_y = 0.768 + 0.03; pos_x = 0.123-0.006;
+pos_y = 0.768 + 0.035; pos_x = 0.123-0.006;
 image_png = {'lowcon.png','highcon.png'};
 num_pngs = 2;
 adjust_x = 0.0275;
@@ -441,7 +449,7 @@ for n = 1:num_pngs
 end
 
 patch_dim = 0.03;
-pos_y = 0.488 + 0.03; pos_x = 0.354-0.006;
+pos_y = 0.488 + 0.043; pos_x = 0.354-0.0072;
 image_png = {'lowcon_02.png','highcon.png'};
 num_pngs = 2;
 adjust_x = 0.0275;
@@ -453,7 +461,7 @@ for n = 1:num_pngs
 end
 
 patch_dim = 0.02;
-pos_y = [0.68,0.615]-0.003; pos_x = [0.221,0.297]-0.001;
+pos_y = [0.68,0.615] + 0.0073; pos_x = [0.221,0.297] - 0.004;
 num_pngs = 2;
 adjust_x = 0.025;
 for n = 2%:num_pngs

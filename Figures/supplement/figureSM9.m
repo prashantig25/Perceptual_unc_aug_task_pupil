@@ -4,10 +4,29 @@
 clc
 clearvars
 
-betas_struct = importdata("patch_condiff.mat");
-perm = importdata("perm_patch_condiff.mat");
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"patch_condiff_linearInt.mat")); % add PE bin curves
+coeffs_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"patch_condiff_linearInt_coeffNames.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_patch_linearInt.mat")); % add PE bin curves
+
+xgaze_idx = find(strcmp(coeffs_names, 'xgaze')); 
+ygaze_idx = find(strcmp(coeffs_names, 'ygaze')); 
+condiff_idx = find(strcmp(coeffs_names, 'zsc_condiff')); 
+condition_idx = find(strcmp(coeffs_names, 'condition_2')); 
+
 x = linspace(-300,2700,300); % x-axis
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 neutral = [7, 53, 94]/255;
 font_name = 'Arial'; % font name
 font_size = 7; % font size
@@ -16,7 +35,7 @@ line_style = '-'; % line style
 
 %% TILED LAYOUT
 
-figure(Position=[200,200,600,200])
+figure(Position=[200,200,450,175])
 hold on
 tiledlayout(1,4);
 ax1 = nexttile(1,[1,1]);
@@ -32,8 +51,8 @@ axes_old = [ax1,ax2,ax3,ax4];
 
 %% PLOT COEFFICIENT CURVES
 
-ylabel_strings = [{"Gaze position";"on x-axis (a.u.)"},{"Gaze position";"on y-axis (a.u.)"},{"BS-modulated";"pupil (a.u.)"},{"Low reward";"uncertainty (a.u.)"},{"UP-modulated";"pupil (a.u.)"},{"RT-modulated";"pupil (a.u.)"},{"xgaze-modulated";"pupil (a.u.)"},{"ygaze-modulated";"pupil (a.u.)"}];
-ncoeffs = [2:5]; % order in which coefficients are to be plotted
+ylabel_strings = [{"Gaze position";"on x-axis (a.u.)"},{"Gaze position";"on y-axis (a.u.)"},{"Uncertainty-modulated";"pupil (a.u.)"},{"Low reward";"uncertainty (a.u.)"},{"UP-modulated";"pupil (a.u.)"},{"RT-modulated";"pupil (a.u.)"},{"xgaze-modulated";"pupil (a.u.)"},{"ygaze-modulated";"pupil (a.u.)"}];
+ncoeffs = [xgaze_idx,ygaze_idx,condiff_idx,condition_idx]; % order in which coefficients are to be plotted
 xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02,0.05]; % change in axes position
 pval_position = [NaN,-0.03,-0.01,0.1,0.08,-0.01,-0.005,0.005]-0.001; % position to plot p-value
 ylim_lower = [-0.03,-0.07,-0.02,0.05,0.03,-0.05,-0.4,-0.3]; % lower limit for y-axis
@@ -59,7 +78,7 @@ for a = 1:length(ncoeffs)
     end
     hold on
     color = color_cell;
-    ySmoothed = smoothdata(nanmean(data_plot,1));
+    ySmoothed = nanmean(data_plot);
     plot(x,ySmoothed,"Color",color{1,:},'LineWidth',2)
     hold on
     color = cell2mat(color_cell);
@@ -118,4 +137,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
  
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'patch_regression_altPipeline1.png', '-dpng', '-r600') 
+print(fig, 'patch_regression_linearInt1.png', '-dpng', '-r600') 

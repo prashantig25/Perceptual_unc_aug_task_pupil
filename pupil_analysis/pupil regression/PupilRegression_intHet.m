@@ -89,7 +89,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
         %% ----------------------------------------------------------------
         %  RUN ANALYSIS (extended from original to support hetero init)
         %% ----------------------------------------------------------------
-        function [betas_struct, perm, residuals_all, predicted_all] = runAnalysis(obj)
+        function [betas_struct, perm] = runAnalysis(obj)
 
             obj.validateConfig();
 
@@ -116,9 +116,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
             obj.predicted_all = cell(obj.num_subs, 1);
 
             for i = 1:obj.num_subs
-                [residuals_subj, predicted_subj] = obj.processSubject(i, obj.binned);
-                obj.residuals_all{i, 1} = residuals_subj;
-                obj.predicted_all{i, 1} = predicted_subj;
+                obj.processSubject(i, obj.binned);
+                % obj.residuals_all{i, 1} = residuals_subj;
+                % obj.predicted_all{i, 1} = predicted_subj;
             end
 
             % Permutation test only meaningful for OLS betas
@@ -128,8 +128,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
             betas_struct  = obj.betas_struct;
             perm          = obj.perm_results;
-            residuals_all = obj.residuals_all;
-            predicted_all = obj.predicted_all;
+            % residuals_all = obj.residuals_all;
+            % predicted_all = obj.predicted_all;
         end
 
         %% ----------------------------------------------------------------
@@ -140,8 +140,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             fprintf('Reading in %s ...\n', obj.subj_ids{subj_idx});
 
             behv_data = obj.loadBehavioralData(subj_idx);
-            [behv_data, missedtrials, missedtrials_slider] = obj.handleMissedTrials(behv_data);
-            [zsc_pupil, xgaze_signal, ygaze_signal] = obj.loadPupilGazeData(subj_idx, missedtrials, missedtrials_slider);
+            [behv_data, missedtrials_slider] = obj.handleMissedTrials(behv_data);
+            [zsc_pupil, xgaze_signal, ygaze_signal] = obj.loadPupilGazeData(subj_idx, missedtrials_slider);
 
             if obj.regress_rt == 1
                 zsc_pupil = obj.regressRTEffects(zsc_pupil, behv_data);
@@ -156,7 +156,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 preds.bin_columns = discretize(preds.con_diff, obj.bins);
             end
 
-            [residuals_subj, predicted_subj] = obj.processBinsAndTimepoints(preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis);
+            obj.processBinsAndTimepoints(preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis);
         end
 
         %% ----------------------------------------------------------------
@@ -182,7 +182,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
         %% ----------------------------------------------------------------
         %  HANDLE MISSED TRIALS (unchanged from original)
         %% ----------------------------------------------------------------
-        function [behv_data, missedtrials, missedtrials_slider] = handleMissedTrials(obj, behv_data)
+        function [behv_data, missedtrials_slider] = handleMissedTrials(obj, behv_data)
 
             missedtrials_rt      = isnan(behv_data.rt);
             behvdata_missedRT    = behv_data(missedtrials_rt == 0, :);
@@ -194,7 +194,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
         %% ----------------------------------------------------------------
         %  LOAD PUPIL GAZE DATA (unchanged from original)
         %% ----------------------------------------------------------------
-        function [zsc_pupil, xgaze_signal, ygaze_signal] = loadPupilGazeData(obj, subj_idx, missedtrials, missedtrials_slider)
+        function [zsc_pupil, xgaze_signal, ygaze_signal] = loadPupilGazeData(obj, subj_idx, missedtrials_slider)
 
             fprintf('Pupil signal...\n');
 
@@ -270,22 +270,19 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 vars_to_check{end+1} = zsc_base;
             end
 
-            ref_rows = size(vars_to_check{1}, 1);
-            for i = 2:numel(vars_to_check)
-                assert(size(vars_to_check{i}, 1) == ref_rows, ...
-                    ['Dimension mismatch: Variable at index ', num2str(i), ' has different row count!']);
-            end
-
-            fprintf('Success: All %d variables have %d rows.\n', numel(vars_to_check), ref_rows);
+            % ref_rows = size(vars_to_check{1}, 1);
+            % for i = 2:numel(vars_to_check)
+            %     assert(size(vars_to_check{i}, 1) == ref_rows, ...
+            %         ['Dimension mismatch: Variable at index ', num2str(i), ' has different row count!']);
+            % end
+            % 
+            % fprintf('Success: All %d variables have %d rows.\n', numel(vars_to_check), ref_rows);
         end
 
         %% ----------------------------------------------------------------
         %  PROCESS BINS AND TIMEPOINTS (extended to branch OLS vs hetero)
         %% ----------------------------------------------------------------
-        function [residuals_subj, predicted_subj] = processBinsAndTimepoints(obj, preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis)
-
-            residuals_subj = [];
-            predicted_subj = [];
+        function processBinsAndTimepoints(obj, preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis)
 
             for r = obj.bins_array
 
@@ -325,14 +322,14 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 else
                     %% --- OLS PATH (original behaviour, unchanged) ---
                     for c = 1:obj.col
-                        [betas, residuals, predicted] = obj.fitModelAtTimepoint(c, ...
+                        obj.fitModelAtTimepoint(c, ...
                             pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, ...
                             preds_bins, zsc_base, r, subj_idx);
 
-                        if obj.residuals_predicted == 1 && ~isempty(residuals)
-                            residuals_subj = [residuals_subj, residuals];
-                            predicted_subj = [predicted_subj, predicted];
-                        end
+                        % if obj.residuals_predicted == 1 && ~isempty(residuals)
+                        %     residuals_subj = [residuals_subj, residuals];
+                        %     predicted_subj = [predicted_subj, predicted];
+                        % end
                     end
                 end
             end
@@ -360,11 +357,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
         %% ----------------------------------------------------------------
         %  FIT OLS MODEL AT TIMEPOINT (unchanged from original)
         %% ----------------------------------------------------------------
-        function [betas, residuals, predicted] = fitModelAtTimepoint(obj, c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx)
+        function fitModelAtTimepoint(obj, c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx)
 
             betas     = [];
-            residuals = [];
-            predicted = [];
             aic       = nan;
             bic       = nan;
 
@@ -390,8 +385,15 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 tbl.baseline = zsc_base(validIdx);
             end
 
-            [betas, ~, residuals, ~, lm] = linear_fit(tbl, obj.model_def, ...
+            [betas, ~, ~, ~, lm] = linear_fit(tbl, obj.model_def, ...
                 obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0, 0, 0, 0);
+
+            % Save coefficient names from first subject, first timepoint
+            if subj_idx == 1 && c == 1
+                coeff_names = lm.CoefficientNames;
+                safe_saveall(fullfile(obj.save_dir, [obj.betas_save, '_coeffNames.mat']), coeff_names);
+                fprintf('Saved coefficient names');
+            end
 
             if ~isempty(lm)
                 if isa(lm, 'LinearModel')

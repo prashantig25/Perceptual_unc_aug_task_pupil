@@ -43,8 +43,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_con
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_linearInt', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -61,7 +59,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', 'pe_condiff_residuals_linearInt', 'pe_condiff_predicted_linearInt');
+reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', '', '');
 
 [betas, perm, residuals, predicted] = reg.runAnalysis();
 reg.saveResults();
@@ -82,8 +80,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_con
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_cubicSplineNew', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -100,9 +96,9 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_cubicSplineNew', 'perm_pe_condiff_cubicSplineNew', 'pe_condiff_residuals_CSnew', 'pe_condiff_predicted_CSnew');
+reg.setFileNames('pe_condiff_cubicSplineNew', 'perm_pe_condiff_cubicSplineNew', '', '');
 
-[betas, perm, residuals, predicted] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS: ADDITIVE MODEL
@@ -122,8 +118,6 @@ vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
 num_vars  = tmpMdl.NumCoefficients - 1;
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_additiveMdl_linearInt', '.mat']), coeff_names);
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
 reg.setModel(model_def, pred_vars, cat_vars, num_vars);
@@ -200,8 +194,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt';
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff2bins_linearInt', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -241,8 +233,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt';
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff2bins_cubicSplineNew', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -282,8 +272,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + zsc_condiff + pe:zsc_condiff 
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_regressedRT_linearInt', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -322,8 +310,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + zsc_condiff + pe:zsc_condiff 
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_regressedRT_cubicSplineNew', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -361,8 +347,6 @@ model_def = 'pupil ~ xgaze + ygaze + condition + zsc_condiff';
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_patch_condiff_linearInt', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf','condition'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -391,7 +375,7 @@ fprintf('\n=== Running Analysis 6: Non-baseline corrected Linear Interpolation =
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb linear Int');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb linearInt');
 save_dir  = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 reg.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
@@ -400,9 +384,7 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_con
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_mathot_nonBaselineCorrected_linearInt', '.mat']), coeff_names);
-num_vars  = tmpMdl.NumCoefficients - 1;
+num_vars  = tmpMdl.NumCoefficients - 1; 
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
 reg.setModel(model_def, pred_vars, cat_vars, num_vars);
@@ -418,7 +400,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_linearInt', 'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt', 'pe_condiff_residuals_mathot_nonBaselineCorrected_linearInt', 'pe_condiff_predicted_mathot_nonBaselineCorrected_linearInt');
+reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_linearInt', 'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt', '', '');
 
 [betas, perm, ~, ~] = reg.runAnalysis();
 reg.saveResults();
@@ -440,8 +422,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_con
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -479,8 +459,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt + zsc_condiff + pe:zsc_con
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_deconvolution_updatedClusterStat', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -518,8 +496,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt + zsc_condiff + pe:zsc_con
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_deconvolution_nonBaselineCorrected', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -557,8 +533,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + zsc_condiff + pe:zsc_condiff 
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff_regressedRT_deconvolution', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -596,8 +570,6 @@ model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt';
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
-coeff_names = tmpMdl.CoefficientNames;
-safe_saveall(fullfile(save_dir, ['coeffNames_pe_condiff2bins_deconv', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};

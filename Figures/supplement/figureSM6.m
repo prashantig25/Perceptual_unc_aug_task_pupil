@@ -34,7 +34,8 @@ rsquared_full = importdata(rsquared_full_path); % r-squared values
 rsquared_signed = importdata(rsquared_signedpath); % r-squared values
 posterior_up_subjs = importdata(posterior_up_subjs_path); % posterior updates
 data_subjs = readtable(data_subjs_path); % single-trial updates, prediction errors
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 %% INITIALISE TILE LAYOUT
 
 figure
@@ -64,7 +65,7 @@ hold on
 xlabel('')
 % ylim([-0.3,0])
 set(gca,'Color','none')
-ylabel('Mean partial-\itr^2\rm values','Interpreter','tex')
+ylabel('Mean partial-\itR^2\rm values','Interpreter','tex')
 title('Model fit','FontWeight','normal')
 %% PLOT POSTERIOR DISTRIBUTION
 
@@ -117,7 +118,7 @@ box off
 
 ax1_pos = ax2_new.Position;
 adjust_x = [- 0.06,-0.075]; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.05; % adjusted y-position for subplot label
+adjust_y = ax1_pos(4)+0.02; % adjusted y-position for subplot label
 
 all_axes = [ax1_new,ax2_new];
 subplot_labels = {'a','b'};

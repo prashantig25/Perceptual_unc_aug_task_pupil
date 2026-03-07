@@ -6,7 +6,8 @@ clearvars
 [~,high_PU,mid_PU,low_PU,color_screen,fb_green,darkblue_muted,mix,perc,rew,~,~,binned_dots,~,...
     ~,~,~,~,~] = colors_rgb(); % colors
 line_width = 0.5; % line width for plots 
-num_subjs = 47;
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 data_subjs = readtable("preprocessed_lr_pupil.xlsx");
 id_subjs = unique(data_subjs.id);
 font_name = 'Arial'; % font name
@@ -45,22 +46,28 @@ avg_ydata = nanmean(avg_ydata_bins,2);
 avg_binneddata = nanmean(avg_behv_bins,2);
 sem_ydata = nanstd(avg_ydata_bins,0,2)./sqrt(num_subjs);
 y = [avg_ydata_bins(1,:).';avg_ydata_bins(2,:).'];
+set(gca,'color','none','FontName',font_name,'FontSize',font_size,'YLim',[0,0.5], ...
+    'LineWidth',linewidth_axes,'YTick',[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1], ...
+    'YTickLabels',{'0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'})
+
 [h,p] = ttest2(avg_ydata_bins(1,:).',avg_ydata_bins(2,:).');
+if p < 0.001
+    pval_str = "\itp\rm < 0.001";
+else
+    pval_str = "\itp\rm = " + num2str(round(p,3));
+end
 
 % PLOT
 figure("Position",[100,100,200,200])
 hold on
 bar_plots_pval(y,avg_ydata,sem_ydata,num_subjs,2,1,{'',''},[1,2],{'High','Low'},'', ...
-    'Belief-state uncertainty','Mean absolute prediction error (PE)',0,1,10,1,7,0.5,'Arial',0,darkblue_muted,'p = 0.3',0.55)
-hold on 
+'State uncertainty','Mean absolute prediction error',0,1,10,1,7,0.5,'Arial',0,darkblue_muted,pval_str,0.55)
+hold on
 plot([1.1, 1.9], ...
         [0.5 0.5], '-','LineWidth', 0.3,'Color','k');
-text(1.5, 0.5, "\itp\rm = 0.3", ...
-    'horizontalalignment', 'center','BackgroundColor','w','FontSize', ...
+text(1.5, 0.5, pval_str, ...
+'horizontalalignment', 'center','BackgroundColor','w','FontSize', ...
     5,'FontWeight','normal','FontName',font_name);
-set(gca,'color','none','FontName',font_name,'FontSize',font_size,'YLim',[0,0.5], ...
-    'LineWidth',linewidth_axes,'YTick',[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1], ...
-    'YTickLabels',{'0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'})
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen

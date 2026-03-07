@@ -3,12 +3,26 @@
 clc
 clearvars
 
-betas_struct = importdata("pe_condiff2bins.mat");
-perm = importdata("perm_pe_condiff2bins.mat");
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt.mat")); % add PE bin curves
+coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff2bins_linearInt.mat")); % add PE bin curves
+
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 x = linspace(-300,2700,300); % x-axis 
-num_subjs = 47; % number of subjects
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
 font_name = 'Arial'; % font name
 font_size = 7; % font size
 fontsize_label = 12; % font size for subplot labels
@@ -16,7 +30,7 @@ line_style = '-'; % line style
 
 %% TILED LAYOUT
 
-figure(Position=[200,200,600,175])
+figure(Position=[200,200,450,150])
 hold on
 tiledlayout(1,4);
 ax1 = nexttile(1,[1,1]);
@@ -32,8 +46,14 @@ axes_new = [ax1_new,ax2_new,ax3_new,ax4_new];
 
 %% PLOT COEFFICIENTS
 
-ylabel_strings = {'UP-modulated pupil (a.u.)','RT-modulated pupil (a.u.)','xgaze-modulated pupil (a.u.)','ygaze-modulated pupil (a.u.)'};
-ncoeffs = [5,6,2,3]; % order of coefficients
+ylabel_strings = {'UP-modulated pupil (a.u.)','RT-modulated pupil (a.u.)','x-gaze-modulated pupil (a.u.)','y-gaze-modulated pupil (a.u.)'};
+
+up_idx = find(strcmp(coeff_names,'zsc_up'));
+rt_idx = find(strcmp(coeff_names,'rt'));
+xgaze_idx = find(strcmp(coeff_names,'xgaze'));
+ygaze_idx = find(strcmp(coeff_names,'ygaze'));
+
+ncoeffs = [up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
 xpos_change = [-0.07,-0.035,0,0.04]; % change in position of tile
 ylim_lower = [-0.05,-0.08,-0.2,-0.1]; % y-axis lower limit
 ylim_upper = [0.1,0.05,0.12,0.1]; % y-axisx upper limit
@@ -60,7 +80,7 @@ for a = 1:length(ncoeffs)
         end
         hold on
         color = color_cell;
-        ySmoothed = smoothdata(nanmean(data_plot,1));
+        ySmoothed = nanmean(data_plot);
         plot(x,ySmoothed,"Color",color{j,:},'LineWidth',2)
         hold on
     end
@@ -73,7 +93,7 @@ for a = 1:length(ncoeffs)
                 data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs(a),s,c);
             end
         end
-        ySmoothed = smoothdata(nanmean(data_plot,1));
+        ySmoothed = nanmean(data_plot);
         color = cell2mat(color_cell);
         shadedErrorBar(x,ySmoothed,nanstd(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
         hold on
@@ -87,7 +107,19 @@ for a = 1:length(ncoeffs)
         plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 0.095*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
             [119, 119, 119]./255, 'markersize', 4);
     end
-    text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.095 ,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+
+    % Compute dynamic p-value string for this coefficient
+    if any(perm.mask(ncoeffs(a),:) == 1)
+        perm_prob_a = perm.prob(ncoeffs(a),:);
+        perm_mask_a = perm.mask(ncoeffs(a),:);
+        pval_a = min(perm_prob_a(perm_mask_a == 1));
+        if pval_a < 0.001
+            pval_str_a = "\itp\rm < 0.001";
+        else
+            pval_str_a = sprintf("\\itp\\rm = %.3f", pval_a);
+        end
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.095, pval_str_a, "FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+    end
     
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
@@ -107,7 +139,7 @@ l.ItemTokenSize = [7 7];
 
 ax1_pos = axes_new(a).Position;
 adjust_x = -0.04; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.06; % adjusted y-position for subplot label
+adjust_y = ax1_pos(4)+0.08; % adjusted y-position for subplot label
 [label_x,label_y] = change_plotlabel(axes_new(1),adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
@@ -128,4 +160,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'binnedreg_full2_altPipeline1.png', '-dpng', '-r600') 
+print(fig, 'binnedreg_full2_linearInt1.png', '-dpng', '-r600')
