@@ -1,6 +1,8 @@
 clc
 clearvars
 
+% TODO: find out where .mat file without name is saved...
+
 %% =======================================================================
 %                            SETUP COMMON PARAMETERS
 % =======================================================================
@@ -61,8 +63,8 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', '', '');
 
-[betas, perm, residuals, predicted] = reg.runAnalysis();
-reg.saveResults();
+% [betas, perm] = reg.runAnalysis();
+% reg.saveResults();
 
 %%
 %%%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%%%%%%%%
@@ -135,7 +137,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('additiveMdl_linearInt', 'perm_additiveMdl_linearInt', '', '');
 
-[betas, perm, residuals, predicted] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %%
@@ -174,7 +176,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('additiveMdl_CSnew', 'perm_additiveMdl_CSnew', '', '');
 
-[betas, perm, residuals, predicted] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS 2: BINNED REGRESSION APPROACH (Figure 3c)
@@ -213,7 +215,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff2bins_linearInt', 'perm_pe_condiff2bins_linearInt', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %%
@@ -252,7 +254,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff2bins_cubicSplineNew', 'perm_pe_condiff2bins_cubicSplineNew', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS 3: REGRESSED RT MODEL (Figure S12)
@@ -290,7 +292,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_regressedRT_linearInt', 'perm_pe_condiff_regressedRT_linearInt', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %%
@@ -328,7 +330,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_regressedRT_cubicSplineNew', 'perm_pe_condiff_regressedRT_cubicSplineNew', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS 5: PATCH-LOCKED PUPIL DILATION (Figure S8)
@@ -365,7 +367,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('patch_condiff_linearInt', 'perm_patch_linearInt', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS 6: MAIN MODEL BUT ON NON-BASELINE CORRECTED SIGNAL + MATHOT et al., 2022 PIPELINE
@@ -402,7 +404,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_linearInt', 'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %%
@@ -440,7 +442,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'pe_condiff_residuals_mathot_nonBaselineCorrected_cubicSplineNew', 'pe_condiff_predicted_mathot_nonBaselineCorrected_cubicSplineNew');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS 10: Figure S11
@@ -477,7 +479,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_deconvolution_updatedClusterStat', 'perm_pe_condiff_deconvolution_updatedClusterStat', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS 10: Figure S11 but w/o baseline correction
@@ -514,7 +516,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_deconvolution_nonBaselineCorrected', 'perm_pe_condiff_deconvolution_nonBaselineCorrected', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS 3: REGRESSED RT MODEL BUT WITH DECONVOLUTION
@@ -551,7 +553,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_regressedRT_deconvolution', 'perm_pe_condiff_regressedRT_deconvolution', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 %% ANALYSIS: BINNED REGRESSION APPROACH (Figure 3c) BUT WITH DECONVOLUTION-BASED
@@ -589,7 +591,7 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff2bins_deconv', 'perm_pe_condiff2bins_deconv', '', '');
 
-[betas, perm, ~, ~] = reg.runAnalysis();
+[betas, perm] = reg.runAnalysis();
 reg.saveResults();
 
 fprintf('\n=== All analyses completed successfully ===\n');
