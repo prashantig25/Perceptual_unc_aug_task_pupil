@@ -33,8 +33,9 @@ save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',fi
 pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 preds_all = readtable(strcat(desiredPath,filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
-mkdir(save_dir);
-
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 for i = 1:num_subs
 
     % GET PUPIL DATA
@@ -47,6 +48,7 @@ for i = 1:num_subs
     data_run = [];
 
     % GET BEHAVIORAL DATA
+    % todo: use function, where also warning would not appear anymore
     for j = 1:num_sess(i)
         filename = strcat(behv_dir,filesep,subj_ids{i},'_','main',num2str(j),'.xlsx');
         if strcmp(subj_ids{i},'4672') == 1
@@ -71,6 +73,8 @@ for i = 1:num_subs
 
     % GET PE DATA
     preds = preds_all(preds_all.id == str2num(subj_ids{i}),:);
+    
+    % Note: this is not used
     validIndices = find(preds.pe == 0); % pe == 0
 
     % GET PUPIL DATA
@@ -88,7 +92,8 @@ for i = 1:num_subs
 
     subj_pupil_signal_pebin1(i,:) = nanmean(pupil_signal(preds.bins == 1,:));
     subj_pupil_signal_pebin2(i,:) = nanmean(pupil_signal(preds.bins == 2,:));
-
+    
+    % todo: is this used?
     if plot_accuracy == 1
         pupil_signalcorrect = pupil_signal(preds.correct == 1,:);
         pupil_signalincorrect = pupil_signal(preds.correct == 0,:);
@@ -123,3 +128,9 @@ condiffbin.pebin2_correct = subj_pupil_signal_pebin2correct;
 condiffbin.pebin2_incorrect = subj_pupil_signal_pebin2incorrect;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
 safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_linearInt.mat"),condiffbin)
+
+% Quick visual check of the mean curves 
+figure()
+hold on
+plot(mean(var1))
+plot(mean(var2))
