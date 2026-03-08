@@ -93,6 +93,7 @@ classdef pupilReg_Vars < handle
             %   ygaze_dir - path to y-gaze preprocessed data directory
             %   base_dir - path to baseline preprocessed data directory
             %   save_dir - path to output directory for saving results
+            
             obj.behv_dir = behv_dir;
             obj.pupil_dir = pupil_dir;
             obj.xgaze_dir = xgaze_dir;
@@ -109,6 +110,7 @@ classdef pupilReg_Vars < handle
             %   pred_vars - cell array of predictor variable names
             %   cat_vars - cell array of categorical variable names  
             %   num_vars - integer specifying total number of variables in model
+            
             obj.model_def = model_def;
             obj.pred_vars = pred_vars;
             obj.cat_vars = cat_vars;

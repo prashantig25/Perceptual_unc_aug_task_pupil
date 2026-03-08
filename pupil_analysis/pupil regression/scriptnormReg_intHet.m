@@ -26,7 +26,7 @@ ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pup
 base_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'baseline before fb');
 
 preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
-preds_all  = readtable(preds_file);
+preds_all = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 %% ANALYSIS 1: MAIN MODEL (Figure 4)
@@ -63,8 +63,8 @@ reg.residuals_predicted = 0;
 
 reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', '', '');
 
-% [betas, perm] = reg.runAnalysis();
-% reg.saveResults();
+[betas, perm] = reg.runAnalysis();
+reg.saveResults();
 
 %%
 %%%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%%%%%%%%

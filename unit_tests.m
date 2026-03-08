@@ -2,17 +2,18 @@ classdef unit_tests < matlab.mock.TestCase
     % Unit tests for the PupilRegression class
 
     % Todo:
-    % 1. If used: Test init with config copy
-    %   1.1 test copyFromConfig
-    % 2. Test RegressRTEffects function
-    % 3. TestloadBaselineData function
-    % 4. testGetBehavioralPredictors with baseline_mdl == 1
-    % 5. testGetBinnedData with binning options
-    % 6. Test runPermutationTest (if used in future)
+    % 1. Heteroskedastic model
+    % 2. If used: Test init with config copy
+    %   2.1 test copyFromConfig
+    % 3. Test RegressRTEffects function
+    % 4. TestloadBaselineData function
+    % 5. testGetBehavioralPredictors with baseline_mdl == 1
+    % 6. testGetBinnedData with binning options
+    % 7. Test runPermutationTest (if used in future)
 
     % Further notes
 
-    % Separate tests for AIC/BIC functions
+    % Separate tests for AIC/BIC functions (or getting rid of them)
     %
     % Don't forget to test linear_fit directly
     %
@@ -32,13 +33,30 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the initialization of the pupil-regression object.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
 
             % General properties
             testCase.verifyEqual(analyzer.betas_struct, struct())
             testCase.verifyEqual(analyzer.perm_results, [])
             testCase.verifyEqual(analyzer.residuals_all, [])
             testCase.verifyEqual(analyzer.predicted_all, [])
+
+            % Model comparison and heteroskedastic model
+            testCase.verifyEqual(analyzer.aic_values, [])
+            testCase.verifyEqual(analyzer.bic_values, [])
+            testCase.verifyEqual(analyzer.logL_values, [])
+            testCase.verifyEqual(analyzer.rsquaredOrdinary, [])
+            testCase.verifyEqual(analyzer.rsquaredAdjusted, [])
+            testCase.verifyEqual(analyzer.starting_points, [])
+            testCase.verifyEqual(analyzer.model_type, 'OLS')
+            testCase.verifyEqual(analyzer.n_sp, 20)
+            testCase.verifyEqual(analyzer.minBound, [])
+            testCase.verifyEqual(analyzer.maxBound, [])
+            testCase.verifyEqual(analyzer.lb, [])
+            testCase.verifyEqual(analyzer.ub, [])
+            testCase.verifyEqual(analyzer.fmincon_options, [])
+            testCase.verifyEqual(analyzer.negLL_values, [])
+            testCase.verifyEqual(analyzer.externalFitFcn, @linear_fit)
 
             % Subject and session parameters
             testCase.verifyEqual(analyzer.subj_ids, [])
@@ -90,22 +108,26 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the setSubjects function in pupilReg_Vars.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
 
             subj_ids = {'01', '02', '03'};
             num_sess = [1, 1, 2];
             analyzer.setSubjects(subj_ids, num_sess);
 
-            testCase.verifyEqual(analyzer.subj_ids, subj_ids);
-            testCase.verifyEqual(analyzer.num_sess, num_sess);
-            testCase.verifyEqual(analyzer.num_subs, 3);
+            testCase.verifyEqual(analyzer.subj_ids, subj_ids)
+            testCase.verifyEqual(analyzer.num_sess, num_sess)
+            testCase.verifyEqual(analyzer.num_subs, 3)
+            testCase.verifyEqual(analyzer.model_type, 'OLS')
+            testCase.verifyEqual(analyzer.n_sp, 20)
+
         end
+
 
         function testSetPaths(testCase)
             % Test the setPaths function in pupilReg_Vars.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
 
             % Mock directories
             behv_dir = "my_path/raw_data";
@@ -129,7 +151,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the setModel in pupilReg_Vars.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
 
             % Set model parameters
             model_def = 'y ~ a + b';
@@ -145,12 +167,11 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(analyzer.num_vars, num_vars)
         end
 
-
         function testSetFilenames(testCase)
             % Tests the setFilenames function.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
 
             betas_save = 'a';
             perm_save = 'b';
@@ -169,8 +190,8 @@ classdef unit_tests < matlab.mock.TestCase
         % Part 3: Core pupilRegression methods
         % ------------------------------------
 
-        function testRunAnalysis(testCase)
-            % Tests the runAnalysis function.
+        function testRunAnalysisOLS(testCase)
+            % Tests the runAnalysis function with OLS appraoch.
 
             % Import mocking methods
             import matlab.mock.actions.Invoke
@@ -205,21 +226,75 @@ classdef unit_tests < matlab.mock.TestCase
 
             % obj.betas_struct.with_intercept is filled in function
             % processSubject. Therefore also sequentially fill this when mocking.
-            [betas, perm, residuals, predicted] = mockAnalyzer.runAnalysis();
+            [betas, perm] = mockAnalyzer.runAnalysis();
 
-            % Expected (reduced) output
+            % Expected output
             num_bins = 1;
             expected_betas = nan(num_bins, mockAnalyzer.num_vars+1, mockAnalyzer.num_subs, mockAnalyzer.col);
             expected_betas(:,:,1) = 1;
             expected_betas(:,:,2) = 2;
             expected_betas(:,:,3) = 3;
-            expected_residuals_all = {[0.1, 0.1, 0.1];[0.1, 0.1, 0.1]; [0.1, 0.1, 0.1]};
-            expected_predicted = {[0.1, 0.2, 0.3];[0.1, 0.2, 0.3]; [0.1, 0.2, 0.3]};
 
             testCase.verifyEqual(perm.p_value, 0.01)
             testCase.verifyEqual(betas.with_intercept, expected_betas)
-            testCase.verifyEqual(residuals, expected_residuals_all)
-            testCase.verifyEqual(predicted, expected_predicted)
+            testCase.verifyEqual(mockAnalyzer.betas_struct.with_intercept, expected_betas)
+
+        end
+
+
+        function testRunAnalysisHet(testCase)
+            % Tests the runAnalysis function with regression accounting for
+            % heteroskedasticity.
+
+            % Import mocking methods
+            import matlab.mock.actions.Invoke
+
+            % Create mock with which we mock out runPermuationTest
+            % and processSubject. The rest remains consistent with
+            % original function. We use the TestPupilRegression helper
+            % class with mock processSubject function
+            [mockAnalyzer, behavior] = testCase.createMock( ...
+                ?TestPupilRegression, ...
+                "MockedMethods", "runPermutationTest");
+
+            % Define output behavior of mocked runPermutationTest function
+            when( ...
+                withAnyInputs(behavior.runPermutationTest), ...
+                Invoke(@(~) assignSignificance(mockAnalyzer)) ...
+                );
+
+            % Create helper function for permutation-test output
+            function assignSignificance(obj)
+                obj.perm_results = struct('p_value', 0.01);
+            end
+
+            % Set attributes for test case
+            mockAnalyzer.model_type = 'heteroskedastic';
+            mockAnalyzer.col = 1;
+            mockAnalyzer.subj_ids = {"001", "003","003"};
+            mockAnalyzer.behv_dir = "my_path/raw_data";
+            mockAnalyzer.pupil_dir = "my_path/pupil";
+            mockAnalyzer.model_def = 'y ~ a + b';
+            mockAnalyzer.num_vars = 2;
+            mockAnalyzer.num_subs = 3;
+
+            % obj.betas_struct.with_intercept is filled in function
+            % processSubject. Therefore also sequentially fill this when mocking.
+            [betas, perm] = mockAnalyzer.runAnalysis();
+
+            % Expected output
+            num_bins = 1;
+            expected_betas = nan(num_bins, mockAnalyzer.num_vars+1, mockAnalyzer.num_subs, mockAnalyzer.col);
+            expected_betas(:,:,1) = 1;
+            expected_betas(:,:,2) = 2;
+            expected_betas(:,:,3) = 3;
+
+            % Todo: Het currently does not compute the p-value within the
+            % function, but this should absolutely be done.
+            % testCase.verifyEqual(perm.p_value, 0.01)
+            testCase.verifyEqual(betas.with_intercept, expected_betas)
+            testCase.verifyEqual(mockAnalyzer.betas_struct.with_intercept, expected_betas)
+
         end
 
 
@@ -228,7 +303,7 @@ classdef unit_tests < matlab.mock.TestCase
 
             % Since this is sort of a wrapper function, we mock out
             % multiple methods
-            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression, ...
+            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression_intHet, ...
                 "ConstructorInputs", {1}, ...
                 "MockedMethods", ["loadBehavioralData",...
                 "handleMissedTrials", "loadPupilGazeData",...
@@ -241,19 +316,34 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.assignOutputsWhen(withAnyInputs(behavior.loadPupilGazeData), 1,2,3);
             testCase.assignOutputsWhen(withAnyInputs(behavior.loadBaselineData), 1);
             testCase.assignOutputsWhen(withAnyInputs(behavior.getBehavioralPredictors), 1,2,3,4,5,6);
+            testCase.assignOutputsWhen(withAnyInputs(behavior.processBinsAndTimepoints), 0);
 
-            % This is the output that we're testing since all other
-            % functions are just before are mocked out
-            expected_residuals = 1;
-            expected_predicted = 2;
-            testCase.assignOutputsWhen(withAnyInputs(behavior.processBinsAndTimepoints), expected_residuals, expected_predicted);
+            mockPupilRegression.subj_ids = {"001", "002", "003"};
 
-            mockPupilRegression.subj_ids = {"001", "003","003"};
-            [residuals_subj, predicted_subj] = mockPupilRegression.processSubject(1, 1);
+            % Run function
+            mockPupilRegression.processSubject(1, 1);
 
-            testCase.verifyEqual(residuals_subj, expected_residuals);
-            testCase.verifyEqual(predicted_subj, expected_predicted);
+            % Verify calls of function
+            testCase.verifyCalled(withAnyInputs(behavior.loadBehavioralData));
+            testCase.verifyCalled(withAnyInputs(behavior.handleMissedTrials));
+            testCase.verifyCalled(withAnyInputs(behavior.loadPupilGazeData));
+            testCase.verifyCalled(withAnyInputs(behavior.loadBaselineData));
+            testCase.verifyCalled(withAnyInputs(behavior.getBehavioralPredictors));
+            testCase.verifyCalled(withAnyInputs(behavior.processBinsAndTimepoints));
+
+            % Verify input to processBinsAndTimepoint, where regression
+            % model is implemented
+            testCase.verifyCalled(behavior.processBinsAndTimepoints(...
+                1, ... % preds
+                2, ... % zsc_pupil
+                3, ... % xgaze_signal
+                4, ... % ygaze_signal
+                5, ... % behv_data
+                6, ... % zsc_base
+                1, ... % subj_idx
+                1));   % binnedAnalysiss
         end
+
 
         function testLoadBehavioralData(testCase)
             % Tests the loadBehavioralData function.
@@ -269,7 +359,7 @@ classdef unit_tests < matlab.mock.TestCase
             numRows = 5;
             dummyData = array2table(zeros(numRows, 16));
             extraData = table(repmat(0.5, numRows, 1), repmat(10, numRows, 1), ...
-                'VariableNames', {'choice_rt', 'slider_respond_response'});
+                'VariableNames', {'choice.rt', 'slider_respond.response'});
             mockTable = [dummyData, extraData];
 
             % Save mock table for testing
@@ -280,13 +370,15 @@ classdef unit_tests < matlab.mock.TestCase
             writetable(mockTable, fullFilePath);
 
             % Initialize analyzer
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
             analyzer.behv_dir = testDir;
             analyzer.subj_ids = {subjID};
             analyzer.num_sess = 1;
-
+            
+            % Run the function
             behv_data = analyzer.loadBehavioralData(1);
 
+            % Verfify everything is loaded correctly
             testCase.verifyClass(behv_data, 'table');
             testCase.verifyEqual(height(behv_data), numRows);
             testCase.verifyTrue(any(strcmp(behv_data.Properties.VariableNames, 'rt')));
@@ -300,7 +392,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the handleMissedTrials function.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
 
             % Create behavioral data
             % We have 2 nan values that are expected to be removed.
@@ -313,14 +405,13 @@ classdef unit_tests < matlab.mock.TestCase
                 'VariableNames', {'ID', 'rt', 'group', 'slider'});
 
             expected_behv_data = behv_data_input(3:end,:);
-            expected_missedtrials = logical([1; 1; 0; 0; 0]);
             expected_missedtrials_slider = logical([1; 0; 0; 0]);
 
-            [behv_data, missedtrials, missedtrials_slider] =...
+            [behv_data, missedtrials_slider] =...
                 analyzer.handleMissedTrials(behv_data_input);
             testCase.verifyEqual(behv_data, expected_behv_data);
-            testCase.verifyEqual(missedtrials, expected_missedtrials);
             testCase.verifyEqual(missedtrials_slider, expected_missedtrials_slider);
+            
         end
 
 
@@ -372,7 +463,7 @@ classdef unit_tests < matlab.mock.TestCase
             save(fullFilePathYGaze, 'dummyData');
 
             % Initialize analyzer and add directory info for testing
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
             analyzer.pupil_dir = pupil_dir;
             analyzer.xgaze_dir = xgaze_dir;
             analyzer.ygaze_dir = ygaze_dir;
@@ -391,7 +482,7 @@ classdef unit_tests < matlab.mock.TestCase
 
             % Test "feedback" case
             [zsc_pupil, xgaze_signal, ygaze_signal] =...
-                analyzer.loadPupilGazeData(subj_idx, missedtrials, missedtrials_slider);
+                analyzer.loadPupilGazeData(subj_idx, missedtrials_slider);
             verifyTrue(testCase, all(size(zsc_pupil) == [7,5]));
             verifyTrue(testCase, all(size(xgaze_signal) == [7,5]));
             verifyTrue(testCase, all(size(ygaze_signal) == [7,5]));
@@ -400,7 +491,7 @@ classdef unit_tests < matlab.mock.TestCase
             analyzer.timewindow = 'patch';
 
             [zsc_pupil, xgaze_signal, ygaze_signal] =...
-                analyzer.loadPupilGazeData(subj_idx, missedtrials, missedtrials_slider);
+                analyzer.loadPupilGazeData(subj_idx, missedtrials_slider);
             verifyTrue(testCase, all(size(zsc_pupil) == [7,10]));
             verifyTrue(testCase, all(size(xgaze_signal) == [7,10]));
             verifyTrue(testCase, all(size(ygaze_signal) == [7,10]));
@@ -429,7 +520,7 @@ classdef unit_tests < matlab.mock.TestCase
             ygaze_signal = zeros(5, 5);
 
             % Initialize analyzer
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
 
             % Input variables and attributes
             subj_idx = 1;
@@ -453,43 +544,67 @@ classdef unit_tests < matlab.mock.TestCase
         function testProcessBinsAndTimepointsWbinnedAnalysis(testCase)
             % Test processBinsAndTimepoints function.
             %
-            % In this case w/o binnedAnalysis == 1
+            % In this case with binnedAnalysis == 1
 
             % Mock out two functions and define their behavior
-            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression, ...
+            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression_intHet, ...
                 "ConstructorInputs", {1}, ...
                 "MockedMethods", ["getBinnedData", "fitModelAtTimepoint"]);
             testCase.assignOutputsWhen(withAnyInputs(behavior.getBinnedData), 1, 2, 3, 4, 5);
-            testCase.assignOutputsWhen(withAnyInputs(behavior.fitModelAtTimepoint), 40, 50, 60);
+            testCase.assignOutputsWhen(withAnyInputs(behavior.fitModelAtTimepoint), 0);
 
             % Add attributes for testing
             mockPupilRegression.residuals_predicted = 1;
             mockPupilRegression.col = 3;
 
-            [residuals_subj, predicted_subj] = mockPupilRegression.processBinsAndTimepoints(1,2,3,4,5,6,7, true);
-            verifyTrue(testCase, all(residuals_subj == [50, 50, 50]));
-            verifyTrue(testCase, all(predicted_subj == [60, 60, 60]));
+            % Todo: function has not output anymore. Adjust test
+            % accordingly
+            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 5, 6, 7, true);
+            
+            % Verify input to fitModelAtTimepoint, where regression
+            % model is implemented
+            testCase.verifyCalled(behavior.fitModelAtTimepoint(...
+                1, ... % c
+                1, ... % pupil_signal_bins
+                2, ... % xgaze_signal_bins
+                3, ... % ygaze_signal_bins
+                4, ... % preds_bins
+                6, ... % zsc_base
+                1, ... % r
+                7));   % % subj_idx
         end
 
 
         function testProcessBinsAndTimepointsNobinnedAnalysis(testCase)
             % Test processBinsAndTimepoints function.
             %
-            % In this case w/o binnedAnalysis == 0
+            % In this case w binnedAnalysis == 0
 
             % Mock out two functions and define their behavior
-            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression, ...
+            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression_intHet, ...
                 "ConstructorInputs", {1}, ...
-                "MockedMethods", ["getBinnedData", "fitModelAtTimepoint"]);
+                "MockedMethods", "fitModelAtTimepoint");
             testCase.assignOutputsWhen(withAnyInputs(behavior.fitModelAtTimepoint), 40, 50, 60);
 
             % Add attributes for testing
             mockPupilRegression.residuals_predicted = 1;
             mockPupilRegression.col = 3;
 
-            [residuals_subj, predicted_subj] = mockPupilRegression.processBinsAndTimepoints(1,2,3,4,5,6,7, false);
-            verifyTrue(testCase, all(residuals_subj == [50, 50, 50]));
-            verifyTrue(testCase, all(predicted_subj == [60, 60, 60]));
+            % Todo: function has not output anymore. Adjust test
+            % accordingly
+            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 5, 6, 7, false);
+           
+            % Verify input to fitModelAtTimepoint, where regression
+            % model is implemented
+            testCase.verifyCalled(behavior.fitModelAtTimepoint(...
+                1, ... % c
+                2, ... % pupil_signal_bins
+                3, ... % xgaze_signal_bins
+                4, ... % ygaze_signal_bins
+                1, ... % preds_bins
+                6, ... % zsc_base
+                1, ... % r
+                7));   % % subj_idx
         end
 
 
@@ -512,7 +627,7 @@ classdef unit_tests < matlab.mock.TestCase
 
             % Non-binned case: we expect that all variables are literally
             % used (note in this case function should not even be called)
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
             analyzer.binned = 0;
             analyzer.binned_accuracy = 0;
             r = nan;
@@ -529,7 +644,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Test fitModelAtTimepoint function
 
             % Initialize analyzer
-            analyzer = PupilRegression();
+            analyzer = PupilRegression_intHet();
 
             % Define mock data
             mockBetas = [2, 10, 7, 1];
@@ -545,8 +660,24 @@ classdef unit_tests < matlab.mock.TestCase
             mockLM.Rsquared.Adjusted = 0.2;
             mockLM.Rsquared.Ordinary = 0.3;
 
+            % todo: only save temporarily for testing!
+            mockLM.CoefficientNames = {'(Intercept)', 'xgaze', 'ygaze', 'zsc_condiff', 'pe', 'zsc_up', 'rt', 'zsc_condiff:pe'};
+
             % Use mock function for linear_fit via new handle construction
             analyzer.externalFitFcn = @(varargin) deal(mockBetas, [], mockResid, [], mockLM);
+
+            % Mock save function
+            analyzer.saveFcn = @(path, data) captureSave(path, data);
+            
+            % Captured path and data
+            capturedPath = '';
+            capturedData = {};
+            
+            % Trap function
+            function captureSave(path, data)
+                capturedPath = path;
+                capturedData = data;
+            end
 
             % Start defining and building the input variables
             % -----------------------------------------------
@@ -555,50 +686,63 @@ classdef unit_tests < matlab.mock.TestCase
             c = 1;
 
             % Pupil and gaze data
-            n_bins = 5;
-            n_trials = 10;
-            pupil_signal_bins = ones(n_trials, n_bins);
-            xgaze_signal_bins = ones(n_trials, n_bins);
-            ygaze_signal_bins = ones(n_trials, n_bins);
+            n_trials = 5;
+            n_bins = 10;
+            pupil_signal_bins = ones(n_bins, n_trials);
+            xgaze_signal_bins = ones(n_bins, n_trials);
+            ygaze_signal_bins = ones(n_bins, n_trials);
 
             % Behavioral data in "preds_bins"
-            pupil = ones(n_trials, 1);
-            xgaze = ones(n_trials, 1);
-            ygaze = ones(n_trials, 1);
-            con_diff = ones(n_trials, 1);
-            signed_pe = ones(n_trials, 1);
-            pe = ones(n_trials, 1);
-            up = ones(n_trials, 1);
-            rt = ones(n_trials, 1);
+            pupil = ones(n_bins, 1);
+            xgaze = ones(n_bins, 1);
+            ygaze = ones(n_bins, 1);
+            con_diff = ones(n_bins, 1);
+            signed_pe = ones(n_bins, 1);
+            pe = ones(n_bins, 1);
+            up = ones(n_bins, 1);
+            rt = ones(n_bins, 1);
             condition = {'A'; 'B'; 'A'; 'B'; 'A'; 'B'; 'A'; 'B'; 'A'; 'B'};
-            ecoperf = ones(n_trials, 1);
-            correct = ones(n_trials, 1);
-            pe_condiff = ones(n_trials, 1);
+            ecoperf = ones(n_bins, 1);
+            correct = ones(n_bins, 1);
+            pe_condiff = ones(n_bins, 1);
             preds_bins = table(pupil, xgaze, ygaze, ...
                 con_diff, signed_pe, pe, up, rt, condition, ecoperf, correct, pe_condiff,...
                 'VariableNames', {'pupil', 'xgaze', 'ygaze', ...
                 'con_diff', 'signed_pe', 'pe', 'up', 'rt', 'condition', 'ecoperf', 'correct', 'pe_condiff'});
 
             zsc_base = nan; % baseline data
-            r = 1; % current bin index
+            r = 5; % current bin index
             subj_idx = 1; % current subject index
 
             % Define analyzer attributes
-            num_bins = size(pupil, 1);
             analyzer.num_vars = 3;
             analyzer.num_subs = 1;
             analyzer.col = 1;
-            analyzer.betas_struct.with_intercept = nan(num_bins, analyzer.num_vars+1, analyzer.num_subs, analyzer.col);
-
+            analyzer.betas_struct.with_intercept = nan(n_bins, analyzer.num_vars+1, analyzer.num_subs, analyzer.col);
+            
+            analyzer.betas_save = 'unit_test';
             % Run function
-            [betas, residuals, predicted] = analyzer.fitModelAtTimepoint(c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx);
-
-            % Test output and updated properties
-            testCase.verifyEqual(betas, mockBetas);
-            testCase.verifyEqual(residuals, mockResid);
-            testCase.verifyEqual(predicted, mockPrediction);
-            testCase.verifyEqual(analyzer.rsquaredAdjusted, mockLM.Rsquared.Adjusted)
-            testCase.verifyEqual(analyzer.rsquaredOrdinary, mockLM.Rsquared.Ordinary)
+            analyzer.fitModelAtTimepoint(c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx);
+           
+            % Expected properties
+            expected_betas_struct = nan(n_bins, analyzer.num_vars+1, analyzer.num_subs, analyzer.col);
+            expected_betas_struct(r, :) = mockBetas;
+            expectedRsquaredAdjusted = zeros(5, 1);
+            expectedRsquaredAdjusted(end,1) = mockLM.Rsquared.Adjusted;
+            expectedRsquaredOrdinary = zeros(5, 1);
+            expectedRsquaredOrdinary(end,1) = mockLM.Rsquared.Ordinary;
+            
+            % Test updated properties
+            testCase.verifyEqual(analyzer.betas_struct.with_intercept, expected_betas_struct);
+            testCase.verifyEqual(analyzer.rsquaredAdjusted, expectedRsquaredAdjusted) % todo: preallocate in class like beta_struct
+            testCase.verifyEqual(analyzer.rsquaredOrdinary, expectedRsquaredOrdinary) % todo: preallocate in class like beta_struct
+            
+            % Check that the path contains the expected string
+            testCase.verifyTrue(contains(capturedPath, '_coeffNames.mat'));
+            
+            % Check that data was actually saved
+            testCase.verifyNotEmpty(capturedData);
+        
         end
     end
 
