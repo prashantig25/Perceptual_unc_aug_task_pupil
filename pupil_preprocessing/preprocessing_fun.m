@@ -31,6 +31,13 @@ else
     pipeline_label = 'Custom pipeline';
 end
 
+% Helper: update waitbar with pipeline, subject, session, and current step
+    function update_wb(wb, s, ss, step_msg)
+        progress = ((s-1) * num_sess(s) + ss) / (num_subs * num_sess(s));
+        waitbar(progress, wb, sprintf('[%s]\nSubject %s (%d/%d) — Session %d/%d\n%s', ...
+            pipeline_label, subj_ids{s}, s, num_subs, ss, num_sess(s), step_msg));
+    end
+
 % Create subject-level waitbar
 wb = waitbar(0, sprintf('[%s]\nStarting...', pipeline_label), ...
     'Name', 'Pupil Preprocessing');
@@ -42,14 +49,10 @@ for s = 1:num_subs
     % LOOP OVER SESSIONS
     for ss = 1:num_sess(s)
 
-        % Update waitbar: show pipeline, subject, and session
-        progress = ((s-1) * num_sess(s) + ss) / (num_subs * num_sess(s));
-        waitbar(progress, wb, sprintf('[%s]\nSubject %s (%d/%d) — Session %d/%d', ...
-            pipeline_label, subj_ids{s}, s, num_subs, ss, num_sess(s)));
-
         % READ DAT AND ASC FILES
         % DAT FOR PUPIL SIZE AND GAZE COORDINATES
         % ASC FOR EVENTS, BLINKS, SACCADES
+        update_wb(wb, s, ss, 'Reading DAT/ASC files...');
         if strcmp(subj_ids(s),'4672') == 1 % only for subj 4672 (read NOTES on top of script to understand)
             filename_dat = strcat(dat_dir, filesep, subj_ids{s},'_','m',num2str(ss),'.EDF_red','.DAT');
             filename_asc = strcat(asc_dir, filesep, subj_ids{s},'_','m',num2str(ss),'_red.asc');
@@ -69,7 +72,7 @@ for s = 1:num_subs
         events = data_asc.event; % get events information from the DAT file
 
         % CONVERT TO TABLE
-        fprintf('converting to table...\n');
+        update_wb(wb, s, ss, 'Converting to table...');
         [data_table] = conv2table(data);
         data_matched = data_table;
         pupil_og = data_matched.pupil_diam;
@@ -84,7 +87,7 @@ for s = 1:num_subs
         end
 
         % STEP 1: BLINK INTERPOLATION - yes
-        fprintf('blink correction step 1...\n');
+        update_wb(wb, s, ss, 'Step 1/7: Blink interpolation...');
         coalesce1 = 0.250;
         padding1 = [-0.150 0.150];
         [pupilcopy, Xgazecopy2, Ygazecopy2, blinksmp] = process_blinks(data_asc, data_matched, sampling_rate, coalesce1, padding1, linearInt);
@@ -98,7 +101,7 @@ for s = 1:num_subs
 
         % STEP 2: PEAK CORRECTION - no
         if noFiltering == 0
-            fprintf('peak correction...\n');
+            update_wb(wb, s, ss, 'Step 2/7: Peak correction...');
             assert(~any(isnan(pupilcopy)));
             win             = hanning(11);
             pupildatsmooth  = filter2(win.',pupilcopy,'same');
@@ -150,7 +153,7 @@ for s = 1:num_subs
 
         % STEP 3: FILTER - no
         if noFiltering == 0
-            fprintf('butterworth filtering...\n');
+            update_wb(wb, s, ss, 'Step 3/7: Butterworth filtering...');
             [~, low_pupil, band_pupil] = apply_filter(pupilcopy, sampling_rate, freqs);
         end
 
@@ -171,14 +174,14 @@ for s = 1:num_subs
 
         % STEP 4: DOWN SAMPLE - no
         if noFiltering == 0
+            update_wb(wb, s, ss, 'Step 4/7: Downsampling...');
             samp_pupil = decimate(band_pupil,downsample_rate,1);
-            fprintf('downsampling data...\n');
         end
 
         % STEP 5: PREPARE FOR DECONVOLUTION - no
         if noFiltering == 0
+            update_wb(wb, s, ss, 'Step 5/7: Performing deconvolution...');
             newsample_rate = sampling_rate/downsample_rate;
-            fprintf('performing deconvolution...\n');
             interval = 6; % time in seconds, after blinks/saccades for deconvolution
             deconv_freq = newsample_rate; % frequency
 
@@ -284,7 +287,9 @@ for s = 1:num_subs
             options = optimoptions('fmincon','Display','iter', 'Algorithm', 'interior-point');
 
             % PERFORM THE OPTIMIZATION
+            rng(42); % set seed for reproducability
             blink_result = fmincon(fun_blink,y0,A,b,Aeq,beq,lb,ub,[],options);
+            rng(42); % set seed again for reproducability
             sacc_result = fmincon(fun_sacc,y0,A,b,Aeq,beq,lb,ub,[],options);
 
             % FIT PARAMETERS
@@ -356,12 +361,12 @@ for s = 1:num_subs
 
         % STEP 6: ZSCORE - no
         if noFiltering == 0
-            fprintf('zscore normalising...\n');
+            update_wb(wb, s, ss, 'Step 6/7: Z-score normalising...');
             data_matched.pupil_zsc = zscore(data_matched.pupil_cleaned);
         end
 
         % STEP 7: DOWNSAMPLE - yes
-        fprintf('downsampling data...\n');
+        update_wb(wb, s, ss, 'Step 7/7: Downsampling & saving...');
         if noFiltering == 1
             data_matched.pupil_cleaned = pupilcopy;
             data_matched.xgaze = Xgazecopy2;

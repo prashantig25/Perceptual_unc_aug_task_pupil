@@ -20,10 +20,9 @@ using_DAT = 1; % always set to 0 if you are preprocessing files for the VERY (!!
 
 % SETUP PATHS (common to both pipelines)
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
@@ -87,8 +86,7 @@ disp('===== RUNNING ALTERNATE PIPELINE =====');
 noFiltering = 0; % filter applied (supplement pipeline)
 linearInt = 1; % linear interpolation (supplement pipeline)
 
-% Set up save directory for alternate pipeline
-save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed'); 
+save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed fixed seed');
 mkdir(save_dir_alt);
 
 % Preprocess
@@ -96,9 +94,7 @@ preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
     downsample_rate, event_names, deconv_time, save_dir_alt, currentDir_asc, currentDir_dat, ...
     save_dirASC, using_DAT, noFiltering, linearInt)
 
-% Add event names and trial numbers
 preproc_dir = save_dir_alt;
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added'); 
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added fixed seed');
 add_eventstrials;
-
 disp('===== PREPROCESSING COMPLETE =====');
