@@ -287,9 +287,9 @@ for s = 1:num_subs
             options = optimoptions('fmincon','Display','iter', 'Algorithm', 'interior-point');
 
             % PERFORM THE OPTIMIZATION
-            rng(42); % set seed for reproducability
+            rng(42); % set seed for reproducability for fmincon
             blink_result = fmincon(fun_blink,y0,A,b,Aeq,beq,lb,ub,[],options);
-            rng(42); % set seed again for reproducability
+            rng(42); % set seed again for reproducability for fmincon
             sacc_result = fmincon(fun_sacc,y0,A,b,Aeq,beq,lb,ub,[],options);
 
             % FIT PARAMETERS

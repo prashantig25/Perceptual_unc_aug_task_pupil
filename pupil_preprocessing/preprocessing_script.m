@@ -5,7 +5,7 @@
 clc
 clearvars
 
-rng(123);
+rng(123); % general seed
 
 % COMMON PARAMETERS (shared across both pipelines)
 subj_ids = importdata("subj_ids.mat");
