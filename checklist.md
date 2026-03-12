@@ -1,6 +1,6 @@
 ## 📝 Task Verification Matrix
 
-| Task Description | My Progress (Owner) | Collaborator Review |
+| Task Description | PG's checklist | RB's checklist |
 | :--- | :---: | :---: |
 | **Task A:** [Describe task A here] | [ ] | [ ] |
 | **Task B:** [Describe task B here] | [ ] | [ ] |
