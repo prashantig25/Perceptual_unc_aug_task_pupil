@@ -14,17 +14,19 @@ subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
 col = 300;
 
-currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil-main';
-pathParts  = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if startsWith(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
+    % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
-alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'new pipeline gaze');
+alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions pipeline gaze');
 
 % Load OLS coefficient names and find pe:zsc_condiff index dynamically
 ols_coeff_names = importdata(fullfile(main_dir, 'pe_condiff_linearInt_coeffNames.mat'));
@@ -41,38 +43,38 @@ betas_linearInt        = importdata(fullfile(main_dir, 'pe_condiff_linearInt.mat
 perm_linearInt         = importdata(fullfile(main_dir, 'perm_pe_condiff_linearInt.mat'));
 betas_cubicSpline      = importdata(fullfile(main_dir, 'pe_condiff_cubicSplineNew.mat'));
 perm_cubicSpline       = importdata(fullfile(main_dir, 'perm_pe_condiff_cubicSplineNew.mat'));
-betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat.mat'));
-perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat.mat'));
+betas_deconv           = importdata(fullfile(main_dir,  'pe_condiff_deconvolution_updatedClusterStat.mat'));
+perm_deconv            = importdata(fullfile(main_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat.mat'));
 betas_linearInt_RT     = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_linearInt.mat'));
 perm_linearInt_RT      = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_linearInt.mat'));
 betas_cubicSpline_RT   = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_cubicSplineNew.mat'));
 perm_cubicSpline_RT    = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_cubicSplineNew.mat'));
-betas_deconv_RT        = importdata(fullfile(alt_dir,  'pe_condiff_regressedRT_deconvolution.mat'));
-perm_deconv_RT         = importdata(fullfile(alt_dir,  'perm_pe_condiff_regressedRT_deconvolution.mat'));
-betas_linearInt_noBL   = importdata(fullfile(alt_dir,  'pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
-perm_linearInt_noBL    = importdata(fullfile(alt_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
-betas_cubicSpline_noBL = importdata(fullfile(alt_dir,  'pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
-perm_cubicSpline_noBL  = importdata(fullfile(alt_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
-betas_deconv_noBL      = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_nonBaselineCorrected.mat'));
-perm_deconv_noBL       = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_nonBaselineCorrected.mat'));
+betas_deconv_RT        = importdata(fullfile(main_dir,  'pe_condiff_regressedRT_deconvolution.mat'));
+perm_deconv_RT         = importdata(fullfile(main_dir,  'perm_pe_condiff_regressedRT_deconvolution.mat'));
+betas_linearInt_noBL   = importdata(fullfile(main_dir,  'pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
+perm_linearInt_noBL    = importdata(fullfile(main_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
+betas_cubicSpline_noBL = importdata(fullfile(main_dir,  'pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
+perm_cubicSpline_noBL  = importdata(fullfile(main_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
+betas_deconv_noBL      = importdata(fullfile(main_dir,  'pe_condiff_deconvolution_nonBaselineCorrected.mat'));
+perm_deconv_noBL       = importdata(fullfile(main_dir,  'perm_pe_condiff_deconvolution_nonBaselineCorrected.mat'));
 
 fprintf('Loading heteroskedasticity specifications...\n');
 betas_linear_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'));
 betas_cubic_het  = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'));
-betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP.mat'));
+betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'));
 
 fprintf('Running permutation tests for heteroskedasticity analyses...\n');
 
 % Heteroskedastic permutation test
-perm_linear_het = get_permtest(1:size(betas_linear_het.with_intercept,2), num_subs, col, betas_linear_het.with_intercept, [], 0, 1);
-perm_cubic_het = get_permtest(1:size(betas_cubic_het.with_intercept,2), num_subs, col, betas_cubic_het.with_intercept, [], 0, 1);
-perm_deconv_het = get_permtest(1:size(betas_deconv_het.with_intercept,2), num_subs, col, betas_deconv_het.with_intercept, [], 0, 1);
+perm_linear_het = get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_cubic_het = get_permtest(1:size(betas_cubic_het.with_intercept,2), num_subjs, col, betas_cubic_het.with_intercept, [], 0, 1);
+perm_deconv_het = get_permtest(1:size(betas_deconv_het.with_intercept,2), num_subjs, col, betas_deconv_het.with_intercept, [], 0, 1);
 
 fprintf('Permutation tests complete!\n');
 
 %% EXTRACT COEFFICIENTS
 
-sub_id = 1:num_subs;
+sub_id = 1:num_subjs;
 col_id = 1:col;
 
 % Original 9 specifications (coefficient 8)

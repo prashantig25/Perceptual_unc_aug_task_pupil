@@ -37,8 +37,10 @@ for j = 1:num_sess(s)
     if strcmp(subj_ids{s},'4672') == 1
         filename = strcat(behv_dir,filesep,subj_ids{s},'_','main',num2str(j),'_red.xlsx');
     end
-    data_run = readtable(filename);
-    rt = table(data_run.choice_rt,'VariableNames',{'rt'}); % add RT data
+    data_run = readtable(filename, 'VariableNamingRule', 'preserve');
+    % data_run = readtable(filename, 'VariableNamingRule', 'preserve');
+    % disp(data_run.Properties.VariableNames)  % add this temporarily to inspect
+    rt = table(data_run.("choice.rt"),'VariableNames',{'rt'}); % add RT data
     data_run = [data_run(:,[1:16]),rt];
     behv_data = [behv_data; data_run];
 end
@@ -48,7 +50,7 @@ condition = behv_data.condition; % task conditions
 data = [];
 for j = 1:num_sess(s)
     filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(j),'.xlsx');
-    data_run = readtable(filename);
+    data_run = readtable(filename,'VariableNamingRule', 'preserve');
     data = [data; data_run];
 end
 

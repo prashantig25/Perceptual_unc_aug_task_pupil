@@ -10,19 +10,27 @@ num_sess = importdata("num_sess.mat");
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain.mat"));
+
+betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+coeff_names = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+pupil_idx = find(strcmp(coeff_names,'pupil'));
+up_idx = find(strcmp(coeff_names,'post_up'));
+pePupil_idx = find(strcmp(coeff_names,'pe:pupil'));
+condiffPupil_idx = find(strcmp(coeff_names,'pupil:con_diff'));
+peCondiffPupil_idx = find(strcmp(coeff_names,'pe:pupil:con_diff'));
+
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
 posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'post_absUP_predict.mat'));
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb'); % directory to get preprocessed data
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb Mathot 2023 linearInt'); % directory to get preprocessed data
 save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual'); 
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'preprocessed');
 betas_field = betas_pupil.with_intercept;
@@ -61,11 +69,11 @@ for s = [1:nsubjs]
     pupil_signal(validIndices,:) = []; % delete pe == 0
     preds.zsc_condiff = nanzscore(preds.norm_condiff);
     for c = 1:col
-        coeffs.pupil(1,c) = betas_field(1,3,s,c);
-        coeffs.pe_condiff_pupil(1,c) = betas_field(1,6,s,c);
-        coeffs.pe_pupil(1,c) = betas_field(1,4,s,c);
-        coeffs.con_diff_pupil(1,c) = betas_field(1,5,s,c);
-        coeffs.post_up(1,c) = betas_field(1,2,s,c);
+        coeffs.pupil(1,c) = betas_field(1,pupil_idx,s,c);
+        coeffs.pe_condiff_pupil(1,c) = betas_field(1,peCondiffPupil_idx,s,c);
+        coeffs.pe_pupil(1,c) = betas_field(1,pePupil_idx,s,c);
+        coeffs.con_diff_pupil(1,c) = betas_field(1,condiffPupil_idx,s,c);
+        coeffs.post_up(1,c) = betas_field(1,up_idx,s,c);
         coeffs.intercept(1,c) = betas_field(1,1,s,c);
         coeffs.pupil_signal(:,c) = pupil_signal(:,c);
     end
@@ -106,4 +114,4 @@ for s = [1:nsubjs]
     clear coeffs
 end
 
-safe_saveall(strcat(save_dir, filesep, "BSarousal_interactions.mat"),posterior);
+safe_saveall(strcat(save_dir, filesep, "BSarousal_interactions_linearInt.mat"),posterior);

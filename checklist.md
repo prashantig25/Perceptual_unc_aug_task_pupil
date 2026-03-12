@@ -9,5 +9,3 @@
 | **Task E:** [Describe task E here] | [ ] | [ ] |
 | **Task F:** [Describe task F here] | [ ] | [ ] |
 | **Task G:** [Describe task G here] | [ ] | [ ] |
-
-> **Note:** Please click the boxes above to mark completion. GitHub will save the state automatically in this PR.

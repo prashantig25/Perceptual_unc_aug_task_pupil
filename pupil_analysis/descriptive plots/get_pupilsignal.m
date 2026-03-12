@@ -19,14 +19,15 @@ pre_duration = 29; % duration for start of pre-event signal
 base_duration = 9; % duration for baseline signal
 regress_rt = 0; % regress RT from pupil phasic signal
 
-% Setup user-based path
-currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil-main';
+% SETUP PATHS (common to both pipelines)
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
+    % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
@@ -56,7 +57,7 @@ mkdir(save_dir);
 mkdir(save_sliderOnset);
 main = 1; % running analyses based on the main pipeline
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, sliderOnset] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -74,7 +75,7 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -91,7 +92,7 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb linearInt');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -113,7 +114,7 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -135,7 +136,7 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch non-baseline corrected linear int');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -157,7 +158,7 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -179,7 +180,7 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp non-baseline corrected linear int');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -206,7 +207,7 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 cubic spline new');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -223,7 +224,7 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb cubic spline new');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -248,15 +249,15 @@ main = 0;
 % ONLY DIFFERENCE: Use alternate preprocessing directory
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
-    filesep, 'preprocessed trials and events added');
+    filesep, 'preprocessed trials and events added fixed seed');
 
 %% 7. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE (DECONVOLUTION PIPELINE)
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb seed fixed');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
@@ -270,10 +271,10 @@ end
 base = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb seed fixed');
 mkdir(save_dir);
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
         [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
             preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
