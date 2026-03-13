@@ -2,9 +2,9 @@ clc
 clearvars
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil-main';
+reqPath    = 'Perceptual_unc_aug_task_pupil';
 pathParts  = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;
 else
     desiredPath = createSavePaths(currentDir, reqPath);

@@ -4,24 +4,18 @@ clearvars
 
 %% LOAD DATA
 
-currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
-pathParts = strsplit(currentDir, filesep);
+currentDir = cd;
+reqPath    = 'Perceptual_unc_aug_task_pupil';
+pathParts  = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
-    disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
-    % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-
 het_save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', ...
-                        'regression', 'control analyses for revisions pipeline gaze');
-betas_struct = importdata(fullfile(het_save_dir,"param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat")); 
-%betas_struct = importdata(fullfile(het_save_dir,"param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat")); 
-coeffs_name = importdata("/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil" + ...
-    "/data/GB data two pipelines/pupil/regression/control analyses for revisions/coeff_names_het.mat");
-% coeffs_name = importdata(fullfile(het_save_dir,"coeff_names_het.mat"));
+                        'regression', 'control analyses for revisions');
+betas_struct = importdata(fullfile(het_save_dir,"param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat")); 
+coeffs_name = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
 x = linspace(-300, 2700, 300); 
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
@@ -32,7 +26,7 @@ col = 300;
 % PREPARE AND RUN PERMUTATION TEST
 fprintf('Running cluster-corrected permutation tests...\n');
 perm = get_permtest(1:num_params, num_subjs, col, betas_struct.with_intercept, [], 0, 1);
-safe_saveall(fullfile(het_save_dir,"permHet_deconv_20SPAbs3Width.mat"),perm);
+% safe_saveall(fullfile(het_save_dir,"permHet_deconv_20SPAbs3Width.mat"),perm);
 
 %% PLOT SETTINGS
 neutral = [7, 53, 94]/255;

@@ -3,15 +3,15 @@ clearvars
 
 %% SETUP
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil-main';
+reqPath = 'Perceptual_unc_aug_task_pupil';
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;
 else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil_missingSlider.xlsx');
+preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil_no_zerope.xlsx');
 preds_all = readtable(preds_file);
 
 [~,~,~,~,~,~,~,~,~,~,~,~,binned_dots,~,~,~,~,~,~] = colors_rgb();
@@ -20,12 +20,11 @@ font_size = 7;
 line_width = 0.5;
 
 %% EXTRACT VARIABLES
-rt_all      = log(preds_all.rt);
-pe_all      = preds_all.pe;
+rt_all       = log(preds_all.rt);
 con_diff_all = preds_all.con_diff;
-id_all      = preds_all.id;
-subj_ids    = unique(id_all);
-nSubj       = length(subj_ids);
+id_all       = preds_all.id;
+subj_ids     = unique(id_all);
+nSubj        = length(subj_ids);
 
 %% SECTION 1: BINNED CON_DIFF vs MEAN RT
 nBins = 5;
@@ -76,24 +75,49 @@ else
     r_con_bins = NaN; p_con_bins = NaN;
 end
 
-%% SECTION 2: BINNED PE vs MEAN RT
-pe_edges    = [0, 0.2, 0.4, 0.6, 0.8, 1];
-nBins_PE    = length(pe_edges) - 1;
-binCenters_pe = (pe_edges(1:end-1) + pe_edges(2:end)) / 2;
-subj_meanRT_pe = NaN(nSubj, nBins_PE);
+%% SECTION 2: BINNED PE (PREVIOUS TRIAL, WITHIN BLOCK) vs MEAN RT (CURRENT TRIAL)
+pe_edges        = [0, 0.2, 0.4, 0.6, 0.8, 1];
+nBins_PE        = length(pe_edges) - 1;
+binCenters_pe   = (pe_edges(1:end-1) + pe_edges(2:end)) / 2;
+subj_meanRT_pe  = NaN(nSubj, nBins_PE);
 
 for s = 1:nSubj
-    sid = subj_ids(s);
-    idx = id_all == sid;
-    pe  = pe_all(idx);
-    rt  = rt_all(idx);
-    valid = ~(isnan(pe) | isnan(rt));
-    pe = pe(valid); rt = rt(valid);
-    if isempty(pe); continue; end
+    sid       = subj_ids(s);
+    subj_data = preds_all(preds_all.id == sid, :);
 
-    binIdx = discretize(pe, pe_edges);
+    pe_prev_all = [];
+    rt_curr_all = [];
+
+    for b = 1:8
+        blockData = subj_data(subj_data.blocks == b, :);
+
+        % Delete trial 1 within this block
+        blockData = blockData(blockData.trial ~= 1, :);
+
+        if height(blockData) < 2; continue; end
+
+        % Shift PE within block only — no cross-block associations
+        pe_prev           = [NaN; blockData.pe(1:end-1)];
+        blockData.pe_prev = pe_prev;
+
+        % Remove first row (NaN pe_prev)
+        blockData = blockData(~isnan(blockData.pe_prev), :);
+
+        pe_prev_all = [pe_prev_all; blockData.pe_prev];
+        rt_curr_all = [rt_curr_all; log(blockData.rt)];
+    end
+
+    % Remove NaNs
+    valid       = ~(isnan(pe_prev_all) | isnan(rt_curr_all));
+    pe_prev_all = pe_prev_all(valid);
+    rt_curr_all = rt_curr_all(valid);
+
+    if isempty(pe_prev_all); continue; end
+
+    % Bin by previous trial PE
+    binIdx = discretize(pe_prev_all, pe_edges);
     for b = 1:nBins_PE
-        subj_meanRT_pe(s, b) = mean(rt(binIdx == b), 'omitnan');
+        subj_meanRT_pe(s, b) = mean(rt_curr_all(binIdx == b), 'omitnan');
     end
 end
 
@@ -127,7 +151,7 @@ title(ax1, ['\itr\rm = ' sprintf('%.2f', r_con_bins) newline '\itp\rm = ' sprint
 set(ax1, 'FontSize', font_size, 'FontName', font_name, 'LineWidth', line_width);
 box(ax1, 'off');
 
-% --- Subplot 2: PE vs RT ---
+% --- Subplot 2: Previous Trial PE vs RT ---
 ax2 = subplot(1, 2, 2);
 hold(ax2, 'on');
 scatter(ax2, binCenters_pe, group_meanRT_pe, 'filled', 'MarkerEdgeColor', 'none', 'MarkerFaceColor', 'none');
@@ -136,7 +160,7 @@ if sum(validBins_pe) >= 2
 end
 errorbar(ax2, binCenters_pe, group_meanRT_pe, group_semRT_pe, 'k', 'LineWidth', line_width, 'LineStyle', 'none');
 scatter(ax2, binCenters_pe, group_meanRT_pe, 'filled', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', binned_dots);
-xlabel(ax2, ['Absolute PE bins' newline '(1 bin = 0.01)']);
+xlabel(ax2, ['Previous trial PE bins' newline '(1 bin = 0.2)']);
 ylabel(ax2, 'Mean log RT');
 title(ax2, ['\itr\rm = ' sprintf('%.2f', r_pe_bins) newline '\itp\rm = ' sprintf('%.3f', p_pe_bins)], ...
     'FontWeight', 'normal', 'Interpreter', 'tex');
@@ -144,13 +168,13 @@ set(ax2, 'FontSize', font_size, 'FontName', font_name, 'LineWidth', line_width);
 box(ax2, 'off');
 
 %% SAVE STATS AND FIGURE
-rVals = [round(r_pe_bins,3); round(r_con_bins,3)];
-pVals = [round(p_pe_bins,3); round(p_con_bins,3)];
-termString = {"rtPE"; "rtCondiff"};
+rVals      = [round(r_pe_bins,3); round(r_con_bins,3)];
+pVals      = [round(p_pe_bins,3); round(p_con_bins,3)];
+termString = {"rtPrevPE"; "rtCondiff"};
 T = table(rVals, pVals, termString, 'VariableNames', {'rValuesRT','pValuesRT','term'});
 saveStat = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'stats');
-safe_saveall(strcat(saveStat, filesep, 'RTDescriptive.csv'), T);
+safe_saveall(strcat(saveStat, filesep, 'RTDescriptive_prevPE.csv'), T);
 
 fig = gcf;
 fig.PaperPositionMode = 'auto';
-print(fig, 'RTPlot.png', '-dpng', '-r600')
+print(fig, 'RTPlot_prevPE.png', '-dpng', '-r600');

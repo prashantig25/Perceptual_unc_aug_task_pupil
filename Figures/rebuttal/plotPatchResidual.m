@@ -2,9 +2,7 @@ clc
 clearvars
 
 % =================== 1. INITIAL SETUP AND BASELINE MODEL FIT ========================
-data = readtable("/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/" + ...
-    "Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/" + ...
-    "GB data peak corrected/behavior/model fitting/preprocessed_lr_pupil_no_zerope.xlsx");
+data = readtable("preprocessed_lr_pupil_no_zerope.xlsx");
 uniqueID = unique(data.id);
 data.ID = data.id;
 
@@ -31,9 +29,9 @@ subj_Rsquared = NaN(numSubjs, 1);
 subj_residuals = cell(numSubjs,1);
 
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
