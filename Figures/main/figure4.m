@@ -10,19 +10,18 @@ fontsize = 7; % font size
 linewidth_plot = 0.5; % line width for plot
 linewidth_curves = 2; % line width for curves
 xaxis = linspace(-300,2700,300); % x-axis
-num_subjs = 47; % number of subjects
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 neutral = [7, 53, 94]/255;
 subj_ids = importdata("subj_ids.mat");
-num_subjs = length(subj_ids); % number of subjects
+num_subs = length(subj_ids); % number of subjects
 col = 300;
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
@@ -94,7 +93,7 @@ ylim_axes = [-0.04,0.05];
 hold on 
 plot(xaxis,nanmean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs.pe),nanstd(coeffs.pe)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,nanmean(coeffs.pe),nanstd(coeffs.pe)./sqrt(num_subs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 xline(0,'LineStyle','--','LineWidth',0.5);
@@ -129,7 +128,7 @@ ylim_axes = [-0.01,0.023];
 hold on 
 plot(xaxis,nanmean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs.pe_condiff),nanstd(coeffs.pe_condiff)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,nanmean(coeffs.pe_condiff),nanstd(coeffs.pe_condiff)./sqrt(num_subs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 

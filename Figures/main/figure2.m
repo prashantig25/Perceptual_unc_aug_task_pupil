@@ -41,9 +41,9 @@ save_csv = 1; % save stats for 1(d) in CSV file for overleaf
 
 % Path setup
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil-main';
+reqPath = 'Perceptual_unc_aug_task_pupil';
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
@@ -322,9 +322,9 @@ end
 title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + pval_str, ...
     'FontWeight','normal','Interpreter','tex')
 if save_csv == 1
-    save_figures = "C:\Users\prash\Nextcloud\Thesis_laptop\Semester 8\pupil_manuscript\stats\behavior";
+    save_figures = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'stats');
     save_table = table("subplot_d",round(rho,2),round(pval,3),8,'VariableNames',{'name','rho','pval','df'});
-    writetable(save_table,strcat(save_figures,'\','figure1d.csv'));
+    writetable(save_table,strcat(save_figures,filesep,'figure1d.csv'));
 end
 %% PLOT BETA COEFFICIENTS
 
