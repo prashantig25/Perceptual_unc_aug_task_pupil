@@ -1,20 +1,14 @@
 % add_eventstrials add trial number and event name to each time point of
 % the preprocessed pupil signal.
 
-% INITIALISE VARS and PATHS
-% subj_ids = {'0806','3970','4300','4885','4954','907','2505','3985','4711',...
-%     '3376','4927','190','306','3391','5047','3922','659','421','3943',...
-%     '4225','4792','3952','4249','4672','4681','4738','3904','852','3337',...
-%     '3442','3571','4360','4522','4807','4943','594','379','4057','4813','601',...
-%     '3319','129','4684','3886','620','901','900'}; % subject IDs
 num_subs = length(subj_ids); % number of subjects
 num_sess = [1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]; % number of sessions
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
@@ -22,13 +16,13 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-save_dirASC = strcat(desiredPath,filesep,'data', filesep,'GB data peak corrected',filesep, 'pupil', filesep, 'preprocessed',filesep,'asc2dat_converted');
-behv_dir = strcat(desiredPath,filesep, 'data', filesep,'GB data peak corrected',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+save_dirASC = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing',filesep,'asc2dat_converted');
+behv_dir = strcat(desiredPath,filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_dir);
 prev_num_trials = 0; % number of trials from previous blocks 
 num_trials_sess = 0; % number of trials for participants with multiple sessions
 
-for s = 1:num_subs
+parfor s = 1:num_subs
     for ss = 1:num_sess(s)
 
         % READ ASC FILES
@@ -79,15 +73,15 @@ for s = 1:num_subs
 
         % GET BEHAVIOURAL DATA FOR THE PARTICIPANT
         filename_behv = strcat(subj_ids{s},'_','main',num2str(ss),'.xlsx');
-        behv_data = readtable(strcat(behv_dir,filesep,filename_behv)); % import from participant's behavioural file
+        behv_data = readtable(strcat(behv_dir,filesep,filename_behv), 'VariableNamingRule', 'preserve'); % import from participant's behavioural file
         condition = behv_data.condition; % task conditions
         num_trial = length(condition); % number of trials in one run of the main task
 
         % GET PUPIL DATA FROM DIFFERENT SESSIONS
         data = [];
         filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'_preprocessed.xlsx');
-        data_run = readtable(filename);
-        [data] = events_trialnums(data_run,events,event_per_trial,num_trial);
+        data_run = readtable(filename, 'VariableNamingRule', 'preserve');
+       [data] = events_trialnums(data_run,events,event_per_trial,num_trial);
 
         % ADJUST TRIAL NUMBERS FOR PARTICIPANTS WITH MULTIPLE RECORDING
         % SESSIONS

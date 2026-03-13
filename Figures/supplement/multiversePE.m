@@ -15,9 +15,9 @@ num_subjs = length(subj_ids); % number of subjects
 col = 300;
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil-main';
+reqPath    = 'Perceptual_unc_aug_task_pupil';
 pathParts  = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;
 else
     desiredPath = createSavePaths(currentDir, reqPath);
@@ -59,20 +59,20 @@ perm_deconv_noBL       = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvol
 fprintf('Loading heteroskedasticity specifications...\n');
 betas_linear_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'));
 betas_cubic_het  = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'));
-betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP.mat'));
+betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'));
 
 fprintf('Running permutation tests for heteroskedasticity analyses...\n');
 
 % Heteroskedastic permutation test
-perm_linear_het = get_permtest(1:size(betas_linear_het.with_intercept,2), num_subs, col, betas_linear_het.with_intercept, [], 0, 1);
-perm_cubic_het = get_permtest(1:size(betas_cubic_het.with_intercept,2), num_subs, col, betas_cubic_het.with_intercept, [], 0, 1);
-perm_deconv_het = get_permtest(1:size(betas_deconv_het.with_intercept,2), num_subs, col, betas_deconv_het.with_intercept, [], 0, 1);
+perm_linear_het = get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_cubic_het = get_permtest(1:size(betas_cubic_het.with_intercept,2), num_subjs, col, betas_cubic_het.with_intercept, [], 0, 1);
+perm_deconv_het = get_permtest(1:size(betas_deconv_het.with_intercept,2), num_subjs, col, betas_deconv_het.with_intercept, [], 0, 1);
 
 fprintf('Permutation tests complete!\n');
 
 %% EXTRACT COEFFICIENTS
 
-sub_id = 1:num_subs;
+sub_id = 1:num_subjs;
 col_id = 1:col;
 
 % Original 9 specifications (coefficient 8)

@@ -5,9 +5,9 @@ clearvars
 %% LOAD DATA
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil-main';
+reqPath    = 'Perceptual_unc_aug_task_pupil';
 pathParts  = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;
 else
     desiredPath = createSavePaths(currentDir, reqPath);
@@ -15,7 +15,7 @@ end
 het_save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', ...
                         'regression', 'control analyses for revisions');
 betas_struct = importdata(fullfile(het_save_dir,"param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat")); 
-coeffs_name = importdata(fullfile(het_save_dir,"coeff_names_het.mat"));
+coeffs_name = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
 x = linspace(-300, 2700, 300); 
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects

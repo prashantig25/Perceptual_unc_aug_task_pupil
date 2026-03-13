@@ -23,14 +23,15 @@ samp_rate = 100; % sampling rate in Hz after down-sampling
 pre_duration = 29; % duration for start of pre-event signal
 base_duration = 9; % duration for baseline signal
 
-% Setup user-based path
-currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil-main';
+% SETUP PATHS (common to both pipelines)
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
+    % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
@@ -75,23 +76,12 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
 save_sliderOnset = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset');
 
-% Create directories if they don't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-if ~exist(save_sliderOnset, 'dir')
-    mkdir(save_sliderOnset);
-end
-
-% Running analyses based on the main pipeline
-main = 1;
-
-% Cycle over subjects
-fprintf("\n1.1 Running feedback-locked with trial-specific baseline and linear interpolation\n")
-for s = 1:num_subs
-    [pupil, sliderOnset] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, sliderOnset] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
     safe_saveall(strcat(save_sliderOnset, filesep, subj_ids{s}, '.mat'), sliderOnset)
 end
@@ -109,16 +99,12 @@ baseline = "event-specific";
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
 
-% Create directories if they don't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n1.2 Running feedback-locked with event-specific baseline and linear interpolation\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -135,16 +121,12 @@ baseline = "no correction";
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb linearInt');
 
-% Create directory if it don't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n1.3 Running feedback-locked without baseline and linear interpolation\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -162,16 +144,12 @@ baseline = "event-specific";
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int');
 
-% Create directory if it doesn't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n1.4 Running patch-locked with event-specific baseline and linear interpolation\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -187,16 +165,12 @@ baseline = "no correction";
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch non-baseline corrected linear int');
 
-% Create directory if it doesn't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n1.5 Running patch-locked without baseline and linear interpolation\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -213,16 +187,12 @@ baseline = "trial-specific";
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int');
 
-% Create directory if it doesn't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n1.6 Running response-locked with trial-specific baseline and linear interpolation\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -238,16 +208,12 @@ baseline = "no correction";
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp non-baseline corrected linear int');
 
-% Create directory if it doesn't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n1.7 Running response-locked without baseline and cubic-spline interpolation\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -274,16 +240,12 @@ baseline = "event-specific";
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 cubic spline new');
 
-% Create directory if it doesn't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n2.1 Running feedback-locked with event-specific baseline and cubic-spline interpolation\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -297,16 +259,12 @@ baseline = "no correction";
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb cubic spline new');
 
-% Create directory if it doesn't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n2.2 Running feedback-locked without baseline and cubic-spline interpolation\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -317,8 +275,7 @@ end
 % Update preprocessing directory
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
-    filesep, 'preprocessed trials and events added');
-PupilDescriptive.preproc_dir = preproc_dir;
+    filesep, 'preprocessed trials and events added fixed seed');
 
 % 3.1 FEEDBACK-LOCKED PUPIL SIGNAL - EVENT-SPECIFIC BASELINE
 % -------------------------------------------------------------------------
@@ -331,18 +288,15 @@ main = 0;
 
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb seed fixed');
+mkdir(save_dir);
 
-% Create directory if it doesn't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n3.1 Running feedback-locked with event-specific baseline and deconvolution\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end
 
@@ -354,17 +308,14 @@ baseline = "no correction";
 
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb seed fixed');
+mkdir(save_dir);
 
-% Create directory if it doesn't exist yet
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
-
-% Cycle over subjects
-fprintf("\n3.2 Running feedback-locked without baseline and deconvolution\n")
-for s = 1:num_subs
-    [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
-        event_name, baseline, main);
+parfor s = 1:num_subs
+    for ss = 1:num_sess(s)
+        [pupil, ~] = run_PupilSignal(num_sess, subj_ids, behv_dir, ...
+            preproc_dir, regress_rt, s, ss, time_pupil, time_base, event_name, ...
+            pre_duration, base_duration, base, base_trialspecific, main);
+    end
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
 end

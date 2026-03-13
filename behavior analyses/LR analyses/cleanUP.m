@@ -23,9 +23,9 @@ num_trials = 20; % number of trials
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
@@ -33,8 +33,8 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines', filesep, 'behavior', filesep, 'preprocessed');
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses'); 
-mkdir(save_dir)
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'descriptive');
+mkdir(save_dir);
 
 % LOOP OVER ALL SUBJECTS
 for n = 1:num_subjs
@@ -44,7 +44,7 @@ for n = 1:num_subjs
 
     % LOOP OVER NUMBER OF SESSIONS FOR THAT PARTICIPANT
 
-    filename = strcat(behv_dir, filesep, subj_ids{n},format); % filename
+    filename = strcat(behv_dir,filesep,subj_ids{n},format); % filename
     data = readtable(filename); % read file
 
     % REMOVE MISSED SLIDER TRIALS
@@ -83,7 +83,7 @@ for n = 1:num_subjs
     data_subj = [];
 end
 
-save_file = strcat(save_dir, filesep, 'pupilbehv_allNEW','.xlsx');
+save_file = strcat(save_dir,filesep,'pupilbehv_allNEW','.xlsx');
 safe_saveall(save_file,data_all);
 
 

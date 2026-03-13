@@ -8,11 +8,11 @@ xaxis = linspace(-0.3, 9.7, 1000); % Time axis for 1000 samples
 
 % --- 2. PATH SETUP ---
 currentDir = cd; 
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; 
+reqPath = 'Perceptual_unc_aug_task_pupil'; 
 
 % Determine paths
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;
 else
     % Note: Ensure createSavePaths.m is in your MATLAB path

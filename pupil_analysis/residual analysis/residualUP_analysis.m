@@ -20,15 +20,16 @@ residulalsAnalyse_SSE = NaN(length(subj_ids),col); % initialised structure to st
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
+
 posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, "post_absUP_predict.mat")); % posterior update
 pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
 save_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
@@ -58,9 +59,9 @@ for n = 1:num_subjs
         if strcmp(subj_ids{n},'4672') == 1
             filename = strcat(behv_dir,filesep,subj_ids{n},'_','main',num2str(j),'_red.xlsx');
         end
-        data_run = readtable(filename);
-        rt = table(data_run.choice_rt,'VariableNames',{'rt'});
-        slider = table(data_run.slider_respond_response,'VariableNames',{'slider'});
+        data_run = readtable(filename,'VariableNamingRule','preserve');
+        rt = table(data_run.("choice.rt"),'VariableNames',{'rt'});
+        slider = table(data_run.("slider_respond.response"),'VariableNames',{'slider'});
         data_run = [data_run(:,[1:16]),rt,slider];
         behv_data = [behv_data; data_run];
     end

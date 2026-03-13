@@ -9,18 +9,22 @@ rng(123);
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 
-currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil-main';
-pathParts  = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if startsWith(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
+    % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
 behv_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'raw data');
-xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze');
+
+xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
+
 base_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'baseline before fb');
 
 preds_file   = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
@@ -85,6 +89,9 @@ fprintf('\n====================================================\n');
 fprintf('  PIPELINE 2: CUBIC SPLINE\n');
 fprintf('====================================================\n');
 
+xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
+
 reg_het2 = PupilRegression_intHet();
 reg_het2.setSubjects(subj_ids, num_sess);
 reg_het2.setPaths(behv_dir, ...
@@ -119,10 +126,13 @@ fprintf('\n====================================================\n');
 fprintf('  PIPELINE 3: DECONVOLUTION\n');
 fprintf('====================================================\n');
 
+xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
+
 reg_het3 = PupilRegression_intHet();
 reg_het3.setSubjects(subj_ids, num_sess);
 reg_het3.setPaths(behv_dir, ...
-    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'alternate pipeline', 'pupil signal', 'fb'), ...
+    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'alternate pipeline', 'pupil signal', 'fb seed fixed'), ...
     xgaze_dir, ygaze_dir, base_dir, het_save_dir);
 reg_het3.setModel(model_def, pred_vars, cat_vars, num_params_hetero - 1);
 reg_het3.setHeteroskedasticConfig(importdata('minHetParams_deconvolutionabs.mat'), ...
@@ -142,8 +152,8 @@ reg_het3.residuals_predicted = 0;
 
 [~, ~] = reg_het3.runAnalysis();
 
-safe_saveall(fullfile(het_save_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP.mat'), reg_het3.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP.mat'),          reg_het3.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'), reg_het3.betas_struct);
+safe_saveall(fullfile(het_save_dir, 'negLL_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'),          reg_het3.negLL_values);
 fprintf('Pipeline 3 saved.\n');
 
 fprintf('\n====================================================\n');
