@@ -10,7 +10,6 @@ fontsize = 7; % font size
 linewidth_plot = 0.5; % line width for plot
 linewidth_curves = 2; % line width for curves
 xaxis = linspace(-300,2700,300); % x-axis
-num_subjs = 47; % number of subjects
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
 neutral = [7, 53, 94]/255;
@@ -20,9 +19,9 @@ col = 300;
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
+if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
@@ -34,7 +33,7 @@ coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data 
 pe_idx = find(strcmp(coeff_names,'pe'));
 up_idx = find(strcmp(coeff_names,'zsc_up'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
-for s = 1:num_subs
+for s = 1:num_subjs
     for c = 1:col
         coeffs.pe(s,c) = betas.with_intercept(1,pe_idx,s,c);
         coeffs.pe_condiff(s,c) = betas.with_intercept(1,peCondiff_idx,s,c);
