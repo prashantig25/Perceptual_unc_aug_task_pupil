@@ -418,7 +418,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             %   behv_data - Aligned behavioral data
             %   zsc_base - Aligned baseline data
 
-            fprintf('Get predictors from behavioural data...\n');
+            % fprintf('Get predictors from behavioural data...\n');
 
             % Extract predictors for current subject
             preds = obj.preds_all(obj.preds_all.id == str2double(obj.subj_ids{subj_idx}), :);
