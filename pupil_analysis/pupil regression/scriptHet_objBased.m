@@ -21,8 +21,6 @@ else
 end
 
 behv_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'raw data');
-% xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze');
-% ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
@@ -34,7 +32,7 @@ preds_all    = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 het_save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', ...
-                        'regression', 'control analyses for revisions pipeline gaze');
+                        'regression', 'control analyses for revisions');
 if ~exist(het_save_dir, 'dir'); mkdir(het_save_dir); end
 
 % Shared model specification
