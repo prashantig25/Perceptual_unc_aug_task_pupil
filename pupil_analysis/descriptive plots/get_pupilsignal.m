@@ -19,7 +19,7 @@ num_sess = importdata("num_sess.mat");
 num_subs = length(subj_ids);
 
 % Shared parameters
-samp_rate = 100; % sampling rate in Hz after down-sampling
+% samp_rate = 100; % sampling rate in Hz after down-sampling
 pre_duration = 29; % duration for start of pre-event signal
 base_duration = 9; % duration for baseline signal
 
