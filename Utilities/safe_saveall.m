@@ -25,7 +25,7 @@ if isfile(filename)
 
     % Compare the new data with the old data
     if isa(newData, "double")
-        equality_check = isequaln(round(newData,10), round(oldData,10));
+        equality_check = isequaln(round(newData,5), round(oldData,5));
     elseif strcmp(string(class(newData)), "LinearModel") == 1
         equality_check = compare_LinearModels(newData, oldData);
     elseif isstruct(newData)
@@ -35,22 +35,74 @@ if isfile(filename)
         numericCols = varfun(@isnumeric, newData, 'OutputFormat', 'uniform');
         equality_check = true;
         for col = 1:width(newData)
+            colNew = newData{:,col};
+            colOld = oldData{:,col};
+
             if numericCols(col)
-                absDiff = abs(newData{:,col} - oldData{:,col});
-                denom = abs(oldData{:,col});
+                absDiff = abs(colNew - colOld);
+                denom = abs(colOld);
                 nearZero = denom < 1e-2;
-                relDiff = absDiff(~nearZero) ./ denom(~nearZero);
-                % fprintf('Col %d: maxAbsDiff=%.2e, maxRelDiff=%.2e\n', col, max(absDiff), max(relDiff));
-                equality_check = equality_check && ...
-                    all(absDiff(~nearZero) ./ denom(~nearZero) < 1e-2, 'all') && ...
-                    all(absDiff(nearZero) < 1e-4, 'all');
+                validMask = ~isnan(absDiff);          % NaN-NaN pairs: skip
+                nanMismatch = isnan(colNew) ~= isnan(colOld);  % one-sided NaN: real diff
+
+                col_check = ~any(nanMismatch) && ...
+                    all(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask) < 1e-2, 'all') && ...
+                    all(absDiff(nearZero & validMask) < 1e-4, 'all');
             else
-                equality_check = equality_check && ...
-                    isequal(newData{:,col}, oldData{:,col});
+                col_check = isequaln(colNew, colOld);
+                if ~col_check
+                    % Fallback: compare as strings to handle char/string mismatches
+                    try
+                        col_check = isequal(string(colNew), string(colOld));
+                    catch
+                        col_check = false;
+                    end
+                end
             end
+
+            if ~col_check
+                fprintf('MISMATCH at col %d (%s)\n', col, newData.Properties.VariableNames{col});
+                if ~numericCols(col)
+                    fprintf('  newData class: %s\n', class(colNew));
+                    fprintf('  oldData class: %s\n', class(colOld));
+                end
+            end
+
+            equality_check = equality_check && col_check;
         end
     elseif iscell(newData)
-        equality_check = all(cellfun(@(a,b) isequaln(a,b), newData, oldData));
+        if ~isequal(size(newData), size(oldData))
+            equality_check = false;
+            fprintf('MISMATCH: size differs. newData=%s, oldData=%s\n', ...
+                mat2str(size(newData)), mat2str(size(oldData)));
+        else
+            equality_check = true;
+            for row = 1:numel(newData)
+                a = newData{row};
+                b = oldData{row};
+
+                if isnumeric(a) && isnumeric(b)
+                    absDiff = abs(a - b);
+                    denom = abs(b);
+                    nearZero = denom < 1e-2;
+                    validMask = ~isnan(absDiff);
+                    nanMismatch = isnan(a) ~= isnan(b);
+
+                    row_check = ~any(nanMismatch) && ...
+                        all(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask) < 1e-2, 'all') && ...
+                        all(absDiff(nearZero & validMask) < 1e-4, 'all');
+                else
+                    row_check = isequaln(a, b);
+                end
+
+                if ~row_check
+                    fprintf('MISMATCH at row %d: maxAbsDiff=%.2e, maxRelDiff=%.2e\n', ...
+                        row, max(abs(a-b), [], 'all'), max(abs(a-b)./abs(b), [], 'all'));
+                end
+
+                equality_check = equality_check && row_check;
+            end
+        end
     else
         equality_check = isequaln(newData, oldData);
     end

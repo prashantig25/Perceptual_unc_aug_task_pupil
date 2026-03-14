@@ -1,0 +1,4 @@
+data/*
+!data/pupil/descriptive/
+fieldtrip-20240110/
+pupil_dataset/
