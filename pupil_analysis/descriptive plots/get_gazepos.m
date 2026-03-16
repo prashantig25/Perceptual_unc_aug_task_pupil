@@ -1,7 +1,6 @@
 function [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
     event_name,num_trials,data,trial_list,pre_duration)
-
-        % funtion GET_GAZEPOS returns gaze position
+        %GET_GAZEPOS returns gaze position
         % response for an event/
         %
         % INPUT:
@@ -19,6 +18,7 @@ function [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_eve
         %   ygaze_event: cell array with y-gaze position
 
         % STORE EVENT NAMES AS NUMBER
+        % todo: function to combine with pupilsignal code
         data.event_code = zeros(height(data), 1);  % Pre-allocate the event_code column
         data.event_code(strcmp(data.events, 'trial_start')) = 1;
         data.event_code(strcmp(data.events, 'instructed_delay_start')) = 3;
@@ -76,6 +76,9 @@ function [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_eve
                 ygaze_resp_event = [ygaze_pre_resp; ygaze_resp_event(1:end-30)];
                 ygaze_event(j,:) = ygaze_resp_event;
             elseif strcmp(event_name,'feedback') == 1 % feedback locked
+                
+                % todo: these are literal copies of each other and the code
+                % for pupilsignal as well. Combine
                 xgaze_fb_event = [xgaze_fb;xgaze_delay1;xgaze_slider]; %(1:140)
                 xgaze_pre_fb = [xgaze_resp;xgaze_delay];
                 xgaze_pre_fb = xgaze_pre_fb(end-pre_duration:end);

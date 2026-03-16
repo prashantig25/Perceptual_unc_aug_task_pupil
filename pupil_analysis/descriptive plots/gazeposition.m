@@ -3,6 +3,8 @@
 
 % todo: 
 % check if we can delete all other cases than "feedback" in get_gazepos
+% check consistency with main branch due to previously inconsistent
+% initialization
 
 clc
 clearvars
@@ -29,12 +31,23 @@ else
 end
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 
+% Initialize object instance
+PupilDescriptive = PupilDescriptive();
+PupilDescriptive.num_sess = num_sess;
+PupilDescriptive.subj_ids = subj_ids;
+PupilDescriptive.behv_dir = behv_dir;
+PupilDescriptive.time_base = time_base;
+PupilDescriptive.pre_duration = pre_duration;
+PupilDescriptive.base_duration = 9; % todo: put in defaults
+
 %% GAZE BASED ON LINEAR INTERPOLATION
 
 fprintf("\n1. Gaze based on linear interpolation\n")
 
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed linear int trials and events added');
+PupilDescriptive.preproc_dir = preproc_dir;
+
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze linear int');
 save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze linear int');
 
@@ -49,47 +62,12 @@ end
 
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
-    
-    % GET BEHAVIORAL DATA
-    behv_data = [];
-    data_run = [];
-    for j = 1:num_sess(s)
-        filename = strcat(behv_dir,filesep,subj_ids{s},'_','main',num2str(j),'.xlsx');
-        if strcmp(subj_ids{s},'4672') == 1
-            filename = strcat(behv_dir,filesep,subj_ids{s},'_','main',num2str(j),'_red.xlsx');
-        end
-        data_run = readtable(filename,'VariableNamingRule', 'preserve');
-        rt = table(data_run.("choice.rt"),'VariableNames',{'rt'}); % add RT data
-        data_run = [data_run(:,[1:16]),rt];
-        behv_data = [behv_data; data_run];
-    end
-    condition = behv_data.condition; % task conditions
-
-    % GET PUPIL DATA FROM DIFFERENT SESSIONS
-    data = [];
-    for j = 1:num_sess(s)
-        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(j),'.xlsx');
-        data_run = readtable(filename);
-        data = [data; data_run];
-    end
-    trial_list = unique(data.trial); % number of trials
-    trial_base = trial_list; % check this ??
-    n = length(condition);
-    missedtrials = ~isnan(behv_data.rt); % missed trials
-    behv_data(missedtrials == 0,:) = []; % remove missed trials
-
-    % GET EVENT-LOCKED GAZE POSITION
-    % todo: check initialization -- inconsistent
-    xgaze_event = NaN(n,time_pupil); % initialise array to store pupil
-    ygaze_event = zeros(n,time_base); % initialise array to store baseline pupil
-    [xgaze_event,ygaze_event] = get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
-        event_name,n,data,trial_list,pre_duration);
-    xgaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
-    ygaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
+  
+    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil);
 
     % SAVE
-    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) % save
-    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event) % save
+    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event)
+    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event)
 end
 
 %% GAZE BASED ON CUBIC SPLINE INTERPOLATION
@@ -100,6 +78,7 @@ save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',
 save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze CS new');
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed cubic spline new trials and events added');
+PupilDescriptive.preproc_dir = preproc_dir;
 
 % Create directories if they don't exist yet
 if ~exist(save_xgaze, 'dir')
@@ -113,45 +92,11 @@ end
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
 
-    % GET BEHAVIORAL DATA
-    behv_data = [];
-    data_run = [];
-    for j = 1:num_sess(s)
-        filename = strcat(behv_dir,filesep,subj_ids{s},'_','main',num2str(j),'.xlsx');
-        if strcmp(subj_ids{s},'4672') == 1
-            filename = strcat(behv_dir,filesep,subj_ids{s},'_','main',num2str(j),'_red.xlsx');
-        end
-        data_run = readtable(filename,'VariableNamingRule', 'preserve');
-        rt = table(data_run.("choice.rt"),'VariableNames',{'rt'}); % add RT data
-        data_run = [data_run(:,[1:16]),rt];
-        behv_data = [behv_data; data_run];
-    end
-    condition = behv_data.condition; % task conditions
-
-    % GET PUPIL DATA FROM DIFFERENT SESSIONS
-    data = [];
-    for j = 1:num_sess(s)
-        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(j),'.xlsx');
-        data_run = readtable(filename);
-        data = [data; data_run];
-    end
-    trial_list = unique(data.trial); % number of trials
-    trial_base = trial_list; % check this ??
-    n = length(condition);
-    missedtrials = ~isnan(behv_data.rt); % missed trials
-    behv_data(missedtrials == 0,:) = []; % remove missed trials
-
-    % GET EVENT-LOCKED GAZE POSITION
-    xgaze_event = NaN(n,time_pupil); % initialise array to store pupil
-    ygaze_event = zeros(n,time_base); % initialise array to store baseline pupil
-    [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
-        event_name,n,data,trial_list,pre_duration);
-    xgaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
-    ygaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
+    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil);
 
     % SAVE
-    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) % save
-    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event) % save
+    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event)
+    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event)
 end
 
 %% GAZE BASED ON DECONVOLUTION
@@ -162,6 +107,7 @@ save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',
 save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze deconv fixed seed');
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
     filesep, 'preprocessed trials and events added fixed seed');
+PupilDescriptive.preproc_dir = preproc_dir;
 
 % Create directories if they don't exist yet
 if ~exist(save_xgaze, 'dir')
@@ -175,43 +121,9 @@ end
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
 
-    % GET BEHAVIORAL DATA
-    behv_data = [];
-    data_run = [];
-    for j = 1:num_sess(s)
-        filename = strcat(behv_dir,filesep,subj_ids{s},'_','main',num2str(j),'.xlsx');
-        if strcmp(subj_ids{s},'4672') == 1
-            filename = strcat(behv_dir,filesep,subj_ids{s},'_','main',num2str(j),'_red.xlsx');
-        end
-        data_run = readtable(filename,'VariableNamingRule', 'preserve');
-        rt = table(data_run.("choice.rt"),'VariableNames',{'rt'}); % add RT data
-        data_run = [data_run(:,[1:16]),rt];
-        behv_data = [behv_data; data_run];
-    end
-    condition = behv_data.condition; % task conditions
-
-    % GET PUPIL DATA FROM DIFFERENT SESSIONS
-    data = [];
-    for j = 1:num_sess(s)
-        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(j),'.xlsx');
-        data_run = readtable(filename);
-        data = [data; data_run];
-    end
-    trial_list = unique(data.trial); % number of trials
-    trial_base = trial_list; % check this ??
-    n = length(condition);
-    missedtrials = ~isnan(behv_data.rt); % missed trials
-    behv_data(missedtrials == 0,:) = []; % remove missed trials
-
-    % GET EVENT-LOCKED GAZE POSITION
-    xgaze_event = NaN(n,time_pupil); % initialise array to store pupil
-    ygaze_event = zeros(n,time_base); % initialise array to store baseline pupil
-    [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
-        event_name,n,data,trial_list,pre_duration);
-    xgaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
-    ygaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
+    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil);
 
     % SAVE
-    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) % save
-    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event) % save
+    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) 
+    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event)
 end

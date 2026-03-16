@@ -67,8 +67,9 @@ classdef PupilDescriptive
             end
 
             % GET EVENT-LOCKED PUPIL SIGNAL
+            which_signal = "dilation";
             [pupil_event, base_event, sliderOnset] = obj.get_pupil_event(time_pupil, event_name, ...
-                pupilData, baseline);
+                pupilData, which_signal, baseline);
 
             % BASELINE CORRECTION
 
@@ -84,7 +85,7 @@ classdef PupilDescriptive
                 for i = 1:nTrials
                     base_event_mean(i) = mean(base_event(i,:));
                 end
-                pupil = base_correction(pupil_event, base_event_mean, time_pupil); 
+                pupil = base_correction(pupil_event, base_event_mean, time_pupil);
 
             else
                 error('Variable "baseline" is undefined. Please initialize properly before running this script.');
@@ -102,7 +103,7 @@ classdef PupilDescriptive
         end
 
         function [pupil_event, base_event, sliderOnset] = get_pupil_event(obj, time_pupil, ...
-                event_name, pupilData, trial_base)
+                event_name, pupilData, which_signal, trial_base)
             % GET_PUPIL_EVENT Returns non-baseline-corrected pupil
             % response for an event or full trial. It also returns the baseline signal for an
             % event or full trial.
@@ -112,6 +113,7 @@ classdef PupilDescriptive
             %   event_name: Specified event name (choice, response, feedback, full)
             %   data: Preprocessed pupil data
             %   trial_list: List of trials
+            %   which_signal: Pupil dilation, x-gaze or y-gaze
             %   trial_base: Get trial-specific baseline
             %
             % OUTPUT:
@@ -154,29 +156,40 @@ classdef PupilDescriptive
                 % USE EVENT CODE TO GET PREPROCESSED DATA
                 % ---------------------------------------
 
+                % Choose relevant signal
+                if which_signal == "dilation"
+                    pupil_signal = pupilData.pupil_zsc;
+                elseif which_signal == "x_gaze"
+                    pupil_signal = pupilData.xgaze;
+                elseif which_signal == "y_gaze"
+                    pupil_signal = pupilData.ygaze;
+                else
+                    error("Variable 'which_signal' not defined");
+                end
+
                 % Pre-patch locked
-                pupil_patch_base = pupilData.pupil_zsc(and(pupilData.event_code == trial_start, pupilData.trial == trialList(j)));
+                pupil_patch_base = pupil_signal(and(pupilData.event_code == trial_start, pupilData.trial == trialList(j)));
 
                 % Patch locked
-                pupil_patch = pupilData.pupil_zsc(and(pupilData.event_code == patches_start, pupilData.trial == trialList(j)));
+                pupil_patch = pupil_signal(and(pupilData.event_code == patches_start, pupilData.trial == trialList(j)));
 
                 % Instructed-delay locked
-                pupil_inst_delay = pupilData.pupil_zsc(and(pupilData.event_code == instructed_delay_start, pupilData.trial == trialList(j)));
+                pupil_inst_delay = pupil_signal(and(pupilData.event_code == instructed_delay_start, pupilData.trial == trialList(j)));
 
                 % Go-cue locked
-                pupil_resp = pupilData.pupil_zsc(and(pupilData.event_code == response_start, pupilData.trial == trialList(j)));
+                pupil_resp = pupil_signal(and(pupilData.event_code == response_start, pupilData.trial == trialList(j)));
 
                 % Feedback locked
-                pupil_fb = pupilData.pupil_zsc(and(pupilData.event_code == feedback_start, pupilData.trial == trialList(j)));
+                pupil_fb = pupil_signal(and(pupilData.event_code == feedback_start, pupilData.trial == trialList(j)));
 
                 % Pre-feedback-delay locked
-                pupil_delay = pupilData.pupil_zsc(and(pupilData.event_code == delay_start, pupilData.trial == trialList(j)));
+                pupil_delay = pupil_signal(and(pupilData.event_code == delay_start, pupilData.trial == trialList(j)));
 
                 % Post-feeback-delay locked
-                pupil_delay1 = pupilData.pupil_zsc(and(pupilData.event_code == delay1_start, pupilData.trial == trialList(j)));
+                pupil_delay1 = pupil_signal(and(pupilData.event_code == delay1_start, pupilData.trial == trialList(j)));
 
                 % Slider locked
-                pupil_slider = pupilData.pupil_zsc(and(pupilData.event_code == slider_start, pupilData.trial == trialList(j)));
+                pupil_slider = pupil_signal(and(pupilData.event_code == slider_start, pupilData.trial == trialList(j)));
 
                 % Choice locked
                 if event_name == "choice"
@@ -290,6 +303,40 @@ classdef PupilDescriptive
             end
         end
 
+        function [xgaze_event, ygaze_event] = runGazePosition(obj, subjNum, time_pupil)
+            %RUNGAZEPOSITION Computes the gaze positions on x and y axis
+            %for a subject
+            %
+            % INPUT:
+            %   subNum: Subject number
+            %   time_pupil: Duration of pupil signal
+            %
+            % OUTPUT:
+            %   xgaze_event: Gaze data x axis
+            %   ygaze_event: Gaze data y axis
+
+            % Load behavioral data
+            behvData = obj.loadBehavioralData(subjNum);
+            missedtrials = ~isnan(behvData.rt); % missed trials
+
+            % Load pupil data
+            pupilData = obj.loadPupilData(subjNum);
+
+            % GET EVENT-LOCKED GAZE POSITION
+            event_name = "feedback";
+            baseline = "event-specific"; % note: we don't save the baseline here anyway for x and y gaze
+            which_signal = "x_gaze";
+            [xgaze_event, ~, ~] = obj.get_pupil_event(time_pupil, event_name, ...
+                pupilData, which_signal, baseline);
+            which_signal = "y_gaze";
+            [ygaze_event, ~, ~] = obj.get_pupil_event(time_pupil, event_name, ...
+                pupilData, which_signal, baseline);
+
+            % Remove pupil response of missed trials
+            xgaze_event(missedtrials == 0,:) = [];
+            ygaze_event(missedtrials == 0,:) = [];
+
+        end
 
         function behvData = loadBehavioralData(obj, subj_idx)
             % Load behavioral data from Excel files for a specific subject
