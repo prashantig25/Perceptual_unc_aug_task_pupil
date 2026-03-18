@@ -86,7 +86,7 @@ disp('===== RUNNING ALTERNATE PIPELINE =====');
 noFiltering = 0; % filter applied (supplement pipeline)
 linearInt = 1; % linear interpolation (supplement pipeline)
 
-save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed PGs run1');
+save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed fixed seed');
 mkdir(save_dir_alt);
 
 % Preprocess
