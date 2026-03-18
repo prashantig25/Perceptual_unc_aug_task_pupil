@@ -66,6 +66,56 @@ if isfile(filename)
                     fprintf('  newData class: %s\n', class(colNew));
                     fprintf('  oldData class: %s\n', class(colOld));
                 end
+
+                % --- EXTENDED DIAGNOSTIC REPORT ---
+                % 1. Identify where Nans don't match
+                nan_mismatch_idx = find(nanMismatch);
+                
+                % 2. Calculate the specific violations
+                rel_errors = absDiff ./ denom;
+                mask_large = ~nearZero & validMask;
+                mask_small = nearZero & validMask;
+                
+                fail_large_idx = find(mask_large & (rel_errors >= 1e-2));
+                fail_small_idx = find(mask_small & (absDiff >= 1e-4));
+                
+                % 3. Print Summary to Command Window
+                %fprintf('\n--- Consistency Report for Subject %s ---\n', subj_ids{s});
+                if ~any(nanMismatch) && isempty(fail_large_idx) && isempty(fail_small_idx)
+                    fprintf('✅ PASS: All values within tolerance.\n');
+                else
+                    fprintf('❌ FAIL: Discrepancies detected.\n');
+                    
+                    if ~isempty(nan_mismatch_idx)
+                        fprintf('  - NaN Mismatch: %d samples differ in NaN placement.\n', length(nan_mismatch_idx));
+                    end
+                    
+                    if ~isempty(fail_large_idx)
+                        max_rel = max(rel_errors(mask_large));
+                        fprintf('  - Large Values: %d violations. Max Rel Error: %.4f%%\n', ...
+                            length(fail_large_idx), max_rel * 100);
+                        fprintf('    Typical Index of failure: %d\n', fail_large_idx(1));
+                    end
+                    
+                    if ~isempty(fail_small_idx)
+                        max_abs = max(absDiff(mask_small));
+                        fprintf('  - Near-Zero Values: %d violations. Max Abs Diff: %.6f\n', ...
+                            length(fail_small_idx), max_abs);
+                    end
+                    
+                    % 4. Visualizing the "Shape" of the error
+                    %figure('Name', ['Error Profile: ' subj_ids{s}]);
+                    subplot(2,1,1);
+                    plot(absDiff);
+                    title('Absolute Difference over Time');
+                    ylabel('Difference'); xlabel('Sample Index');
+                    
+                    subplot(2,1,2);
+                    plot(rel_errors);
+                    ylim([0 0.05]); % Cap at 5% to see detail
+                    title('Relative Error (capped at 5%)');
+                    ylabel('Rel Error'); xlabel('Sample Index');
+                end
             end
 
             equality_check = equality_check && col_check;
