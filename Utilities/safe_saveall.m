@@ -44,10 +44,33 @@ if isfile(filename)
                 nearZero = denom < 1e-2;
                 validMask = ~isnan(absDiff);          % NaN-NaN pairs: skip
                 nanMismatch = isnan(colNew) ~= isnan(colOld);  % one-sided NaN: real diff
+                % 
+                % col_check = ~any(nanMismatch) && ...
+                %     all(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask) < 1e-2, 'all') && ...
+                %     all(absDiff(nearZero & validMask) < 1e-4, 'all');
 
+                % --- STRICT CONSISTENCY CHECK ---
+                absDiff = abs(colNew - colOld);
+                denom = abs(colOld);
+                
+                % Use a much smaller 'nearZero' floor
+                nearZero = denom < eps(1); % eps(1) is ~2.2e-16, the smallest gap at scale 1
+                
+                % Check for NaN mismatches
+                nanMismatch = isnan(colNew) ~= isnan(colOld);
+                
+                % --- BALANCED CONSISTENCY CHECK ---
+                
                 col_check = ~any(nanMismatch) && ...
-                    all(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask) < 1e-2, 'all') && ...
-                    all(absDiff(nearZero & validMask) < 1e-4, 'all');
+                    all(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask) < 1e-8, 'all') && ...
+                    all(absDiff(nearZero & validMask) < 1e-9, 'all');
+                
+                % ADD THIS: Print the actual Max Drift to the console
+                if ~col_check
+                    fprintf('Max Absolute Drift: %e\n', max(absDiff(validMask)));
+                    fprintf('Max Relative Drift: %e\n', max(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask)));
+                end
+                
             else
                 col_check = isequaln(colNew, colOld);
                 if ~col_check
@@ -80,36 +103,36 @@ if isfile(filename)
                 fail_small_idx = find(mask_small & (absDiff >= 1e-4));
                 
                 % 3. Print Summary to Command Window
-                %fprintf('\n--- Consistency Report for Subject %s ---\n', subj_ids{s});
+                % fprintf('\n--- Consistency Report for Subject %s ---\n', subj_ids{s});
                 if ~any(nanMismatch) && isempty(fail_large_idx) && isempty(fail_small_idx)
                     fprintf('✅ PASS: All values within tolerance.\n');
                 else
                     fprintf('❌ FAIL: Discrepancies detected.\n');
-                    
+
                     if ~isempty(nan_mismatch_idx)
                         fprintf('  - NaN Mismatch: %d samples differ in NaN placement.\n', length(nan_mismatch_idx));
                     end
-                    
+
                     if ~isempty(fail_large_idx)
                         max_rel = max(rel_errors(mask_large));
                         fprintf('  - Large Values: %d violations. Max Rel Error: %.4f%%\n', ...
                             length(fail_large_idx), max_rel * 100);
                         fprintf('    Typical Index of failure: %d\n', fail_large_idx(1));
                     end
-                    
+
                     if ~isempty(fail_small_idx)
                         max_abs = max(absDiff(mask_small));
                         fprintf('  - Near-Zero Values: %d violations. Max Abs Diff: %.6f\n', ...
                             length(fail_small_idx), max_abs);
                     end
-                    
+
                     % 4. Visualizing the "Shape" of the error
                     %figure('Name', ['Error Profile: ' subj_ids{s}]);
                     subplot(2,1,1);
                     plot(absDiff);
                     title('Absolute Difference over Time');
                     ylabel('Difference'); xlabel('Sample Index');
-                    
+
                     subplot(2,1,2);
                     plot(rel_errors);
                     ylim([0 0.05]); % Cap at 5% to see detail

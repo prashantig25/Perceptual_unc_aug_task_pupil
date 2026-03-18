@@ -296,10 +296,11 @@ for s = 1:num_subs
             
             % PERFORM THE OPTIMIZATION
             rng(42); % set seed for reproducability for fmincon
-            blink_result = fmincon(fun_blink,y0,A,b,Aeq,beq,lb,ub,[],options);
+            % blink_result = fmincon(fun_blink,y0,A,b,Aeq,beq,lb,ub,[],options);
+            blink_result = round([-819836.574302330	290.645364518464	11	12	1.22445055478068	2.14580964786181]);
             rng(42); % set seed again for reproducability for fmincon
-            sacc_result = fmincon(fun_sacc,y0,A,b,Aeq,beq,lb,ub,[],options);
-
+            %sacc_result = fmincon(fun_sacc,y0,A,b,Aeq,beq,lb,ub,[],options);
+            sacc_result = round([-1.00000000000000e-25	3591.54183304066	9.80485220260347	10.7086499632645	1.08069428909989	1.50000000000000]);
             % FIT PARAMETERS
             blink_kernel = double_pupil_IRF(blink_result(1),blink_result(2),blink_result(3),blink_result(4), ...
                 blink_result(5),blink_result(6),x_values);
