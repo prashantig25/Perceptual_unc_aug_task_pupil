@@ -1,5 +1,7 @@
 function preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, ...
-    event_names, deconv_time, savedir, asc_dir, dat_dir, save_dirASC, using_DAT, noFiltering, linearInt)
+    event_names, deconv_time, savedir, asc_dir, dat_dir, save_dirASC, using_DAT, noFiltering, linearInt, pupil_og_path, pupil_lin_interp_path, pupil_urai_peak_path, pupil_low_filter_path, ...
+    pupil_band_filter_path, pupil_downsamp_path, pupil_cleaned_bp_path, pupil_cleaned_lp_path, ...
+    pupil_zsc_path)
 
 % function PREPROCESS_FUNCTION performs the preprocessing of pupillometry
 % data collected using EyeLink
@@ -76,6 +78,8 @@ for s = 1:num_subs
         [data_table] = conv2table(data);
         data_matched = data_table;
         pupil_og = data_matched.pupil_diam;
+        filename = strcat(pupil_og_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+        safe_saveall(filename,pupil_og);
 
         % PLOT OG PUPIL SIZE
         if plot_steps == 1
@@ -91,6 +95,8 @@ for s = 1:num_subs
         coalesce1 = 0.250;
         padding1 = [-0.150 0.150];
         [pupilcopy, Xgazecopy2, Ygazecopy2, blinksmp] = process_blinks(data_asc, data_matched, sampling_rate, coalesce1, padding1, linearInt);
+        filename = strcat(pupil_lin_interp_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+        safe_saveall(filename,pupilcopy);
 
         % PLOT AFTER INTERPOLATION
         if plot_steps == 1
@@ -150,12 +156,18 @@ for s = 1:num_subs
                 newblinksmp = [];
             end
         end
+        filename = strcat(pupil_urai_peak_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+        safe_saveall(filename,pupilcopy);
 
         % STEP 3: FILTER - no
         if noFiltering == 0
             update_wb(wb, s, ss, 'Step 3/7: Butterworth filtering...');
             [~, low_pupil, band_pupil] = apply_filter(pupilcopy, sampling_rate, freqs);
         end
+        filename = strcat(pupil_low_filter_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+        safe_saveall(filename,low_pupil);
+        filename = strcat(pupil_band_filter_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+        safe_saveall(filename,band_pupil);
 
         % PLOT AFTER FILTERING
         if noFiltering == 0
@@ -177,6 +189,8 @@ for s = 1:num_subs
             update_wb(wb, s, ss, 'Step 4/7: Downsampling...');
             samp_pupil = decimate(band_pupil,downsample_rate,1);
         end
+        filename = strcat(pupil_downsamp_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+        safe_saveall(filename,samp_pupil);
 
         % STEP 5: PREPARE FOR DECONVOLUTION - no
         if noFiltering == 0
@@ -328,6 +342,10 @@ for s = 1:num_subs
             % [pupil_clean_bp, pupil_clean_lp] = perform_convolutionGLM(blink_reg, blinkIRFup, ...
             %     sacc_reg, saccIRFup, band_pupil, noFiltering);
             [pupil_clean_bp, pupil_clean_lp] = perform_convolutionGLM(blink_reg, blinkIRFup, sacc_reg, saccIRFup, band_pupil, low_pupil);
+            filename = strcat(pupil_cleaned_bp_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+            safe_saveall(filename,pupil_clean_bp);
+            filename = strcat(pupil_cleaned_lp_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+            safe_saveall(filename,pupil_clean_lp);
 
             if plot_steps == 1
 
@@ -364,6 +382,8 @@ for s = 1:num_subs
             update_wb(wb, s, ss, 'Step 6/7: Z-score normalising...');
             data_matched.pupil_zsc = zscore(data_matched.pupil_cleaned);
         end
+        filename = strcat(pupil_zsc_path,filesep,subj_ids{s},'_main',num2str(ss),'.mat');
+        safe_saveall(filename,data_matched.pupil_zsc);
 
         % STEP 7: DOWNSAMPLE - yes
         update_wb(wb, s, ss, 'Step 7/7: Downsampling & saving...');

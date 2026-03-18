@@ -86,13 +86,37 @@ disp('===== RUNNING ALTERNATE PIPELINE =====');
 noFiltering = 0; % filter applied (supplement pipeline)
 linearInt = 1; % linear interpolation (supplement pipeline)
 
-save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed PGs run1');
-mkdir(save_dir_alt);
+save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed fixed seed');
+% Define individual path variables
+pupil_og_path           = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil og');
+pupil_lin_interp_path   = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil linear interpolation');
+pupil_urai_peak_path    = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil urai peak correction');
+pupil_low_filter_path   = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil low filter');
+pupil_band_filter_path  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil band filter');
+pupil_downsamp_path     = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil downsampling for deconv');
+pupil_cleaned_bp_path   = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil cleaned bp');
+pupil_cleaned_lp_path   = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil cleaned lp');
+pupil_zsc_path          = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'pupil zsc');
+
+% Create directories
+if ~isfolder(save_dir_alt);    mkdir(save_dir_alt);    end
+if ~isfolder(pupil_og_path);          mkdir(pupil_og_path);          end
+if ~isfolder(pupil_lin_interp_path);  mkdir(pupil_lin_interp_path);  end
+if ~isfolder(pupil_urai_peak_path);   mkdir(pupil_urai_peak_path);   end
+if ~isfolder(pupil_low_filter_path);  mkdir(pupil_low_filter_path);  end
+if ~isfolder(pupil_band_filter_path); mkdir(pupil_band_filter_path); end
+if ~isfolder(pupil_downsamp_path);    mkdir(pupil_downsamp_path);    end
+if ~isfolder(pupil_cleaned_bp_path);  mkdir(pupil_cleaned_bp_path);  end
+if ~isfolder(pupil_cleaned_lp_path);  mkdir(pupil_cleaned_lp_path);  end
+if ~isfolder(pupil_zsc_path);         mkdir(pupil_zsc_path);         end
 
 % Preprocess
 preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
     downsample_rate, event_names, deconv_time, save_dir_alt, currentDir_asc, currentDir_dat, ...
-    save_dirASC, using_DAT, noFiltering, linearInt)
+    save_dirASC, using_DAT, noFiltering, linearInt, ...
+    pupil_og_path, pupil_lin_interp_path, pupil_urai_peak_path, pupil_low_filter_path, ...
+    pupil_band_filter_path, pupil_downsamp_path, pupil_cleaned_bp_path, pupil_cleaned_lp_path, ...
+    pupil_zsc_path);
 
 preproc_dir = save_dir_alt;
 save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added fixed seed');
