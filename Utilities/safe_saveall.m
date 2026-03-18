@@ -48,6 +48,7 @@ if isfile(filename)
                 col_check = ~any(nanMismatch) && ...
                     all(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask) < 1e-2, 'all') && ...
                     all(absDiff(nearZero & validMask) < 1e-4, 'all');
+                % col_check = isequaln(round(colNew, 5), round(colOld, 5));
             else
                 col_check = isequaln(colNew, colOld);
                 if ~col_check
