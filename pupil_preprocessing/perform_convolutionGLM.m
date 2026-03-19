@@ -25,7 +25,8 @@ function [pupil_clean_bp, pupil_clean_lp] = perform_convolutionGLM(blink_reg, bl
     % GLM
     regs = vertcat(blink_reg_conv, sacc_reg_conv);
     design_matrix = transpose(regs);
-    betas = ((inv(design_matrix'*design_matrix))*design_matrix')*band_pupil;
+    %betas = ((inv(design_matrix'*design_matrix))*design_matrix')*band_pupil;
+    betas = design_matrix \ band_pupil(:); % rasmus tried this to avoid matrix issue 
     betas_regs = [];
     for b = 1:length(betas)
         betas_regs = vertcat(betas_regs, betas(b) .* regs(b,:));

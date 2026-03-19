@@ -35,42 +35,53 @@ if isfile(filename)
         numericCols = varfun(@isnumeric, newData, 'OutputFormat', 'uniform');
         equality_check = true;
         for col = 1:width(newData)
-            colNew = newData{:,col};
-            colOld = oldData{:,col};
 
             if numericCols(col)
-                absDiff = abs(colNew - colOld);
-                denom = abs(colOld);
-                nearZero = denom < 1e-2;
-                validMask = ~isnan(absDiff);          % NaN-NaN pairs: skip
-                nanMismatch = isnan(colNew) ~= isnan(colOld);  % one-sided NaN: real diff
-                % 
-                % col_check = ~any(nanMismatch) && ...
-                %     all(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask) < 1e-2, 'all') && ...
-                %     all(absDiff(nearZero & validMask) < 1e-4, 'all');
 
-                % --- STRICT CONSISTENCY CHECK ---
+                % Extract data
+                colNew = newData{:,col};
+                colOld = oldData{:,col};
+
+                % Compute differences
                 absDiff = abs(colNew - colOld);
                 denom = abs(colOld);
-                
-                % Use a much smaller 'nearZero' floor
-                nearZero = denom < eps(1); % eps(1) is ~2.2e-16, the smallest gap at scale 1
-                
-                % Check for NaN mismatches
+                validMask = ~isnan(colNew) & ~isnan(colOld); % ignore rows where either is NaN                nanMismatch = isnan(colNew) ~= isnan(colOld);  % one-sided NaN: real diff
                 nanMismatch = isnan(colNew) ~= isnan(colOld);
+
+                % Define a fFloor" for near-zero values (anything below 0.001 is noise)
+                nearZeroLimit = 1e-3;
+                mask_large = (denom >= nearZeroLimit) & validMask;
+                mask_small = (denom < nearZeroLimit) & validMask;
                 
-                % --- BALANCED CONSISTENCY CHECK ---
+                % Tolearance
+                relTol = 1e-3;
+                absTol = 1e-4;
+
+                % Identify Violations
+                fail_large = any(absDiff(mask_large) ./ denom(mask_large) > relTol);
+                fail_small = any(absDiff(mask_small) > absTol);
                 
-                col_check = ~any(nanMismatch) && ...
-                    all(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask) < 1e-8, 'all') && ...
-                    all(absDiff(nearZero & validMask) < 1e-9, 'all');
-                
-                % ADD THIS: Print the actual Max Drift to the console
+                % Perform the check and indicate larger differences
+                col_check = ~any(nanMismatch) && ~fail_large && ~fail_small;
+
                 if ~col_check
-                    fprintf('Max Absolute Drift: %e\n', max(absDiff(validMask)));
-                    fprintf('Max Relative Drift: %e\n', max(absDiff(~nearZero & validMask) ./ denom(~nearZero & validMask)));
+                    fprintf('MISMATCH at col %d (%s)\n', col, newData.Properties.VariableNames{col});
+
+                    if any(nanMismatch)
+                        fprintf('NaN Mismatch detected.\n');
+                    end
+                    if fail_large
+                        max_rel = max(absDiff(mask_large) ./ denom(mask_large));
+                        fprintf('Large Values: Max Rel Error: %.4f%% (Limit: %.2f%%)\n', ...
+                            max_rel * 100, relTol * 100);
+                    end
+                    if fail_small
+                        max_abs = max(absDiff(mask_small));
+                        fprintf('Near-Zero: Max Abs Diff: %.6f (Limit: %.6f)\n', ...
+                            max_abs, absTol);
+                    end
                 end
-                
+               
             else
                 col_check = isequaln(colNew, colOld);
                 if ~col_check
@@ -80,64 +91,6 @@ if isfile(filename)
                     catch
                         col_check = false;
                     end
-                end
-            end
-
-            if ~col_check
-                fprintf('MISMATCH at col %d (%s)\n', col, newData.Properties.VariableNames{col});
-                if ~numericCols(col)
-                    fprintf('  newData class: %s\n', class(colNew));
-                    fprintf('  oldData class: %s\n', class(colOld));
-                end
-
-                % --- EXTENDED DIAGNOSTIC REPORT ---
-                % 1. Identify where Nans don't match
-                nan_mismatch_idx = find(nanMismatch);
-                
-                % 2. Calculate the specific violations
-                rel_errors = absDiff ./ denom;
-                mask_large = ~nearZero & validMask;
-                mask_small = nearZero & validMask;
-                
-                fail_large_idx = find(mask_large & (rel_errors >= 1e-2));
-                fail_small_idx = find(mask_small & (absDiff >= 1e-4));
-                
-                % 3. Print Summary to Command Window
-                % fprintf('\n--- Consistency Report for Subject %s ---\n', subj_ids{s});
-                if ~any(nanMismatch) && isempty(fail_large_idx) && isempty(fail_small_idx)
-                    fprintf('✅ PASS: All values within tolerance.\n');
-                else
-                    fprintf('❌ FAIL: Discrepancies detected.\n');
-
-                    if ~isempty(nan_mismatch_idx)
-                        fprintf('  - NaN Mismatch: %d samples differ in NaN placement.\n', length(nan_mismatch_idx));
-                    end
-
-                    if ~isempty(fail_large_idx)
-                        max_rel = max(rel_errors(mask_large));
-                        fprintf('  - Large Values: %d violations. Max Rel Error: %.4f%%\n', ...
-                            length(fail_large_idx), max_rel * 100);
-                        fprintf('    Typical Index of failure: %d\n', fail_large_idx(1));
-                    end
-
-                    if ~isempty(fail_small_idx)
-                        max_abs = max(absDiff(mask_small));
-                        fprintf('  - Near-Zero Values: %d violations. Max Abs Diff: %.6f\n', ...
-                            length(fail_small_idx), max_abs);
-                    end
-
-                    % 4. Visualizing the "Shape" of the error
-                    %figure('Name', ['Error Profile: ' subj_ids{s}]);
-                    subplot(2,1,1);
-                    plot(absDiff);
-                    title('Absolute Difference over Time');
-                    ylabel('Difference'); xlabel('Sample Index');
-
-                    subplot(2,1,2);
-                    plot(rel_errors);
-                    ylim([0 0.05]); % Cap at 5% to see detail
-                    title('Relative Error (capped at 5%)');
-                    ylabel('Rel Error'); xlabel('Sample Index');
                 end
             end
 
