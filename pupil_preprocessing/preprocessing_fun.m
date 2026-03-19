@@ -199,7 +199,6 @@ for s = 1:num_subs
             tp_blinks = blinksmp(:,2)/sampling_rate;
             tp_blinks(del_blinks,:) = [];
             blink_ends(del_blinks,:) = [];
-            pupil = samp_pupil;
             tp_sacc = data_asc.saccsmp(:,2)/sampling_rate;
             tp_sacc(del_sacc,:) = [];
 
@@ -231,7 +230,7 @@ for s = 1:num_subs
 
             % BASELINE
             blink_response = blink_response - mean(blink_response(1));
-            sacc_response = sacc_response - mean(blink_response(1));
+            sacc_response = sacc_response - mean(sacc_response(1)); % note: this was updated
 
             % PLOT AFTER DECONVOLUTION
             if plot_steps == 1
@@ -247,61 +246,79 @@ for s = 1:num_subs
                 title('Fitting to blink responses')
             end
 
-            A = [];
-            b = [];
-            Aeq = [];
-            beq = [];
-
             % CREATE A SET OF PARAMETERS
             params = struct();
-            params.s1 = struct('Value', -1, 'Min', -inf, 'Max', -1e-25);
-            params.s2 = struct('Value', 1, 'Min', 1e-25, 'Max', inf);
+            params.s1 = struct('Value', -1, 'Min', -10, 'Max', -1e-12);
+            params.s2 = struct('Value', 1, 'Min', 1e-12, 'Max', 10);
             params.n1 = struct('Value', 10, 'Min', 9, 'Max', 11);
             params.n2 = struct('Value', 10, 'Min', 8, 'Max', 12);
             params.tmax1 = struct('Value', 0.9, 'Min', 0.5, 'Max', 1.5);
             params.tmax2 = struct('Value', 2.5, 'Min', 1.5, 'Max', 4);
-
-            s1_0 = [params.s1.Min,params.s1.Max];
-            s2_0 = [params.s2.Min,params.s2.Max];
-            n1_0 = [params.n1.Min,params.n1.Max];
-            n2_0 = [params.n2.Min,params.n2.Max];
-            tmax1_0 = [params.tmax1.Min,params.tmax1.Max];
-            tmax2_0 = [params.tmax2.Min,params.tmax2.Max];
+            
+            % FUNCTION X-VALUES
             x = linspace(0,6,length(blink_response));
             x_values = x.';
-            s1 = params.s1.Value;
-            s2 = params.s2.Value;
-            n1 = params.n1.Value;
-            n2 = params.n2.Value;
-            tmax1 = params.tmax1.Value;
-            tmax2 = params.tmax2.Value;
 
             % DEFINE FUNCTIONS THAT NEED TO BE OPTIMIZED
             fun_blink = @(y) double_pupil_IRF_ls(y(1), y(2), y(3), y(4), y(5), y(6), blink_response, x_values);
             fun_sacc = @(y) double_pupil_IRF_ls(y(1), y(2), y(3), y(4), y(5), y(6), sacc_response, x_values);
 
             % INITIALIZE VARS FOR PARAMETER ESTIMATION
-            y0 = [s1,s2,n1,n2,tmax1,tmax2]; % starting point for optimization
+            y0 = [params.s1.Value, params.s2.Value, params.n1.Value, params.n2.Value, params.tmax1.Value,params.tmax2.Value]; % starting point for optimization
             lb = [params.s1.Min, params.s2.Min, params.n1.Min, params.n2.Min, params.tmax1.Min, params.tmax2.Min];
             ub = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, params.tmax1.Max, params.tmax2.Max];
-            %options = optimoptions('fmincon','Display','iter', 'Algorithm', 'interior-point');
+
             options = optimoptions('fmincon', ...
-            'Display', 'iter', ...
-            'Algorithm', 'sqp', ...            % SQP is more numerically stable across OS architectures
-            'MaxIterations', 1000, ...         % Ensure it doesn't time out early on the Mac
-            'MaxFunctionEvaluations', 3000, ...% Give the solver more "room" to find the same valley
-            'OptimalityTolerance', 1e-6, ...   % Relaxing slightly from 1e-12 prevents "vibrating" on noise
-            'StepTolerance', 1e-6, ...         % Ensures the solver stops when it's "close enough" to agree
-            'ConstraintTolerance', 1e-6);      % Keeps boundary conditions consistent
+                'Algorithm', 'sqp', ...            % most consistent across OS
+                'Display', 'off', ...              % 'off' for speed in loops
+                'FiniteDifferenceType', 'central', ... % jigh precision
+                'FiniteDifferenceStepSize', 1e-6, ...  % hard-coded for cross-platform match
+                'MaxIterations', 800, ...
+                'OptimalityTolerance', 1e-7, ...
+                'StepTolerance', 1e-7);
+
+            % Fix seed for reproducible results
+            rng(42, 'twister'); 
             
-            % PERFORM THE OPTIMIZATION
-            rng(42); % set seed for reproducability for fmincon
-            % blink_result = fmincon(fun_blink,y0,A,b,Aeq,beq,lb,ub,[],options);
-            blink_result = round([-819836.574302330	290.645364518464	11	12	1.22445055478068	2.14580964786181]);
-            rng(42); % set seed again for reproducability for fmincon
-            %sacc_result = fmincon(fun_sacc,y0,A,b,Aeq,beq,lb,ub,[],options);
-            sacc_result = round([-1.00000000000000e-25	3591.54183304066	9.80485220260347	10.7086499632645	1.08069428909989	1.50000000000000]);
-            % FIT PARAMETERS
+            % Number of starting pointss
+            numStarts = 10;
+            
+            % Starting-point matrix
+            y0_matrix = zeros(numStarts, 6);
+            y0_matrix(1, :) = y0; % starting points always the default
+            
+            % Generate random starting points
+            for i = 2:numStarts    
+                y0_matrix(i, :) = lb + (ub - lb) .* rand(1, 6);
+            end
+
+            % PERFORM THE BLINK OPTIMIZATION
+            best_fval_blink = inf;
+            blink_result = y0;
+            
+            % Cycle over starting points and optimize
+            for i = 1:numStarts
+                [res, fval] = fmincon(fun_blink, y0_matrix(i,:), [], [], [], [], lb, ub, [], options);
+                if fval < best_fval_blink && ~isnan(fval)
+                    best_fval_blink = fval;
+                    blink_result = res;
+                end
+            end
+
+            % PERFORM THE SACCADE OPTIMIZATION
+            best_fval_sacc = inf;
+            sacc_result = y0;
+
+            % Cycle over starting points and optimize
+            for i = 1:numStarts
+                [res, fval] = fmincon(fun_sacc, y0_matrix(i,:), [], [], [], [], lb, ub, [], options);
+                if fval < best_fval_sacc && ~isnan(fval)
+                    best_fval_sacc = fval;
+                    sacc_result = res;
+                end
+            end
+
+            % COMPUTE KERNELS
             blink_kernel = double_pupil_IRF(blink_result(1),blink_result(2),blink_result(3),blink_result(4), ...
                 blink_result(5),blink_result(6),x_values);
             sacc_kernel = double_pupil_IRF(sacc_result(1),sacc_result(2),sacc_result(3),sacc_result(4), ...
