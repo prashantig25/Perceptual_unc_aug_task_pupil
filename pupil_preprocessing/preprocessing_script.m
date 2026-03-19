@@ -94,6 +94,8 @@ preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
     downsample_rate, event_names, deconv_time, save_dir_alt, currentDir_asc, currentDir_dat, ...
     save_dirASC, using_DAT, noFiltering, linearInt)
 
+% uncomment next line if using PG's baseline data
+% save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed PG - adjusted optimizer and fixed saccade baseline');
 preproc_dir = save_dir_alt;
 save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added fixed seed');
 add_eventstrials;

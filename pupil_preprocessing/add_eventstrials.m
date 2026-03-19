@@ -79,7 +79,7 @@ parfor s = 1:num_subs
 
         % GET PUPIL DATA FROM DIFFERENT SESSIONS
         data = [];
-        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'_preprocessed.xlsx');
+        filename = strcat(preproc_dir,filesep,subj_ids{s},'_main',num2str(ss),'_preprocessed.xlsx'); 
         data_run = readtable(filename, 'VariableNamingRule', 'preserve');
        [data] = events_trialnums(data_run,events,event_per_trial,num_trial);
 
