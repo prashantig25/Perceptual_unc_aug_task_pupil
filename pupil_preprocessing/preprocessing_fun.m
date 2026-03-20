@@ -258,8 +258,12 @@ for s = 1:num_subs
             params.s2 = struct('Value', 1, 'Min', 1e-25, 'Max', inf);
             params.n1 = struct('Value', 10, 'Min', 9, 'Max', 11);
             params.n2 = struct('Value', 10, 'Min', 8, 'Max', 12);
-            params.tmax1 = struct('Value', 0.9, 'Min', 0.5, 'Max', 1.5);
-            params.tmax2 = struct('Value', 2.5, 'Min', 1.5, 'Max', 4);
+            % params.tmax1 = struct('Value', 0.9, 'Min', 0.5, 'Max', 1.5);
+            % params.tmax2 = struct('Value', 2.5, 'Min', 1.5, 'Max', 4);
+
+            % note - PG changed tmax1 starting value from 0.9 to 1 (urai)
+            params.tmax1 = struct('Value', 1, 'Min', 0.5, 'Max', 2); % blink-specific ub
+            params.tmax2 = struct('Value', 2.5, 'Min', 1.5, 'Max', 5); % ub 4→5
 
             s1_0 = [params.s1.Min,params.s1.Max];
             s2_0 = [params.s2.Min,params.s2.Max];
@@ -282,15 +286,23 @@ for s = 1:num_subs
 
             % INITIALIZE VARS FOR PARAMETER ESTIMATION
             y0 = [s1,s2,n1,n2,tmax1,tmax2]; % starting point for optimization
+            % lb = [params.s1.Min, params.s2.Min, params.n1.Min, params.n2.Min, params.tmax1.Min, params.tmax2.Min];
+            % ub = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, params.tmax1.Max, params.tmax2.Max];
+
+            % note - PG changed bounds (urai)
             lb = [params.s1.Min, params.s2.Min, params.n1.Min, params.n2.Min, params.tmax1.Min, params.tmax2.Min];
-            ub = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, params.tmax1.Max, params.tmax2.Max];
+            ub_blink = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, 2, 5];
+            ub_sacc  = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, 3, 5];
+
             options = optimoptions('fmincon','Display','iter', 'Algorithm', 'interior-point');
 
             % PERFORM THE OPTIMIZATION
             rng(42); % set seed for reproducability for fmincon
-            blink_result = fmincon(fun_blink,y0,A,b,Aeq,beq,lb,ub,[],options);
+            % blink_result = fmincon(fun_blink,y0,A,b,Aeq,beq,lb,ub,[],options);
+            blink_result = fmincon(fun_blink, y0, A, b, Aeq, beq, lb, ub_blink, [], options); % note - pg updated this
             rng(42); % set seed again for reproducability for fmincon
-            sacc_result = fmincon(fun_sacc,y0,A,b,Aeq,beq,lb,ub,[],options);
+            % sacc_result = fmincon(fun_sacc,y0,A,b,Aeq,beq,lb,ub,[],options);
+            sacc_result  = fmincon(fun_sacc,  y0, A, b, Aeq, beq, lb, ub_sacc,  [], options); % note - pg updated this
 
             % FIT PARAMETERS
             blink_kernel = double_pupil_IRF(blink_result(1),blink_result(2),blink_result(3),blink_result(4), ...

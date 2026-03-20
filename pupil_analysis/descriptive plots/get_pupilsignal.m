@@ -249,12 +249,12 @@ main = 0;
 % ONLY DIFFERENCE: Use alternate preprocessing directory
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
-    filesep, 'preprocessed trials and events added saccade correction');
+    filesep, 'preprocessed trials and events added saccade correction and urai params');
 
 %% 7. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE (DECONVOLUTION PIPELINE)
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params');
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -271,7 +271,7 @@ end
 base = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected saccade correction');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected saccade correction and urai params');
 mkdir(save_dir);
 
 parfor s = 1:num_subs
