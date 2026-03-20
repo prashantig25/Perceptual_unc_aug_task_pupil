@@ -231,7 +231,7 @@ for s = 1:num_subs
 
             % BASELINE
             blink_response = blink_response - mean(blink_response(1));
-            sacc_response = sacc_response - mean(blink_response(1));
+            sacc_response = sacc_response - mean(sacc_response(1)); % note - PG updated this
 
             % PLOT AFTER DECONVOLUTION
             if plot_steps == 1
