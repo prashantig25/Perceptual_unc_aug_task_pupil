@@ -86,7 +86,7 @@ disp('===== RUNNING ALTERNATE PIPELINE =====');
 noFiltering = 0; % filter applied (supplement pipeline)
 linearInt = 1; % linear interpolation (supplement pipeline)
 
-save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed fixed seed');
+save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed only RB optimizer');
 mkdir(save_dir_alt);
 
 % Preprocess
@@ -97,6 +97,6 @@ preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
 % uncomment next line if using PG's baseline data
 % save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed PG - adjusted optimizer and fixed saccade baseline');
 preproc_dir = save_dir_alt;
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added fixed seed');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added only RB optimizer');
 add_eventstrials;
 disp('===== PREPROCESSING COMPLETE =====');
