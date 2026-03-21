@@ -1,0 +1,46 @@
+clc
+clearvars
+
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
+num_subs = length(subj_ids);
+col = 1000;
+
+% Save path definition
+figDir = "/Users/prashantig/fb signal comparison urai saccade params";
+PG_fbDir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil/data/GB data two pipelines/pupil/alternate pipeline/pupil signal/fb saccade correction and urai params";
+RB_fbDir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil/data/GB data two pipelines/pupil/alternate pipeline/pupil signal/fb saccade correction and urai params RB";
+mkdir(figDir) % creates folder if it doesn't exist
+
+for i = 1:num_subs
+    % GET PUPIL DATA - PG BASELINE
+    filename = strcat(PG_fbDir,filesep,subj_ids{i},'.mat');
+    pupil = importdata(filename);
+    pupil_PG = pupil(:,1:col);
+    % GET PUPIL DATA - RB BASELINE
+    filename = strcat(RB_fbDir,filesep,subj_ids{i},'.mat');
+    pupil = importdata(filename);
+    pupil_RB = pupil(:,1:col);
+
+    fig = figure("Visible","off","Position",[100,100,600,300]);
+    subplot(1,2,1)
+    hold on
+    plot(1:col,abs(pupil_PG - pupil_RB),'LineWidth',0.3,'Color',[0.5,0.5,0.5])
+    title(num2str(subj_ids{i}))
+    xlabel('Time')
+    ylabel('Abs diff PG - RB baseline data (saccade changed, urai params, fmincon prev settings)')
+
+    subplot(1,2,2)
+    hold on
+    r = plot(1:col,pupil_RB,'LineWidth',0.3,'Color','b');
+    p = plot(1:col,pupil_PG,'LineWidth',0.3,'Color','r');
+    xlabel('Time')
+    ylabel('Feedback signal')
+    legend([r(1),p(1)],'RB baseline','PG baseline')
+    set(findall(gcf,'-property','FontSize'),'FontSize',9)
+
+    % Save figure
+    savePath = strcat(figDir, filesep, subj_ids{i}, '_baseline_comparison');
+    print(fig, savePath, '-dpng', '-r300')
+    close(fig)
+end

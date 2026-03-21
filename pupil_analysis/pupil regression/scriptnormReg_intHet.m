@@ -553,7 +553,7 @@ fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) ===\n');
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params RB');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
@@ -581,7 +581,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_regressedRT_deconvolution_saccCorr_uraiParams', 'perm_pe_condiff_regressedRT_deconvolution_saccCorr_uraiParams', '', '');
+reg.setFileNames('pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsRB', 'perm_pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsRB', '', '');
 
 [betas, perm] = reg.runAnalysis();
 reg.saveResults();
