@@ -254,8 +254,8 @@ for s = 1:num_subs
 
             % CREATE A SET OF PARAMETERS
             params = struct();
-            params.s1 = struct('Value', -1, 'Min', -inf, 'Max', -1e-25);
-            params.s2 = struct('Value', 1, 'Min', 1e-25, 'Max', inf);
+            params.s1 = struct('Value', -1, 'Min', -10, 'Max', -1e-25);
+            params.s2 = struct('Value', 1, 'Min', 1e-25, 'Max', 10);
             params.n1 = struct('Value', 10, 'Min', 9, 'Max', 11);
             params.n2 = struct('Value', 10, 'Min', 8, 'Max', 12);
             % params.tmax1 = struct('Value', 0.9, 'Min', 0.5, 'Max', 1.5);
@@ -299,11 +299,62 @@ for s = 1:num_subs
             % PERFORM THE OPTIMIZATION
             rng(42); % set seed for reproducability for fmincon
             % blink_result = fmincon(fun_blink,y0,A,b,Aeq,beq,lb,ub,[],options);
-            blink_result = fmincon(fun_blink, y0, A, b, Aeq, beq, lb, ub_blink, [], options); % note - pg updated this
+            % blink_result = fmincon(fun_blink, y0, A, b, Aeq, beq, lb, ub_blink, [], options); % note - pg updated this
+            
+            % Starting point settings 
+            numStarts = 20; 
+            y0_matrix = zeros(numStarts, 6); 
+            y0_matrix(1, :) = y0;
+            
+            % Generate starting points for blinks
+            for i = 2:numStarts 
+                y0_matrix(i, :) = lb + (ub_blink - lb) .* rand(1, 6); 
+            end 
+            
+            % Blink optimization
+            best_fval_blink = inf; 
+            blink_result = y0;
+             
+            for i = 1:numStarts 
+                try 
+                    [res, fval] = fmincon(fun_blink, y0_matrix(i,:), [], [], [], [], lb, ub_blink, [], options); 
+                    if fval < best_fval_blink && ~isnan(fval) 
+                        best_fval_blink = fval; 
+                        blink_result = res; 
+                    end 
+                catch 
+                    fprintf('Blink Start %d: Objective undefined - skipping.\n', i); 
+                end 
+            end 
+            
             rng(42); % set seed again for reproducability for fmincon
             % sacc_result = fmincon(fun_sacc,y0,A,b,Aeq,beq,lb,ub,[],options);
-            sacc_result  = fmincon(fun_sacc,  y0, A, b, Aeq, beq, lb, ub_sacc,  [], options); % note - pg updated this
+            % sacc_result  = fmincon(fun_sacc,  y0, A, b, Aeq, beq, lb, ub_sacc,  [], options); % note - pg updated this
 
+            y0_matrix = zeros(numStarts, 6); 
+            y0_matrix(1, :) = y0;
+             
+            % Generate starting points for saccades
+            for i = 2:numStarts 
+                y0_matrix(i, :) = lb + (ub_sacc - lb) .* rand(1, 6); 
+            end 
+            
+            % Saccade optimization
+            best_fval_sacc = inf; 
+            sacc_result = y0; 
+             
+            for i = 1:numStarts 
+                try 
+                    [res, fval] = fmincon(fun_sacc, y0_matrix(i,:), [], [], [], [], lb, ub_sacc, [], options); 
+                    if fval < best_fval_sacc && ~isnan(fval) 
+                        best_fval_sacc = fval; 
+                        sacc_result = res; 
+                    end 
+                catch 
+                    fprintf('Saccade Start %d: Objective undefined - skipping.\n', i); 
+                end 
+            end 
+            
             % FIT PARAMETERS
             blink_kernel = double_pupil_IRF(blink_result(1),blink_result(2),blink_result(3),blink_result(4), ...
                 blink_result(5),blink_result(6),x_values);

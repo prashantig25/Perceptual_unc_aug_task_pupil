@@ -41,8 +41,11 @@ betas_linearInt        = importdata(fullfile(main_dir, 'pe_condiff_linearInt.mat
 perm_linearInt         = importdata(fullfile(main_dir, 'perm_pe_condiff_linearInt.mat'));
 betas_cubicSpline      = importdata(fullfile(main_dir, 'pe_condiff_cubicSplineNew.mat'));
 perm_cubicSpline       = importdata(fullfile(main_dir, 'perm_pe_condiff_cubicSplineNew.mat'));
-betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat.mat'));
-perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat.mat'));
+%betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat.mat'));  % pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat% pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB_coeffNames
+betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat'));  % pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat% pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB_coeffNames
+%perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat.mat')); %perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB
+perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat')); %perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB
+
 betas_linearInt_RT     = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_linearInt.mat'));
 perm_linearInt_RT      = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_linearInt.mat'));
 betas_cubicSpline_RT   = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_cubicSplineNew.mat'));

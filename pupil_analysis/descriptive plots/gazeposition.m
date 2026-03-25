@@ -159,8 +159,11 @@ end
 
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze deconv fixed seed'); 
 save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze deconv fixed seed'); 
-preproc_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil/data/" + ...
-    "GB data two pipelines/pupil/preprocessing/alternate pipeline/preprocessed trials and events added fixed seed";
+%preproc_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil/data/" + ...
+ %   "GB data two pipelines/pupil/preprocessing/alternate pipeline/preprocessed trials and events added fixed seed";
+preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
+    filesep, 'preprocessed trials and events added saccade correction and urai params RB');
+
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 mkdir(save_xgaze);
 mkdir(save_ygaze);

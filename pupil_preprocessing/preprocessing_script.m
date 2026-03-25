@@ -50,15 +50,15 @@ linearInt = 1; % cubic-spline interpolation (main MS pipeline)
 save_dir_main = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed linear int'); 
 mkdir(save_dir_main);
 
-% Preprocess
-preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
-    downsample_rate, event_names, deconv_time, save_dir_main, currentDir_asc, currentDir_dat, ...
-    save_dirASC, using_DAT, noFiltering, linearInt)
-
-% Add event names and trial numbers
-preproc_dir = save_dir_main;
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed linear int trials and events added'); 
-add_eventstrials;
+% % Preprocess
+% preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
+%     downsample_rate, event_names, deconv_time, save_dir_main, currentDir_asc, currentDir_dat, ...
+%     save_dirASC, using_DAT, noFiltering, linearInt)
+% 
+% % Add event names and trial numbers
+% preproc_dir = save_dir_main;
+% save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed linear int trials and events added'); 
+% add_eventstrials;
 
 %% RUN MAIN PIPELINE (no filtering, cubic-spline interpolation)
 
@@ -70,15 +70,15 @@ linearInt = 0; % cubic-spline interpolation (main MS pipeline)
 save_dir_main = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed cubic spline new'); 
 mkdir(save_dir_main);
 
-% Preprocess
-preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
-    downsample_rate, event_names, deconv_time, save_dir_main, currentDir_asc, currentDir_dat, ...
-    save_dirASC, using_DAT, noFiltering, linearInt)
-
-% Add event names and trial numbers
-preproc_dir = save_dir_main;
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed cubic spline new trials and events added'); 
-add_eventstrials;
+% % Preprocess
+% preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
+%     downsample_rate, event_names, deconv_time, save_dir_main, currentDir_asc, currentDir_dat, ...
+%     save_dirASC, using_DAT, noFiltering, linearInt)
+% 
+% % Add event names and trial numbers
+% preproc_dir = save_dir_main;
+% save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed cubic spline new trials and events added'); 
+% add_eventstrials;
 
 %% RUN ALTERNATE PIPELINE (with filtering, deconvolution-based)
 
@@ -86,7 +86,7 @@ disp('===== RUNNING ALTERNATE PIPELINE =====');
 noFiltering = 0; % filter applied (supplement pipeline)
 linearInt = 1; % linear interpolation (supplement pipeline)
 
-save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed saccade correction and urai params');
+save_dir_alt = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed saccade correction and urai params RB');
 mkdir(save_dir_alt);
 
 % Preprocess
@@ -95,6 +95,6 @@ preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
     save_dirASC, using_DAT, noFiltering, linearInt)
 
 preproc_dir = save_dir_alt;
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added saccade correction and urai params');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added saccade correction and urai params RB');
 add_eventstrials;
 disp('===== PREPROCESSING COMPLETE =====');
