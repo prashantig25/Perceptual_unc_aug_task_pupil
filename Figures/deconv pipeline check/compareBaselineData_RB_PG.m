@@ -16,9 +16,9 @@ end
 PG_nonBasefbDir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb seed fixed - PG baseline curves');
 PG_fbDir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb seed fixed - PG baseline curves');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
 RB_fbDir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb seed fixed - RB baseline curves');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params RB');
 RB_nonBasefbDir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb seed fixed - RB baseline curves');
 
@@ -32,12 +32,12 @@ col = 1000;
 for i = 1:num_subs
 
     % GET PUPIL DATA - PG BASELINE
-    filename = strcat(PG_nonBasefbDir,filesep,subj_ids{i},'.mat');
+    filename = strcat(PG_fbDir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename);
     pupil_PG = pupil(:,1:col);
 
     % GET PUPIL DATA - RB BASELINE
-    filename = strcat(RB_nonBasefbDir,filesep,subj_ids{i},'.mat');
+    filename = strcat(RB_fbDir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename);
     pupil_RB = pupil(:,1:col);
 
@@ -56,12 +56,11 @@ for i = 1:num_subs
     hold on
     p = plot(1:col,pupil_PG,'LineWidth',0.3,'Color','r');
     xlabel('Time')
-    ylabel('Feedback non-baseline corrected signal')
+    ylabel('Feedback signal')
     set(findall(gcf, '-property', 'FontSize'), 'FontSize', 9)
 
     legend([r(1),p(1)],'RB baseline','PG baseline')
 
     print(fig, strcat(num2str(subj_ids{i}), '_baseline_comparison'), '-dpng', '-r300')
 end
-
 
