@@ -393,9 +393,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
         %% ----------------------------------------------------------------
         function fitModelAtTimepoint(obj, c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx)
 
-            aic = nan;
-            bic = nan;
-
             y         = pupil_signal_bins(:, c);
             zsc_xgaze = nanzscore(xgaze_signal_bins(:, c));
             zsc_ygaze = nanzscore(ygaze_signal_bins(:, c));
@@ -428,20 +425,20 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
 
             if ~isempty(lm)
-                if isa(lm, 'LinearModel')
-                    negLL     = -lm.LogLikelihood;
-                    N         = lm.NumObservations;
-                    k         = lm.NumCoefficients + 1;
-                    aic       = 2*k + 2*negLL;
-                    bic       = k*log(N) + 2*negLL;
-                    residuals = lm.Residuals.Raw;
-                    sigma2    = var(residuals);
-                    n         = lm.NumObservations;
-                    logL      = -0.5*n*(log(2*pi*sigma2) + 1);
-                else
-                    warning('lm is not a LinearModel. Cannot calculate AIC/BIC.');
-                    logL = nan;
-                end
+            %     if isa(lm, 'LinearModel')
+            %         negLL     = -lm.LogLikelihood;
+            %         N         = lm.NumObservations;
+            %         k         = lm.NumCoefficients + 1;
+            %         aic       = 2*k + 2*negLL;
+            %         bic       = k*log(N) + 2*negLL;
+            %         residuals = lm.Residuals.Raw;
+            %         sigma2    = var(residuals);
+            %         n         = lm.NumObservations;
+            %         logL      = -0.5*n*(log(2*pi*sigma2) + 1);
+            %     else
+            %         warning('lm is not a LinearModel. Cannot calculate AIC/BIC.');
+            %         logL = nan;
+            %     end
 
                 if obj.binned_accuracy == 1
                     storage_r_idx = r + 1;
@@ -449,9 +446,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     storage_r_idx = r;
                 end
 
-                obj.aic_values(storage_r_idx,  subj_idx, c) = aic;
-                obj.bic_values(storage_r_idx,  subj_idx, c) = bic;
-                obj.logL_values(storage_r_idx, subj_idx, c) = logL;
+                % obj.aic_values(storage_r_idx,  subj_idx, c) = aic;
+                % obj.bic_values(storage_r_idx,  subj_idx, c) = bic;
+                % obj.logL_values(storage_r_idx, subj_idx, c) = logL;
             end
 
             if obj.binned_accuracy == 1
