@@ -3,7 +3,33 @@
 
 clc
 clearvars 
-cleanUP; % run to clean up missing slider responses before further LR analyses
+
+% INITIALIZE
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
+total_blocks = 8; % total number of blocks
+num_trials = 20; % number of trials
+task_name = '_main'; % file name
+format = '.xlsx';
+num_subjs = length(subj_ids); % number of subjects
+
+% USER-BASED PATH
+currentDir = cd; % current directory
+pathParts = strsplit(currentDir, filesep);
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+if startsWith(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+% Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+behv_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'preprocessed');
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'descriptive');
+mkdir(save_dir);
+[data_all] = cleanUP_func(subj_ids, num_trials, format, behv_dir); % run to clean up missing slider responses before further LR analyses
+save_file = strcat(save_dir,filesep,'pupilbehv_allNEW','.xlsx');
+safe_saveall(save_file,data_all);
 
 % PREPROCESS FOR LEARNING-RATE ANALYSIS
 preprocess_obj = preprocess_LR(); % initialise object with all required variables and functions
@@ -90,7 +116,7 @@ lr_analysis.cat_vars = {'congruence','condition','reward_unc','pe_sign','salienc
 lr_analysis.resp_var = 'up';
 lr_analysis.num_vars = 0;
 lr_analysis.absolute_analysis = 0;
-[betas_all,rsquared_full,residuals_all,coeffs_name,posterior_up_subjs,loglikelihood_full,SSE_full] = lr_analysis.get_coeffs(@fitlm);
+[~,~,~,~,~,loglikelihood_full,SSE_full] = lr_analysis.get_coeffs(@fitlm);
 
 safe_saveall(fullfile(save_dir,"loglikelihood_baselineSigned.mat"),loglikelihood_full); % save r-squared values
 safe_saveall(fullfile(save_dir,"SSEsigned_baseline.mat"),SSE_full); % save SSE values
