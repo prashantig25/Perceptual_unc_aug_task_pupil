@@ -5,11 +5,11 @@ classdef PupilRegression_intHet < pupilReg_Vars
         perm_results
         residuals_all
         predicted_all
-        aic_values
-        bic_values
-        logL_values
-        rsquaredOrdinary
-        rsquaredAdjusted
+        % aic_values
+        % bic_values
+        % logL_values
+        % rsquaredOrdinary
+        % rsquaredAdjusted
         starting_points
 
         % Heteroskedastic model properties
@@ -128,7 +128,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
         %% ----------------------------------------------------------------
         %  RUN ANALYSIS
         %% ----------------------------------------------------------------
-        function [betas_struct, perm] = runAnalysis(obj)
+        function runAnalysis(obj)
 
             obj.validateConfig();
 
@@ -145,8 +145,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             if strcmp(obj.model_type, 'heteroskedastic')
                 obj.betas_struct.with_intercept = nan(num_bins, obj.num_vars+1, obj.num_subs, obj.col);
                 obj.negLL_values = nan(num_bins, obj.num_subs, obj.col);
-                obj.aic_values   = nan(num_bins, obj.num_subs, obj.col);
-                obj.bic_values   = nan(num_bins, obj.num_subs, obj.col);
+                % obj.aic_values   = nan(num_bins, obj.num_subs, obj.col);
+                % obj.bic_values   = nan(num_bins, obj.num_subs, obj.col);
             else
                 obj.betas_struct.with_intercept = nan(num_bins, obj.num_vars+1, obj.num_subs, obj.col);
             end
@@ -174,8 +174,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
             obj.closeProgress();
 
-            betas_struct = obj.betas_struct;
-            perm         = obj.perm_results;
+            % betas_struct = obj.betas_struct;
+            % perm         = obj.perm_results;
         end
 
         %% ----------------------------------------------------------------
@@ -220,7 +220,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 if strcmp(obj.subj_ids{subj_idx}, '4672')
                     filename = fullfile(obj.behv_dir, [obj.subj_ids{subj_idx}, '_main', num2str(j), '_red.xlsx']);
                 end
-                % data_run  = readtable(filename);
                 data_run = readtable(filename, 'VariableNamingRule', 'preserve');
                 rt        = table(data_run.("choice.rt"),                   'VariableNames', {'rt'});
                 slider    = table(data_run.("slider_respond.response"),     'VariableNames', {'slider'});
@@ -337,25 +336,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 if strcmp(obj.model_type, 'heteroskedastic')
                     %% ── HETEROSKEDASTIC PATH ──────────────────────────
                     obj.updateProgress(sprintf('%s | Het model…', binLabel));
-
-                    [negLL_row, betas_row, aic_row, bic_row] = obj.fitHeteroAllTimepoints( ...
+                    obj.fitHeteroAllTimepoints( ...
                         pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, subj_idx);
-
-                    % fitHeteroAllTimepoints already consumed obj.col ticks
-                    % via the DataQueue, so no extra tick here.
-
-                    if obj.binned_accuracy == 1
-                        storage_r = r + 1;
-                    else
-                        storage_r = r;
-                    end
-
-                    obj.negLL_values(storage_r, subj_idx, :) = negLL_row;
-                    obj.aic_values(storage_r,   subj_idx, :) = aic_row;
-                    obj.bic_values(storage_r,   subj_idx, :) = bic_row;
-                    for c = 1:obj.col
-                        obj.betas_struct.with_intercept(storage_r, :, subj_idx, c) = betas_row(c, :);
-                    end
 
                 else
                     %% ── OLS PATH ──────────────────────────────────────
@@ -457,14 +439,14 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 obj.betas_struct.with_intercept(r,   :, subj_idx, c) = betas;
             end
 
-            obj.rsquaredAdjusted(r, :, subj_idx, c) = lm.Rsquared.Adjusted;
-            obj.rsquaredOrdinary(r,  :, subj_idx, c) = lm.Rsquared.Ordinary;
+            % obj.rsquaredAdjusted(r, :, subj_idx, c) = lm.Rsquared.Adjusted;
+            % obj.rsquaredOrdinary(r,  :, subj_idx, c) = lm.Rsquared.Ordinary;
         end
 
         %% ----------------------------------------------------------------
         %  FIT HETERO MODEL ACROSS ALL TIMEPOINTS
         %% ----------------------------------------------------------------
-        function [negLL_row, betas_row, aic_row, bic_row] = fitHeteroAllTimepoints( ...
+        function fitHeteroAllTimepoints( ...
                 obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
 
             % Extract all obj fields into plain variables (parfor-safe)
@@ -517,8 +499,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             % Pre-allocate outputs
             negLL_row = nan(1, col);
             betas_row = nan(col, num_params);
-            aic_row   = nan(1, col);
-            bic_row   = nan(1, col);
+            % aic_row   = nan(1, col);
+            % bic_row   = nan(1, col);
 
             starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
 
@@ -545,11 +527,16 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 k            = num_params;
                 negLL_row(c) = bestNegLL;
                 betas_row(c, :) = bestParams;
-                aic_row(c)   = 2*k + 2*bestNegLL;
-                bic_row(c)   = k*log(N_trials) + 2*bestNegLL;
+                % aic_row(c)   = 2*k + 2*bestNegLL;
+                % bic_row(c)   = k*log(N_trials) + 2*bestNegLL;
 
                 % Notify main thread: one timepoint done
                 send(dq, 1); %#ok<PFBNS>
+            end
+
+            obj.negLL_values(1, subj_idx, :) = negLL_row;
+            for c = 1:obj.col
+                obj.betas_struct.with_intercept(1, :, subj_idx, c) = betas_row(c, :);
             end
         end
 
