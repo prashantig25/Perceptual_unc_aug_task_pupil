@@ -107,11 +107,8 @@ end
 
 % RUN PERM TEST
 num_vars = 1; % number of variables
-var1 = subj_pupil_signal_pebin1; 
-var2 = subj_pupil_signal_pebin2;
-two_tailed = 1; % apply two-tailed permutation test
-betas = 0; % permutation test on descriptive data
-perm = get_permtest(num_vars, num_subs, col, var1, var2, two_tailed, betas);
+var1 = reshape(subj_pupil_signal_pebin1, [1, num_subs, col]); % [num_vars x num_subjs x col]
+perm = get_permtest_updated(num_vars, num_subs, col, var1);
 
 % SAVE
 condiffbin.stat = perm.mask;

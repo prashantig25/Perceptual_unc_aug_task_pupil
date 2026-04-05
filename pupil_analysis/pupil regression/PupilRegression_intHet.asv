@@ -585,7 +585,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 safe_saveall(fullfile(obj.save_dir, [obj.perm_save, '.mat']), obj.perm_results);
             elseif strcmp(obj.model_type, 'heteroskedastic')
                 safe_saveall(fullfile(obj.save_dir, ['negLL_', obj.betas_save, '.mat']), obj.negLL_values);
-                safe_saveall(fullfile(obj.save_dir, ['perm_', obj.betas_save, '.mat']), obj.perm_results);
+                safe_saveall(fullfile(obj.save_dir, [obj.perm_save, '.mat']), obj.perm_results);
             end
         end
 
