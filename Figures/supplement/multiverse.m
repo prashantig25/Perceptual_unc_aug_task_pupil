@@ -42,27 +42,27 @@ perm_linearInt         = importdata(fullfile(main_dir, 'perm_pe_condiff_linearIn
 betas_cubicSpline      = importdata(fullfile(main_dir, 'pe_condiff_cubicSplineNew.mat'));
 perm_cubicSpline       = importdata(fullfile(main_dir, 'perm_pe_condiff_cubicSplineNew.mat'));
 %betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat.mat'));  % pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat% pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB_coeffNames
-betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat'));  % pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat% pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB_coeffNames
+betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG.mat'));  % pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat% pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB_coeffNames
 %perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat.mat')); %perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB
-perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB.mat')); %perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB
+perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG.mat')); %perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_RB
 
 betas_linearInt_RT     = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_linearInt.mat'));
 perm_linearInt_RT      = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_linearInt.mat'));
 betas_cubicSpline_RT   = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_cubicSplineNew.mat'));
 perm_cubicSpline_RT    = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_cubicSplineNew.mat'));
-betas_deconv_RT        = importdata(fullfile(alt_dir,  'pe_condiff_regressedRT_deconvolution.mat'));
-perm_deconv_RT         = importdata(fullfile(alt_dir,  'perm_pe_condiff_regressedRT_deconvolution.mat'));
+betas_deconv_RT        = importdata(fullfile(alt_dir,  'pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG.mat'));
+perm_deconv_RT         = importdata(fullfile(alt_dir,  'perm_pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG.mat'));
 betas_linearInt_noBL   = importdata(fullfile(alt_dir,  'pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
 perm_linearInt_noBL    = importdata(fullfile(alt_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
 betas_cubicSpline_noBL = importdata(fullfile(alt_dir,  'pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
 perm_cubicSpline_noBL  = importdata(fullfile(alt_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
-betas_deconv_noBL      = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_nonBaselineCorrected.mat'));
-perm_deconv_noBL       = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_nonBaselineCorrected.mat'));
+betas_deconv_noBL      = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG.mat'));
+perm_deconv_noBL       = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG.mat'));
 
 fprintf('Loading heteroskedasticity specifications...\n');
 betas_linear_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'));
 betas_cubic_het  = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'));
-betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'));
+betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat'));
 
 fprintf('Running permutation tests for heteroskedasticity analyses...\n');
 
@@ -225,7 +225,7 @@ yline(0,'LineStyle','--','LineWidth',1,'Color',[0.5 0.5 0.5],'HandleVisibility',
 xlabel('Time since feedback onset (ms)','FontName',fontname,'FontSize',fontsize)
 ylabel('Standardized uncertainty-weighted PE coefficients','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 lgd = legend('Location','best','FontSize',4,'NumColumns',1,'Color','none','EdgeColor','none');
-lgd.ItemTokenSize = [10, 10];
+lgd.ItemTokenSize = [7, 7];
 title('Multiverse Analysis: All 12 Specifications (Standardized)','FontName',fontname,'FontSize',fontsize+1,'FontWeight','normal')
 adjust_figprops(ax1,fontname,fontsize,linewidth_plot);
 
@@ -289,8 +289,8 @@ safe_saveall(fullfile(stats_dir, 'medianMultiversePval.csv'), medianMultiverse);
 
 yline(0.025, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1, 'HandleVisibility', 'off');
 yline(0.05, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1, 'HandleVisibility', 'off');
-text(1.5, 0.028, 'Significant threshold for two-tailed test', 'FontSize', 7, 'VerticalAlignment', 'middle');
-text(1.5, 0.053, 'Significant threshold for one-tailed test', 'FontSize', 7, 'VerticalAlignment', 'middle');
+text(0.3, 0.028, 'Significant threshold for two-tailed test', 'FontSize', 7, 'VerticalAlignment', 'middle');
+text(0.3, 0.053, 'Significant threshold for one-tailed test', 'FontSize', 7, 'VerticalAlignment', 'middle');
 
 ylabel("{\itp}-value",'FontName',fontname,'FontSize',fontsize)
 xlabel("Specification",'FontName',fontname,'FontSize',fontsize)
@@ -305,7 +305,7 @@ adjust_figprops(ax3,fontname,fontsize,linewidth_plot);
 
 ax1_pos = ax1.Position;
 adjust_x = -0.065; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)-0.02; % adjusted y-position for subplot label
+adjust_y = ax1_pos(4)-0.01; % adjusted y-position for subplot label
 [label_x,label_y] = change_plotlabel(ax1,adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')

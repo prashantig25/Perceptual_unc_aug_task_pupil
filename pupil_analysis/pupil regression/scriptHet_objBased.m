@@ -132,7 +132,7 @@ ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pup
 reg_het3 = PupilRegression_intHet();
 reg_het3.setSubjects(subj_ids, num_sess);
 reg_het3.setPaths(behv_dir, ...
-    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'alternate pipeline', 'pupil signal', 'fb seed fixed'), ...
+    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'alternate pipeline', 'pupil signal', 'fb saccade correction and urai params PG'), ...
     xgaze_dir, ygaze_dir, base_dir, het_save_dir);
 reg_het3.setModel(model_def, pred_vars, cat_vars, num_params_hetero - 1);
 reg_het3.setHeteroskedasticConfig(importdata('minHetParams_deconvolutionabs.mat'), ...
@@ -152,8 +152,8 @@ reg_het3.residuals_predicted = 0;
 
 [~, ~] = reg_het3.runAnalysis();
 
-safe_saveall(fullfile(het_save_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'), reg_het3.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'),          reg_het3.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat'), reg_het3.betas_struct);
+safe_saveall(fullfile(het_save_dir, 'negLL_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat'),          reg_het3.negLL_values);
 fprintf('Pipeline 3 saved.\n');
 
 fprintf('\n====================================================\n');
