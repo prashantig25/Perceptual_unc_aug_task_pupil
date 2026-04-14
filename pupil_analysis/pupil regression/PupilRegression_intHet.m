@@ -179,7 +179,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
                     var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
                     obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
-                else
+                elseif length(obj.bins) <= 3
                     num_vars = 1:obj.num_vars+1;
                     % betas    = 1;
                     % obj.perm_results = get_permtest(num_vars, obj.num_subs, obj.col, var1, var2, obj.two_tailed, betas);
@@ -187,8 +187,11 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
                     var2 = squeeze(obj.betas_struct.with_intercept(2, :, :, :)); % [num_vars x num_subjs x col]
                     obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1, var2);
+                else 
+                    obj.perm_results = [];
                 end
             elseif strcmp(obj.model_type, 'heteroskedastic')
+                num_vars = 1:obj.num_vars+1;
                 obj.updateProgress('Running permutation test…');
                 obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
             end
@@ -406,10 +409,10 @@ classdef PupilRegression_intHet < pupilReg_Vars
             preds_valid = preds_bins(validIdx, :);
 
             tbl = table(yValid, xgazeValid, ygazeValid, ...
-                nanzscore(preds_valid.con_diff), nanzscore(preds_valid.pe), ...
-                nanzscore(abs(preds_valid.pe)), nanzscore(abs(preds_valid.up)), ...
-                nanzscore(log(preds_valid.rt)), preds_valid.condition, preds_valid.ecoperf, ...
-                preds_valid.correct, nanzscore(preds_valid.pe_condiff), ...
+                zscore(preds_valid.con_diff), zscore(preds_valid.pe), ...
+                zscore(abs(preds_valid.pe)), zscore(abs(preds_valid.up)), ...
+                zscore(log(preds_valid.rt)), preds_valid.condition, preds_valid.ecoperf, ...
+                preds_valid.correct, zscore(preds_valid.pe_condiff), ...
                 'VariableNames', {'pupil','xgaze','ygaze','zsc_condiff','signed_pe', ...
                                   'pe','zsc_up','rt','condition','ecoperf','reward','pe_condiff'});
 
@@ -478,16 +481,16 @@ classdef PupilRegression_intHet < pupilReg_Vars
             num_params = obj.num_vars + 1;
 
             % ── Pre-compute z-scored predictors ───────────────────────
-            x1_z = nanzscore(abs(preds_bins.pe));
-            x2_z = nanzscore(preds_bins.con_diff);
-            rt_z = nanzscore(log(preds_bins.rt));
-            up_z = nanzscore(abs(preds_bins.up));
+            x1_z = zscore(abs(preds_bins.pe));
+            x2_z = zscore(preds_bins.con_diff);
+            rt_z = zscore(log(preds_bins.rt));
+            up_z = zscore(abs(preds_bins.up));
 
             xgaze_z = nan(size(xgaze_signal));
             ygaze_z = nan(size(ygaze_signal));
             for c = 1:col
-                xgaze_z(:, c) = nanzscore(xgaze_signal(:, c));
-                ygaze_z(:, c) = nanzscore(ygaze_signal(:, c));
+                xgaze_z(:, c) = zscore(xgaze_signal(:, c));
+                ygaze_z(:, c) = zscore(ygaze_signal(:, c));
             end
 
             % ── Remove NaN rows ────────────────────────────────────────

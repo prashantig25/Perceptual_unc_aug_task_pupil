@@ -73,7 +73,7 @@ for s = 1:num_subjs
         data_plot(s,c) = betas_pupil.with_intercept(1,postUP_idx,s,c);
     end
 end
-coeffs = nanmean(data_plot,2);
+coeffs = mean(data_plot,2);
 [avg,sd,coeffs] = prepare_betas(coeffs,1,num_subjs);
 h = bar_plots_pval(coeffs,avg,sd,num_subjs, ...
         1,1,{'','Example participant','Normative agent'}, ...
@@ -105,9 +105,9 @@ coeffs = data_plot;
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,mean(coeffs),std(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 xline(0,'LineStyle','--','LineWidth',0.5);

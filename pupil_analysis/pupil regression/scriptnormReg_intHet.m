@@ -61,7 +61,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_linearInt_zscore', 'perm_pe_condiff_linearInt_zscore', '', '');
+reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', '', '');
 
 reg.runAnalysis();
 reg.saveResults();
@@ -244,7 +244,7 @@ reg3.binned_accuracy     = 0;
 reg3.two_tailed          = 1;
 reg3.preds_all           = preds_all;
 reg3.residuals_predicted = 0;
-reg3.setFileNames('pe_condiff3bins_linearInt', 'perm_pe_condiff3bins_linearInt', '', '');
+reg3.setFileNames('pe_condiff3bins_linearInt', '', '', '');
 reg3.runAnalysis();
 reg3.saveResults();
 
@@ -264,7 +264,7 @@ reg5.binned_accuracy     = 0;
 reg5.two_tailed          = 1;
 reg5.preds_all           = preds_all;
 reg5.residuals_predicted = 0;
-reg5.setFileNames('pe_condiff5bins_linearInt', 'perm_pe_condiff5bins_linearInt', '', '');
+reg5.setFileNames('pe_condiff5bins_linearInt', '', '', '');
 reg5.runAnalysis();
 reg5.saveResults();
 

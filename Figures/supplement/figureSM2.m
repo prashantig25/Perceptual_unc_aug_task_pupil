@@ -80,7 +80,7 @@ for a = 1:length(ncoeffs)
         end
         hold on
         color = color_cell;
-        ySmoothed = nanmean(data_plot);
+        ySmoothed = mean(data_plot);
         plot(x,ySmoothed,"Color",color{j,:},'LineWidth',2)
         hold on
     end
@@ -93,9 +93,9 @@ for a = 1:length(ncoeffs)
                 data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs(a),s,c);
             end
         end
-        ySmoothed = nanmean(data_plot);
+        ySmoothed = mean(data_plot);
         color = cell2mat(color_cell);
-        shadedErrorBar(x,ySmoothed,nanstd(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
+        shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
         hold on
     end
 

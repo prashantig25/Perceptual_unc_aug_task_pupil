@@ -91,9 +91,9 @@ ylim_axes = [-0.04,0.05];
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs.pe),nanstd(coeffs.pe)./sqrt(num_subs), ...
+shadedErrorBar(xaxis,mean(coeffs.pe),std(coeffs.pe)./sqrt(num_subs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 xline(0,'LineStyle','--','LineWidth',0.5);
@@ -126,9 +126,9 @@ ylim_axes = [-0.01,0.023];
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs.pe_condiff),nanstd(coeffs.pe_condiff)./sqrt(num_subs), ...
+shadedErrorBar(xaxis,mean(coeffs.pe_condiff),std(coeffs.pe_condiff)./sqrt(num_subs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 
@@ -162,9 +162,9 @@ delete(ax3);
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(posterior.highPU),'Color',high_PU,'LineWidth',1.5)
-plot(xaxis,nanmean(posterior.midPU),'Color',mid_PU,'LineWidth',1.5)
-plot(xaxis,nanmean(posterior.lowPU),'Color',low_PU,'LineWidth',1.5)
+plot(xaxis,mean(posterior.highPU),'Color',high_PU,'LineWidth',1.5)
+plot(xaxis,mean(posterior.midPU),'Color',mid_PU,'LineWidth',1.5)
+plot(xaxis,mean(posterior.lowPU),'Color',low_PU,'LineWidth',1.5)
 
 % ADJUST FIGURE PROPERTIES
 

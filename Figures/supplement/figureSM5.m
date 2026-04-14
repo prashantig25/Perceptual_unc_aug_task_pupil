@@ -69,9 +69,9 @@ coeffs = data_plot;
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,mean(coeffs),std(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 plot(xaxis(find(perm.mask(pupil_condiff_idx,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(pupil_condiff_idx,:)==1)))), '.', 'color', ...
@@ -107,15 +107,15 @@ delete(ax4); % delete old axis
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(posterior.lowarousal_lowcondiff),"LineWidth",2,'LineStyle','--','Color','none')
-plot(xaxis,nanmean(posterior.lowarousal_highcondiff),"LineWidth",2,'LineStyle','--','Color','none')
-plot(xaxis,nanmean(posterior.higharousal_lowcondiff),"LineWidth",1,'LineStyle','-','Color',high_PU)
-plot(xaxis,nanmean(posterior.higharousal_highcondiff),"LineWidth",1,'LineStyle','-','Color',low_PU)
+plot(xaxis,mean(posterior.lowarousal_lowcondiff),"LineWidth",2,'LineStyle','--','Color','none')
+plot(xaxis,mean(posterior.lowarousal_highcondiff),"LineWidth",2,'LineStyle','--','Color','none')
+plot(xaxis,mean(posterior.higharousal_lowcondiff),"LineWidth",1,'LineStyle','-','Color',high_PU)
+plot(xaxis,mean(posterior.higharousal_highcondiff),"LineWidth",1,'LineStyle','-','Color',low_PU)
 
-shadedErrorBar(xaxis,nanmean(posterior.lowarousal_lowcondiff),nanstd(posterior.lowarousal_lowcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",high_PU,'LineStyle','--'},1)
-shadedErrorBar(xaxis,nanmean(posterior.lowarousal_highcondiff),nanstd(posterior.lowarousal_highcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",low_PU,'LineStyle','--'},1)
-shadedErrorBar(xaxis,nanmean(posterior.higharousal_lowcondiff),nanstd(posterior.higharousal_lowcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",high_PU},1)
-shadedErrorBar(xaxis,nanmean(posterior.higharousal_highcondiff),nanstd(posterior.higharousal_highcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",low_PU},1)
+shadedErrorBar(xaxis,mean(posterior.lowarousal_lowcondiff),std(posterior.lowarousal_lowcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",high_PU,'LineStyle','--'},1)
+shadedErrorBar(xaxis,mean(posterior.lowarousal_highcondiff),std(posterior.lowarousal_highcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",low_PU,'LineStyle','--'},1)
+shadedErrorBar(xaxis,mean(posterior.higharousal_lowcondiff),std(posterior.higharousal_lowcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",high_PU},1)
+shadedErrorBar(xaxis,mean(posterior.higharousal_highcondiff),std(posterior.higharousal_highcondiff)./sqrt(num_subjs),{'LineWidth',2,"Color",low_PU},1)
 
 % ADJUST FIGURE PROPERTIES
 l = legend('','','High arousal-high uncertainty','High arousal-low uncertainty','','Low arousal-high uncertainty','','Low arousal-low uncertainty','','','','','', ...
@@ -145,9 +145,9 @@ coeffs = data_plot;
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,mean(coeffs),std(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 plot(xaxis(find(perm.mask(pe_pupil_idx,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(pe_pupil_idx,:)==1)))), '.', 'color', ...
@@ -190,9 +190,9 @@ coeffs = data_plot;
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,mean(coeffs),std(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 plot(xaxis(find(perm.mask(pe_pupil_condiff_idx,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(pe_pupil_condiff_idx,:)==1)))), '.', 'color', ...

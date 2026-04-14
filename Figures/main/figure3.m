@@ -79,7 +79,7 @@ l = line([x x], ylims); set(l, 'Color', 'k', 'LineStyle', '-', 'LineWidth', 0.5)
 x = length(patch_tp) + length(resp_tp) + 30;
 l = line([x x], ylims); set(l, 'Color', 'k', 'LineStyle', '-', 'LineWidth', 0.5);
 
-xlabels = {'0','500','0','1000','0','500','1000','200'};
+xlabels = {'0','500','0','1000','0','1000','2000'};
 xticks = [0,50,130,230,360,460,560];
 set(gca,  'XTick', xticks, 'XTickLabel', xlabels,'box', 'off');
 
@@ -108,11 +108,11 @@ x = linspace(-300,2700,300); % x-axis
 ylim_axes = [-0.1,0.45];
 [pval_pos] = create_pvalpos(ylim_axes);
 
-avg_bin1= nanmean(condiffbin.pebin1);
-sem_bin1 = nanstd(condiffbin.pebin1)./sqrt(num_subjs);
+avg_bin1= mean(condiffbin.pebin1);
+sem_bin1 = std(condiffbin.pebin1)./sqrt(num_subjs);
 
-avg_bin2 = nanmean(condiffbin.pebin2);
-sem_bin2 = nanstd(condiffbin.pebin2)./sqrt(num_subjs);
+avg_bin2 = mean(condiffbin.pebin2);
+sem_bin2 = std(condiffbin.pebin2)./sqrt(num_subjs);
 
 % PLOT
 hold on
@@ -191,7 +191,7 @@ for j = cats
     end
     hold on
     color = color_cell;
-    ySmoothed = nanmean(data_plot,1);
+    ySmoothed = mean(data_plot,1);
     plot(x,ySmoothed,"Color",color{j,:},'LineWidth',2)
     hold on
     m = m + num_subjs;
@@ -205,9 +205,9 @@ for j = cats
             data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs,s,c);
         end
     end
-    ySmoothed = nanmean(data_plot,1);
+    ySmoothed = mean(data_plot,1);
     color = cell2mat(color_cell);
-    shadedErrorBar(x,ySmoothed,nanstd(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
+    shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
     hold on
 end
 

@@ -50,20 +50,20 @@ for n = 1:numSubjs
     end
     
     for b = 1:nbins 
-        BS_binned(n,b) = nanmean(belief_state(dataSubj.bins == b),1);
+        BS_binned(n,b) = mean(belief_state(dataSubj.bins == b),1);
     end
 end
 
 % Plot group mean and error bars
-scatter(1:nbins, nanmean(BS_binned), 50,"white");
+scatter(1:nbins, mean(BS_binned), 50,"white");
 hold on
 ls = lsline;
 hold on
-scatter(1:nbins, nanmean(BS_binned), 50, binned_dots, 'filled','MarkerEdgeColor','k');
+scatter(1:nbins, mean(BS_binned), 50, binned_dots, 'filled','MarkerEdgeColor','k');
 
 % Calculate correlation
 x_data_a = 1:nbins;
-y_data_a = nanmean(BS_binned);
+y_data_a = mean(BS_binned);
 [rho_a, pval_a] = corr(x_data_a', y_data_a', 'rows', 'pairwise');
 xlim([2,10])
 xlabel('Contrast-difference bins');
@@ -112,12 +112,12 @@ for b = 1:nbins
     for n = 1:numSims
         bins_subj = bins(run_id == simID(n));
         y_data_absLR_subj = y_data_absLR(run_id == simID(n));
-        avg_ydataAbsLR_bins(b,n) = nanmean(y_data_absLR_subj(bins_subj == b));
+        avg_ydataAbsLR_bins(b,n) = mean(y_data_absLR_subj(bins_subj == b));
     end
 end
 
-avg_ydataAbsLR = nanmean(avg_ydataAbsLR_bins,2);
-sem_ydataAbsLR = nanstd(avg_ydataAbsLR_bins,0,2)./sqrt(numSims);
+avg_ydataAbsLR = mean(avg_ydataAbsLR_bins,2);
+sem_ydataAbsLR = std(avg_ydataAbsLR_bins,0,2)./sqrt(numSims);
 
 % Plot
 scatter(1:nbins, avg_ydataAbsLR, 50, 'white', 'filled', 'MarkerEdgeColor', 'w','MarkerFaceAlpha',0.5);
@@ -152,7 +152,7 @@ set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
 subplot(1,3,3)
 
 % Load and process human learning rate data
-regression_path = "data/GB data peak corrected/behavior/LR analyses";
+regression_path = "data/GB data two pipelines/behavior/LR analyses";
 data_subjs = readtable(fullfile(desiredPath,regression_path,"preprocessed_lr_pupil_no_zerope.xlsx"));
 
 % Initialize variables
@@ -180,14 +180,14 @@ for b = 1:nbins
         bins_subj = bins(run_id == id_subjs(n));
         y_data_subj = y_data(run_id == id_subjs(n));
         binned_data_subj = binned_data(run_id == id_subjs(n));
-        avg_behv_bins(b,n) = nanmean(binned_data_subj(bins_subj == b));
-        avg_ydata_bins(b,n) = nanmean(y_data_subj(bins_subj == b));
+        avg_behv_bins(b,n) = mean(binned_data_subj(bins_subj == b));
+        avg_ydata_bins(b,n) = mean(y_data_subj(bins_subj == b));
     end
 end
 
-avg_ydata = nanmean(avg_ydata_bins,2);
-avg_binneddata = nanmean(avg_behv_bins,2);
-sem_ydata = nanstd(avg_ydata_bins,0,2)./sqrt(num_subjs);
+avg_ydata = mean(avg_ydata_bins,2);
+avg_binneddata = mean(avg_behv_bins,2);
+sem_ydata = std(avg_ydata_bins,0,2)./sqrt(num_subjs);
 
 % Plot
 scatter(1:nbins, avg_ydata,"filled",'MarkerEdgeColor',"none",'MarkerFaceColor',"none");

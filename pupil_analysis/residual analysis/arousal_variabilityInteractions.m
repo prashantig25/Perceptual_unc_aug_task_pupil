@@ -67,7 +67,7 @@ for s = [1:nsubjs]
     validIndices = find(preds.pe == 0); % pe == 0
     preds(validIndices,:) = []; % delete pe == 0
     pupil_signal(validIndices,:) = []; % delete pe == 0
-    preds.zsc_condiff = nanzscore(preds.norm_condiff);
+    preds.zsc_condiff = zscore(preds.norm_condiff);
     for c = 1:col
         coeffs.pupil(1,c) = betas_field(1,pupil_idx,s,c);
         coeffs.pe_condiff_pupil(1,c) = betas_field(1,peCondiffPupil_idx,s,c);
@@ -81,7 +81,7 @@ for s = [1:nsubjs]
     pe_trial = abs(preds.pe); % single trial PEs
     condiff_trial = preds.zsc_condiff; % contrast difference
     predicted_UP = coeffs.intercept + coeffs.pupil.*coeffs.pupil_signal + coeffs.pe_condiff_pupil.* pe_trial .* coeffs.pupil_signal.* condiff_trial + coeffs.pe_pupil.* pe_trial .* coeffs.pupil_signal + coeffs.con_diff_pupil.* condiff_trial .* coeffs.pupil_signal + coeffs.post_up .* post_up;
-    pupil_mean = nanmean(pupil_signal,2); % mean pupil-linked arousa
+    pupil_mean = mean(pupil_signal,2); % mean pupil-linked arousa
 
     % DIVIDE TRIALS FOR HIGH AND LOW AROUSAL
     bin_edges = prctile(pupil_mean, 0:50:100); % calculate percentile edges
@@ -106,10 +106,10 @@ for s = [1:nsubjs]
     predicted_UP_lowarousal_highcondiff = predicted_UP_lowarousal(bins == 2,:);
 
     % STORE
-    posterior.lowarousal_lowcondiff(s,:) = nanmean(predicted_UP_lowarousal_lowcondiff);
-    posterior.lowarousal_highcondiff(s,:) = nanmean(predicted_UP_lowarousal_highcondiff);
-    posterior.higharousal_lowcondiff(s,:) = nanmean(predicted_UP_higharousal_lowcondiff);
-    posterior.higharousal_highcondiff(s,:) = nanmean(predicted_UP_higharousal_highcondiff);
+    posterior.lowarousal_lowcondiff(s,:) = mean(predicted_UP_lowarousal_lowcondiff);
+    posterior.lowarousal_highcondiff(s,:) = mean(predicted_UP_lowarousal_highcondiff);
+    posterior.higharousal_lowcondiff(s,:) = mean(predicted_UP_higharousal_lowcondiff);
+    posterior.higharousal_highcondiff(s,:) = mean(predicted_UP_higharousal_highcondiff);
 
     clear coeffs
 end

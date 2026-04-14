@@ -87,8 +87,8 @@ for i = 1:num_subs
     pe_binedges = [0,0.5,1]; % set bin edges
     preds.bins = discretize(abs(preds.pe),pe_binedges); % bin data
 
-    subj_pupil_signal_pebin1(i,:) = nanmean(pupil_signal(preds.bins == 1,:));
-    subj_pupil_signal_pebin2(i,:) = nanmean(pupil_signal(preds.bins == 2,:));
+    subj_pupil_signal_pebin1(i,:) = mean(pupil_signal(preds.bins == 1,:));
+    subj_pupil_signal_pebin2(i,:) = mean(pupil_signal(preds.bins == 2,:));
 
     if plot_accuracy == 1
         pupil_signalcorrect = pupil_signal(preds.correct == 1,:);
@@ -97,11 +97,11 @@ for i = 1:num_subs
         preds_incorrect = preds(preds.correct == 0,:);
         preds_correct = preds(preds.correct == 1,:);
 
-        subj_pupil_signal_pebin1correct(i,:) = nanmean(pupil_signalcorrect(preds_correct.bins == 1,:));
-        subj_pupil_signal_pebin2correct(i,:) = nanmean(pupil_signalcorrect(preds_correct.bins == 2,:));
+        subj_pupil_signal_pebin1correct(i,:) = mean(pupil_signalcorrect(preds_correct.bins == 1,:));
+        subj_pupil_signal_pebin2correct(i,:) = mean(pupil_signalcorrect(preds_correct.bins == 2,:));
 
-        subj_pupil_signal_pebin1incorrect(i,:) = nanmean(pupil_signalincorrect(preds_incorrect.bins == 1,:));
-        subj_pupil_signal_pebin2incorrect(i,:) = nanmean(pupil_signalincorrect(preds_incorrect.bins == 2,:));
+        subj_pupil_signal_pebin1incorrect(i,:) = mean(pupil_signalincorrect(preds_incorrect.bins == 1,:));
+        subj_pupil_signal_pebin2incorrect(i,:) = mean(pupil_signalincorrect(preds_incorrect.bins == 2,:));
     end
 end
 
