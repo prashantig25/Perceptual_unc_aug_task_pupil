@@ -44,6 +44,7 @@ PupilDescriptive.num_sess = num_sess;
 PupilDescriptive.subj_ids = subj_ids;
 PupilDescriptive.behv_dir = behv_dir;
 
+% Cycle over subjects
 for i = 1:num_subs
 
     % GET PUPIL DATA
@@ -55,6 +56,7 @@ for i = 1:num_subs
     behvData = PupilDescriptive.loadBehavioralData(i);
 
     % MISSED TRIALS
+    % todo: is loop really necessary
     missed_trials = []; % initialize array for index of missed trials
     for b = 1:height(behvData)
         if isnan(behvData.rt(b,:)) % || isnan(behvData.slider(b,:)) % check if participant has not responded

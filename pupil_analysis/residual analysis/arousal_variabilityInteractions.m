@@ -47,7 +47,7 @@ for n = 1:length(subj_ids)
     array_index = [array_index;find(str2num(subj_ids{n}) == subj_ids_num_sorted)];  % get index
 end
 
-for s = [1:nsubjs]
+for s = 1:nsubjs
 
     % GET BEHAVIORAL DATA
     fprintf('reading in %s ...\n', subj_ids{s});

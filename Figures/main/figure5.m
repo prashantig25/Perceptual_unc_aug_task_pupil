@@ -28,7 +28,7 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-data_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
+data_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
 coeffs_name = importdata(fullfile(data_dir,"coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % import coeff names
 pupil_idx = find(strcmp(coeffs_name, 'pupil')); % GET INDEX OF PUPIL COEFFICIENT
 postUP_idx = find(strcmp(coeffs_name, 'post_up')); % GET INDEX OF PUPIL COEFFICIENT
@@ -68,12 +68,11 @@ box(ax1_new, 'off'); % remove box
 delete(ax1); % delete old axis
 
 % PLOT
-for s = 1:num_subjs
-    for c = 1:col
-        data_plot(s,c) = betas_pupil.with_intercept(1,postUP_idx,s,c);
-    end
-end
-coeffs = nanmean(data_plot,2);
+coeffs = squeeze(mean(betas_pupil.with_intercept(1, postUP_idx, :, :), 4));
+
+% Run t-test
+[h, pVals] = ttest(coeffs);
+
 [avg,sd,coeffs] = prepare_betas(coeffs,1,num_subjs);
 h = bar_plots_pval(coeffs,avg,sd,num_subjs, ...
         1,1,{'','Example participant','Normative agent'}, ...
@@ -96,18 +95,14 @@ delete(ax2); % delete old axis
 ylim_axes = [-0.02,0.07];
 [pval_pos] = create_pvalpos(ylim_axes);
 
-for s = 1:num_subjs
-    for c = 1:col
-        data_plot(s,c) = betas_pupil.with_intercept(1,pupil_idx,s,c);
-    end
-end
-coeffs = data_plot;
+% Squeeze data
+coeffs = squeeze(betas_pupil.with_intercept(1, pupil_idx, :, :));
 
 % PLOT
 hold on 
-plot(xaxis,nanmean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs),nanstd(coeffs)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis,mean(coeffs),std(coeffs)./sqrt(num_subjs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 xline(0,'LineStyle','--','LineWidth',0.5);

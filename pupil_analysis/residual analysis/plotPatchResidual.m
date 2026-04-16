@@ -80,11 +80,6 @@ for n = 1:numSubjs
 
         % Full Model (ecoperf ~ 1 + postPredChoice + pupil)
         mdlfull = fitglm(preds,'ecoperf','ecoperf ~ 1 + postPredChoice + pupil', 'Distribution','binomial','Link','logit');
-
-        % Pupil beta is the 3rd coefficient
-
-        % todo: add beta for PPC. It would be more consistent to report
-        % this like in Fig 5.and just mention behavioral preds in text.
         betas_ppc(n,c,1) = mdlfull.Coefficients.Estimate(2);
         betas_pupil(n,c,1) = mdlfull.Coefficients.Estimate(3);
     end
@@ -135,7 +130,6 @@ delete(ax1);
 % Reshape data for bar_plots_pval function
 % Stack all three predictors vertically
 y = [patch_betas(:,1); patch_betas(:,2); patch_betas(:,3)];
-
 
 % Slices the 4D array and averages across the 4th dimension (columns)
 coeffs = mean(betas_ppc, 2);
