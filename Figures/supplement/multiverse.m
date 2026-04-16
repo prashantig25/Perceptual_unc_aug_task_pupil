@@ -194,7 +194,7 @@ color_deconv_hetero = [0.70, 0.50, 0.80];  % Light muted purple
 %% CREATE FIGURE
 
 fprintf('Creating figure with 12 specifications...\n');
-figure("Position",[600,600,300,550])
+figure("Position",[600,600,275,525])
 t = tiledlayout(3,1,"Padding","compact","TileSpacing","compact");
 
 xlim_axes = [-300,2700];
@@ -225,7 +225,7 @@ yline(0,'LineStyle','--','LineWidth',1,'Color',[0.5 0.5 0.5],'HandleVisibility',
 xlabel('Time since feedback onset (ms)','FontName',fontname,'FontSize',fontsize)
 ylabel('Standardized uncertainty-weighted PE coefficients','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 lgd = legend('Location','best','FontSize',4,'NumColumns',1,'Color','none','EdgeColor','none');
-lgd.ItemTokenSize = [7, 7];
+lgd.ItemTokenSize = [6, 6];
 title('Multiverse Analysis: All 12 Specifications (Standardized)','FontName',fontname,'FontSize',fontsize+1,'FontWeight','normal')
 adjust_figprops(ax1,fontname,fontsize,linewidth_plot);
 
@@ -289,8 +289,8 @@ safe_saveall(fullfile(stats_dir, 'medianMultiversePval.csv'), medianMultiverse);
 
 yline(0.025, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1, 'HandleVisibility', 'off');
 yline(0.05, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1, 'HandleVisibility', 'off');
-text(0.3, 0.028, 'Significant threshold for two-tailed test', 'FontSize', 7, 'VerticalAlignment', 'middle');
-text(0.3, 0.053, 'Significant threshold for one-tailed test', 'FontSize', 7, 'VerticalAlignment', 'middle');
+text(0.1, 0.028, 'Significant threshold for two-tailed test', 'FontSize', 7, 'VerticalAlignment', 'middle');
+text(0.1, 0.053, 'Significant threshold for one-tailed test', 'FontSize', 7, 'VerticalAlignment', 'middle');
 
 ylabel("{\itp}-value",'FontName',fontname,'FontSize',fontsize)
 xlabel("Specification",'FontName',fontname,'FontSize',fontsize)
@@ -304,7 +304,7 @@ adjust_figprops(ax3,fontname,fontsize,linewidth_plot);
 %% ADD SUBPLOT LABELS
 
 ax1_pos = ax1.Position;
-adjust_x = -0.065; % adjusted x-position for subplot label
+adjust_x = -0.05; % adjusted x-position for subplot label
 adjust_y = ax1_pos(4)-0.01; % adjusted y-position for subplot label
 [label_x,label_y] = change_plotlabel(ax1,adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
