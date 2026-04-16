@@ -55,7 +55,7 @@ for i = 1:num_subjs
 
     % CONCATANATE
     trial = [patch,resp,fb];
-    trial_subj = nanmean(trial,1);
+    trial_subj = mean(trial,1);
     trial_all(i,:) = trial_subj;
 end
 

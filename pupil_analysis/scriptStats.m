@@ -5,7 +5,7 @@ clc
 clearvars
 % USER-BASED PATH
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil-main';
+reqPath = 'Perceptual_unc_aug_task_pupil';
 pathParts = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');

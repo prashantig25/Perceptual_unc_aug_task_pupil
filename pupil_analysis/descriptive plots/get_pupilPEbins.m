@@ -93,21 +93,18 @@ for i = 1:num_subs
         preds_incorrect = preds(preds.correct == 0,:);
         preds_correct = preds(preds.correct == 1,:);
 
-        subj_pupil_signal_pebin1correct(i,:) = nanmean(pupil_signalcorrect(preds_correct.bins == 1,:));
-        subj_pupil_signal_pebin2correct(i,:) = nanmean(pupil_signalcorrect(preds_correct.bins == 2,:));
+        subj_pupil_signal_pebin1correct(i,:) = mean(pupil_signalcorrect(preds_correct.bins == 1,:));
+        subj_pupil_signal_pebin2correct(i,:) = mean(pupil_signalcorrect(preds_correct.bins == 2,:));
 
-        subj_pupil_signal_pebin1incorrect(i,:) = nanmean(pupil_signalincorrect(preds_incorrect.bins == 1,:));
-        subj_pupil_signal_pebin2incorrect(i,:) = nanmean(pupil_signalincorrect(preds_incorrect.bins == 2,:));
+        subj_pupil_signal_pebin1incorrect(i,:) = mean(pupil_signalincorrect(preds_incorrect.bins == 1,:));
+        subj_pupil_signal_pebin2incorrect(i,:) = mean(pupil_signalincorrect(preds_incorrect.bins == 2,:));
     end
 end
 
 % RUN PERM TEST
 num_vars = 1; % number of variables
-var1 = subj_pupil_signal_pebin1; 
-var2 = subj_pupil_signal_pebin2;
-two_tailed = 1; % apply two-tailed permutation test
-betas = 0; % permutation test on descriptive data
-perm = get_permtest(num_vars, num_subs, col, var1, var2, two_tailed, betas);
+var1 = reshape(subj_pupil_signal_pebin1, [1, num_subs, col]); % [num_vars x num_subjs x col]
+perm = get_permtest_updated(num_vars, num_subs, col, var1);
 
 % SAVE
 condiffbin.stat = perm.mask;

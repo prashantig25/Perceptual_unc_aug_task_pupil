@@ -6,11 +6,11 @@ classdef PupilRegression_intHet < pupilReg_Vars
         perm_results        % permutation test results
         residuals_all       % model residuals for all subjects
         predicted_all       % model-predicted pupil responses for all subjects
-        aic_values          % AIC model fit
-        bic_values          % BIC model fit
-        logL_values         % log-likelihood 
-        rsquaredOrdinary    % ordinary R2
-        rsquaredAdjusted    % adjusted R2
+        % aic_values
+        % bic_values
+        % logL_values
+        % rsquaredOrdinary
+        % rsquaredAdjusted
         starting_points     % [n_subj x col x n_sp x num_params], pre-generated
 
         % Heteroskedastic model properties
@@ -143,9 +143,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
         %% ----------------------------------------------------------------
         %  RUN ANALYSIS
         %% ----------------------------------------------------------------
-        
-        % todo: is the output actually used anywhere?
-        function [betas_struct, perm] = runAnalysis(obj)
+        function runAnalysis(obj)
             % Main method to run the complete pupil regression analysis pipeline
             % Processes all subjects, fits regression models, and runs permutation tests
             %
@@ -170,8 +168,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             if strcmp(obj.model_type, 'heteroskedastic')
                 obj.betas_struct.with_intercept = nan(num_bins, obj.num_vars+1, obj.num_subs, obj.col);
                 obj.negLL_values = nan(num_bins, obj.num_subs, obj.col);
-                obj.aic_values = nan(num_bins, obj.num_subs, obj.col);
-                obj.bic_values = nan(num_bins, obj.num_subs, obj.col);
+                % obj.aic_values   = nan(num_bins, obj.num_subs, obj.col);
+                % obj.bic_values   = nan(num_bins, obj.num_subs, obj.col);
             else
                 % todo: preallocate R2 etc.
                 obj.betas_struct.with_intercept = nan(num_bins, obj.num_vars+1, obj.num_subs, obj.col);
@@ -198,21 +196,43 @@ classdef PupilRegression_intHet < pupilReg_Vars
             % Todo: not true, we also need it for het model
             if strcmp(obj.model_type, 'OLS')
                 obj.updateProgress('Running permutation test…');
-                obj.runPermutationTest();
+                % obj.runPermutationTest();
+
+                if obj.binned == 0
+                    num_vars = 1:obj.num_vars+1;
+                    % var2     = obj.betas_struct.with_intercept;
+                    % betas    = 1;
+                    % obj.perm_results = get_permtest(num_vars, obj.num_subs, obj.col, var1, var2, obj.two_tailed, betas);
+
+                    var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
+                    obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
+                elseif length(obj.bins) <= 3
+                    num_vars = 1:obj.num_vars+1;
+                    % betas    = 1;
+                    % obj.perm_results = get_permtest(num_vars, obj.num_subs, obj.col, var1, var2, obj.two_tailed, betas);
+
+                    var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
+                    var2 = squeeze(obj.betas_struct.with_intercept(2, :, :, :)); % [num_vars x num_subjs x col]
+                    obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1, var2);
+                else 
+                    obj.perm_results = [];
+                end
+            elseif strcmp(obj.model_type, 'heteroskedastic')
+                num_vars = 1:obj.num_vars+1;
+                obj.updateProgress('Running permutation test…');
+                obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
             end
 
             obj.closeProgress();
 
-            betas_struct = obj.betas_struct;
-            perm         = obj.perm_results;
+            % betas_struct = obj.betas_struct;
+            % perm         = obj.perm_results;
         end
-        
-        % todo: output undefined
-        function [residuals_subj, predicted_subj] = processSubject(obj, subj_idx, binnedAnalysis)
+        function processSubject(obj, subj_idx, binnedAnalysis)
             % Process a single subject through the complete analysis pipeline
             % Loads data, handles missing trials, applies preprocessing, and fits models
-            %
             % Parameters:
+            %
             %   subj_idx - Index of subject to process (1 to num_subs)
             %   binnedAnalysis - Boolean indicating whether we run binned
             %       or regular analysis 
@@ -251,8 +271,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             % Process data through bins and timepoints to fit regression models
             obj.processBinsAndTimepoints(preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis);
 
-            residuals_subj = [];
-            predicted_subj = [];
+            % residuals_subj = [];
+            % predicted_subj = [];
         end
 
         function behv_data = loadBehavioralData(obj, subj_idx)
@@ -478,27 +498,10 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 % similar. That is, store negLL etc in the fitHet function
                 % already, not here. Like for the OLS case.
                 if strcmp(obj.model_type, 'heteroskedastic')
-
-                    [negLL_row, betas_row, aic_row, bic_row] = obj.fitHeteroAllTimepoints( ...
+                    %% ── HETEROSKEDASTIC PATH ──────────────────────────
+                    obj.updateProgress(sprintf('%s | Het model…', binLabel));
+                    obj.fitHeteroAllTimepoints( ...
                         pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, subj_idx);
-
-                    % fitHeteroAllTimepoints already consumed obj.col ticks
-                    % via the DataQueue, so no extra tick here.
-
-                    if obj.binned_accuracy == 1
-                        storage_r = r + 1;
-                    else
-                        storage_r = r;
-                    end
-
-                    obj.negLL_values(storage_r, subj_idx, :) = negLL_row;
-                    obj.aic_values(storage_r, subj_idx, :) = aic_row;
-                    obj.bic_values(storage_r, subj_idx, :) = bic_row;
-                    
-                    % betas_row is [col x num_params]; store as [1 x num_params x 1 x col]
-                    for c = 1:obj.col
-                        obj.betas_struct.with_intercept(storage_r, :, subj_idx, c) = betas_row(c, :);
-                    end
 
                 else
                     
@@ -506,8 +509,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     for c = 1:obj.col
                         obj.updateProgress(sprintf('%s | t %d/%d', binLabel, c, obj.col));
                         obj.fitModelAtTimepoint(c, ...
-                            pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, ...
-                            preds_bins, zsc_base, r, subj_idx);
+                            pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx);
                     end
                 end
             end
@@ -565,18 +567,12 @@ classdef PupilRegression_intHet < pupilReg_Vars
             %   r - Current bin index
             %   subj_idx - Current subject index
 
-            aic = nan;
-            bic = nan;
-
             % Extract dependent variable (pupil diameter at timepoint c)
             y = pupil_signal_bins(:, c);
             
             % Z-score gaze signals
-            % todo: is it still expected that nans are present?
-            % If not, make sure they are removed.
-            zsc_xgaze = nanzscore(xgaze_signal_bins(:, c));
-            zsc_ygaze = nanzscore(ygaze_signal_bins(:, c));
-            validIdx = ~isnan(y) & ~isnan(preds_bins.up);
+            zsc_xgaze = zscore(xgaze_signal_bins(:, c));
+            zsc_ygaze = zscore(ygaze_signal_bins(:, c));
 
             % Extract valid data
             yValid = y(validIdx);
@@ -586,10 +582,10 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
             % Create regression table with all predictors
             tbl = table(yValid, xgazeValid, ygazeValid, ...
-                nanzscore(preds_valid.con_diff), nanzscore(preds_valid.pe), ...
-                nanzscore(abs(preds_valid.pe)), nanzscore(abs(preds_valid.up)), ...
-                nanzscore(log(preds_valid.rt)), preds_valid.condition, preds_valid.ecoperf, ...
-                preds_valid.correct, nanzscore(preds_valid.pe_condiff), ...
+                zscore(preds_valid.con_diff), zscore(preds_valid.pe), ...
+                zscore(abs(preds_valid.pe)), zscore(abs(preds_valid.up)), ...
+                zscore(log(preds_valid.rt)), preds_valid.condition, preds_valid.ecoperf, ...
+                preds_valid.correct, zscore(preds_valid.pe_condiff), ...
                 'VariableNames', {'pupil','xgaze','ygaze','zsc_condiff','signed_pe', ...
                                   'pe','zsc_up','rt','condition','ecoperf','reward','pe_condiff'});
 
@@ -613,20 +609,20 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
 
             if ~isempty(lm)
-                if isa(lm, 'LinearModel')
-                    negLL     = -lm.LogLikelihood;
-                    N         = lm.NumObservations;
-                    k         = lm.NumCoefficients + 1;
-                    aic       = 2*k + 2*negLL;
-                    bic       = k*log(N) + 2*negLL;
-                    residuals = lm.Residuals.Raw;
-                    sigma2    = var(residuals);
-                    n         = lm.NumObservations;
-                    logL      = -0.5*n*(log(2*pi*sigma2) + 1);
-                else
-                    warning('lm is not a LinearModel. Cannot calculate AIC/BIC.');
-                    logL = nan;
-                end
+            %     if isa(lm, 'LinearModel')
+            %         negLL     = -lm.LogLikelihood;
+            %         N         = lm.NumObservations;
+            %         k         = lm.NumCoefficients + 1;
+            %         aic       = 2*k + 2*negLL;
+            %         bic       = k*log(N) + 2*negLL;
+            %         residuals = lm.Residuals.Raw;
+            %         sigma2    = var(residuals);
+            %         n         = lm.NumObservations;
+            %         logL      = -0.5*n*(log(2*pi*sigma2) + 1);
+            %     else
+            %         warning('lm is not a LinearModel. Cannot calculate AIC/BIC.');
+            %         logL = nan;
+            %     end
 
                 if obj.binned_accuracy == 1
                     storage_r_idx = r + 1;
@@ -634,10 +630,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     storage_r_idx = r;
                 end
 
-                % Store the results
-                obj.aic_values(storage_r_idx, subj_idx, c) = aic;
-                obj.bic_values(storage_r_idx, subj_idx, c) = bic;
-                obj.logL_values(storage_r_idx, subj_idx, c) = logL;
+                % obj.aic_values(storage_r_idx,  subj_idx, c) = aic;
+                % obj.bic_values(storage_r_idx,  subj_idx, c) = bic;
+                % obj.logL_values(storage_r_idx, subj_idx, c) = logL;
             end
             
             % Generate model predictions 
@@ -651,16 +646,15 @@ classdef PupilRegression_intHet < pupilReg_Vars
             else
                 obj.betas_struct.with_intercept(r,   :, subj_idx, c) = betas;
             end
-            
-            % todo: preallocate
-            obj.rsquaredAdjusted(r, :, subj_idx, c) = lm.Rsquared.Adjusted;
-            obj.rsquaredOrdinary(r,  :, subj_idx, c) = lm.Rsquared.Ordinary;
+
+            % obj.rsquaredAdjusted(r, :, subj_idx, c) = lm.Rsquared.Adjusted;
+            % obj.rsquaredOrdinary(r,  :, subj_idx, c) = lm.Rsquared.Ordinary;
         end
 
         %% ----------------------------------------------------------------
         %  FIT HETERO MODEL ACROSS ALL TIMEPOINTS
         %% ----------------------------------------------------------------
-        function [negLL_row, betas_row, aic_row, bic_row] = fitHeteroAllTimepoints( ...
+        function fitHeteroAllTimepoints( ...
                 obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
 
             % Extract all obj fields into plain variables (parfor-safe)
@@ -672,16 +666,16 @@ classdef PupilRegression_intHet < pupilReg_Vars
             num_params = obj.num_vars + 1;
 
             % ── Pre-compute z-scored predictors ───────────────────────
-            x1_z = nanzscore(abs(preds_bins.pe));
-            x2_z = nanzscore(preds_bins.con_diff);
-            rt_z = nanzscore(log(preds_bins.rt));
-            up_z = nanzscore(abs(preds_bins.up));
+            x1_z = zscore(abs(preds_bins.pe));
+            x2_z = zscore(preds_bins.con_diff);
+            rt_z = zscore(log(preds_bins.rt));
+            up_z = zscore(abs(preds_bins.up));
 
             xgaze_z = nan(size(xgaze_signal));
             ygaze_z = nan(size(ygaze_signal));
             for c = 1:col
-                xgaze_z(:, c) = nanzscore(xgaze_signal(:, c));
-                ygaze_z(:, c) = nanzscore(ygaze_signal(:, c));
+                xgaze_z(:, c) = zscore(xgaze_signal(:, c));
+                ygaze_z(:, c) = zscore(ygaze_signal(:, c));
             end
 
             % ── Remove NaN rows ────────────────────────────────────────
@@ -713,8 +707,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             % Pre-allocate outputs
             negLL_row = nan(1, col);
             betas_row = nan(col, num_params);
-            aic_row   = nan(1, col);
-            bic_row   = nan(1, col);
+            % aic_row   = nan(1, col);
+            % bic_row   = nan(1, col);
 
             starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
 
@@ -741,11 +735,16 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 k            = num_params;
                 negLL_row(c) = bestNegLL;
                 betas_row(c, :) = bestParams;
-                aic_row(c)   = 2*k + 2*bestNegLL;
-                bic_row(c)   = k*log(N_trials) + 2*bestNegLL;
+                % aic_row(c)   = 2*k + 2*bestNegLL;
+                % bic_row(c)   = k*log(N_trials) + 2*bestNegLL;
 
                 % Notify main thread: one timepoint done
                 send(dq, 1); %#ok<PFBNS>
+            end
+
+            obj.negLL_values(1, subj_idx, :) = negLL_row;
+            for c = 1:obj.col
+                obj.betas_struct.with_intercept(1, :, subj_idx, c) = betas_row(c, :);
             end
         end
 
@@ -776,6 +775,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 safe_saveall(fullfile(obj.save_dir, [obj.perm_save, '.mat']), obj.perm_results);
             elseif strcmp(obj.model_type, 'heteroskedastic')
                 safe_saveall(fullfile(obj.save_dir, ['negLL_', obj.betas_save, '.mat']), obj.negLL_values);
+                safe_saveall(fullfile(obj.save_dir, ['perm_', obj.betas_save, '.mat']), obj.perm_results);
             end
         end
 

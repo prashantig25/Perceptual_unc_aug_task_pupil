@@ -76,10 +76,11 @@ reg_het1.two_tailed        = 0;
 reg_het1.bins_array        = 1;
 reg_het1.residuals_predicted = 0;
 
-[~, ~] = reg_het1.runAnalysis();
+reg_het1.runAnalysis();
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'), reg_het1.betas_struct);
 safe_saveall(fullfile(het_save_dir, 'negLL_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'),          reg_het1.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'),          reg_het1.perm_results);
 fprintf('Pipeline 1 saved.\n');
 
 %% =======================================================================
@@ -117,6 +118,8 @@ reg_het2.residuals_predicted = 0;
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'), reg_het2.betas_struct);
 safe_saveall(fullfile(het_save_dir, 'negLL_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'),          reg_het2.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'),          reg_het1.perm_results);
+
 fprintf('Pipeline 2 saved.\n');
 
 %% =======================================================================
@@ -154,6 +157,8 @@ reg_het3.residuals_predicted = 0;
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'), reg_het3.betas_struct);
 safe_saveall(fullfile(het_save_dir, 'negLL_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'),          reg_het3.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP.mat'),          reg_het1.perm_results);
+
 fprintf('Pipeline 3 saved.\n');
 
 fprintf('\n====================================================\n');

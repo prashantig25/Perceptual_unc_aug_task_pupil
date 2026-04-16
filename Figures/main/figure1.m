@@ -23,7 +23,8 @@ pe_vals = linspace(-1,1,10); % prediction error range
 neg_up = [-0.5,-0.15,-0.325,-0.325]; % negative updates
 pos_up = [0.5,0.15,0.325,0.325]; % positive updates
 
-condiffbin = importdata("condiff_pebin2.mat"); % pupil regression
+condiffbin = importdata("fb_PE2bins_linearInt.mat"); % pupil regression
+% condiffbin = condiffbin.pebin2;
 num_subjs = 47; % number of subjects
 col = 300; % number of timepoints
 %% INITIALISE TILE LAYOUT
@@ -153,12 +154,15 @@ ax2_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax2_new, 'on');
 delete(ax2);
 
+midPU = 0.66;
+lowPU = 0.3;
+
 % USE BETAS TO PLOT AS ILLUSTRATION BUT MAKE IT CARTOONISH USING SMOOTH
 
 xaxis = linspace(-300,2700,250); % x-axis values
-highPU_pupil = nanmean(smoothdata(condiffbin.pebin1(:,1:250),2,"gaussian")); % high perceptual uncertainty
-midPU_pupil = nanmean(smoothdata(condiffbin.pebin1(:,1:250),2,"gaussian"))*0.66; % mid perceptual uncertainty
-lowPU_pupil = nanmean(smoothdata(condiffbin.pebin1(:,1:250),2,"gaussian"))*0.3; % low perceptual uncertatinty
+highPU_pupil = mean(smoothdata(condiffbin.pebin1(:,1:250),2,"gaussian")); % high perceptual uncertainty
+midPU_pupil = mean(smoothdata(condiffbin.pebin1(:,1:250),2,"gaussian"))*midPU; % mid perceptual uncertainty
+lowPU_pupil = mean(smoothdata(condiffbin.pebin1(:,1:250),2,"gaussian"))*lowPU; % low perceptual uncertatinty
 
 highPU_pupil(1,highPU_pupil < 0) = 0;
 midPU_pupil(1,midPU_pupil < 0) = 0;
@@ -182,7 +186,7 @@ box off
 xlabel('Time')
 ylabel('Arousal')
 xlim([-300,2700])
-ylim([-0.005,0.4])
+ylim([-5,150])
 xticks([]); % Remove x-axis ticks
 yticks([]); % Remove x-axis ticks
 title('PE Encoding in Arousal Signal','FontWeight','normal')

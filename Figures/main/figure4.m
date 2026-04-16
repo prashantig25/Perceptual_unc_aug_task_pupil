@@ -91,9 +91,9 @@ ylim_axes = [-0.04,0.05];
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs.pe),nanstd(coeffs.pe)./sqrt(num_subs), ...
+shadedErrorBar(xaxis,mean(coeffs.pe),std(coeffs.pe)./sqrt(num_subs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 xline(0,'LineStyle','--','LineWidth',0.5);
@@ -126,9 +126,9 @@ ylim_axes = [-0.01,0.023];
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
+plot(xaxis,mean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
-shadedErrorBar(xaxis,nanmean(coeffs.pe_condiff),nanstd(coeffs.pe_condiff)./sqrt(num_subs), ...
+shadedErrorBar(xaxis,mean(coeffs.pe_condiff),std(coeffs.pe_condiff)./sqrt(num_subs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 hold on
 
@@ -162,20 +162,26 @@ delete(ax3);
 % PLOT
 
 hold on 
-plot(xaxis,nanmean(posterior.highPU),'Color',high_PU,'LineWidth',1.5)
-plot(xaxis,nanmean(posterior.midPU),'Color',mid_PU,'LineWidth',1.5)
-plot(xaxis,nanmean(posterior.lowPU),'Color',low_PU,'LineWidth',1.5)
+plot(xaxis,mean(posterior.highPU),'Color',high_PU,'LineWidth',1.5)
+plot(xaxis,mean(posterior.midPU),'Color',mid_PU,'LineWidth',1.5)
+plot(xaxis,mean(posterior.lowPU),'Color',low_PU,'LineWidth',1.5)
 
 % ADJUST FIGURE PROPERTIES
 
-l = legend('High state uncertainty','Mid state uncertainty','Low state uncertainty','Location','best','EdgeColor', ...
-    'none','AutoUpdate','off','FontSize',fontsize,'FontName',fontname,'Color','none');
-l.ItemTokenSize = [7 7];
-set(gca,'Color','none','FontName','Arial','FontSize',8)
+% 1. Create the legend with standard single-line placeholders
+l = legend('Line 1', 'Line 2', 'Line 3', 'Location', 'best', 'EdgeColor', 'none', ...
+    'AutoUpdate', 'off', 'FontSize', fontsize-0.5, 'FontName', fontname, 'Color', 'none');
+l.ItemTokenSize = [5 5];
+% 2. Manually update the String property using a cell array and 'newline'
+% This bypasses the initial input error.
+l.String = {['High state uncertainty', newline, '(Contrast difference = 0)'], ...
+            ['Mid state uncertainty', newline, '(Contrast difference = 0.05)'], ...
+            ['Low state uncertainty', newline, '(Contrast difference = 0.1)']};
+set(gca,'Color','none','FontName','Arial','FontSize',fontsize)
 xline(0,'--','LineWidth',0.5)
 yline(0,'--','LineWidth',0.5)
 xlim([-300,2700])
-% ylim([-0.03,0.09])
+ylim([-30,40])
 xlabel('Time from feedback onset (ms)')
 ylabel('Posterior pupil dilation (a.u.)')
 hold on

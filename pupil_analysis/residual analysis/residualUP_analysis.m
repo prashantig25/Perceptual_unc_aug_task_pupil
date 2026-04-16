@@ -96,8 +96,8 @@ for n = 1:num_subjs
         pe = abs(preds.pe);
         condiff = preds.con_diff;
         pupil_tp = pupil_signal(:,c);
-        tbl = table(nanzscore(up),nanzscore(post_up),nanzscore(pe), ...
-            nanzscore(pupil_tp),nanzscore(condiff),'VariableNames',{'up','post_up','pe','pupil','con_diff'});
+        tbl = table(zscore(up),zscore(post_up),zscore(pe), ...
+            zscore(pupil_tp),zscore(condiff),'VariableNames',{'up','post_up','pe','pupil','con_diff'});
         [betas,rsquared,residuals,coeffs_name,lm] = linear_fit(tbl,mdl, ...
             pred_vars,resp_var,'',num_vars,0,0,0,0);
         betas_pupil.with_intercept(1,:,n,c) = betas;
@@ -111,10 +111,6 @@ safe_saveall(strcat(save_dir, filesep, "coeffs_name_behvresidual_abs_pecondiff_n
 safe_saveall(strcat(save_dir,filesep,"betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"), betas_pupil);
 
 % RUN PERM TEST
-num_vars = 1:num_vars+1; % number of variables
-var1 = betas_pupil.with_intercept; 
-var2 = betas_pupil.with_intercept;
-betas = 1; % permutation test on regression data
-two_tailed = 0; % run one-tailed permutation test 
-perm = get_permtest(num_vars, num_subjs, col, var1, var2, two_tailed, betas);
+var1 = squeeze(betas_pupil.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
+perm = get_permtest_updated(1:num_vars+1, num_subjs, col, var1);
 safe_saveall(strcat(save_dir,filesep,"perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"), perm);

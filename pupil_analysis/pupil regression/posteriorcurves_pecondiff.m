@@ -34,10 +34,11 @@ highPU = -1.5; % high BS uncertainty
 midPU = 0.015; % medium BS uncertainty
 lowPU = 1.5; % low BS uncertainty
 
+
 % LOOP OVER SUBJECTS
 for s = 1:num_subjs
     preds = preds_all(preds_all.id == str2num(subj_ids{s}),:);
-    preds.zsc_condiff = nanzscore(preds.norm_condiff);
+    preds.zsc_condiff = zscore(preds.norm_condiff);
     for c = 1:col
         coeffs.pe(s,c) = betas_field(1,5,s,c);
         coeffs.pe_condiff(s,c) = betas_field(1,8,s,c);
@@ -45,9 +46,9 @@ for s = 1:num_subjs
         coeffs.con_diff(s,c) = betas_field(1,4,s,c);
     end
     pe_trial = ones(height(preds),1);
-    posterior.midPU(s,:) = nanmean(coeffs.pe_condiff(s,:).*midPU.*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.con_diff(s,:).*midPU);
-    posterior.highPU(s,:) = nanmean(coeffs.pe_condiff(s,:).*highPU.*pe_trial(preds.con_diff < 0.033) + coeffs.pe(s,:).*pe_trial(preds.con_diff < 0.033) + coeffs.con_diff(s,:).*highPU);
-    posterior.lowPU(s,:) = nanmean(coeffs.pe_condiff(s,:).*lowPU.*pe_trial(preds.con_diff > 0.066) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.066) + coeffs.con_diff(s,:).*lowPU);
+    posterior.midPU(s,:) = mean(coeffs.pe_condiff(s,:).*midPU.*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.con_diff(s,:).*midPU);
+    posterior.highPU(s,:) = mean(coeffs.pe_condiff(s,:).*highPU.*pe_trial(preds.con_diff < 0.033) + coeffs.pe(s,:).*pe_trial(preds.con_diff < 0.033) + coeffs.con_diff(s,:).*highPU);
+    posterior.lowPU(s,:) = mean(coeffs.pe_condiff(s,:).*lowPU.*pe_trial(preds.con_diff > 0.066) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.066) + coeffs.con_diff(s,:).*lowPU);
 end
 
 % SAVE
@@ -71,7 +72,7 @@ lowPU = 1.5; % low BS uncertainty
 % LOOP OVER SUBJECTS
 for s = 1:num_subjs
     preds = preds_all(preds_all.id == str2num(subj_ids{s}),:);
-    preds.zsc_condiff = nanzscore(preds.norm_condiff);
+    preds.zsc_condiff = zscore(preds.norm_condiff);
     for c = 1:col
         coeffs.pe(s,c) = betas_field(1,5,s,c);
         coeffs.pe_condiff(s,c) = betas_field(1,8,s,c);
@@ -79,9 +80,9 @@ for s = 1:num_subjs
         coeffs.con_diff(s,c) = betas_field(1,4,s,c);
     end
     pe_trial = ones(height(preds),1);
-    posterior.midPU(s,:) = nanmean(coeffs.pe_condiff(s,:).*midPU.*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.con_diff(s,:).*midPU);
-    posterior.highPU(s,:) = nanmean(coeffs.pe_condiff(s,:).*highPU.*pe_trial(preds.con_diff < 0.033) + coeffs.pe(s,:).*pe_trial(preds.con_diff < 0.033) + coeffs.con_diff(s,:).*highPU);
-    posterior.lowPU(s,:) = nanmean(coeffs.pe_condiff(s,:).*lowPU.*pe_trial(preds.con_diff > 0.066) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.066) + coeffs.con_diff(s,:).*lowPU);
+    posterior.midPU(s,:) = mean(coeffs.pe_condiff(s,:).*midPU.*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.con_diff(s,:).*midPU);
+    posterior.highPU(s,:) = mean(coeffs.pe_condiff(s,:).*highPU.*pe_trial(preds.con_diff < 0.033) + coeffs.pe(s,:).*pe_trial(preds.con_diff < 0.033) + coeffs.con_diff(s,:).*highPU);
+    posterior.lowPU(s,:) = mean(coeffs.pe_condiff(s,:).*lowPU.*pe_trial(preds.con_diff > 0.066) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.066) + coeffs.con_diff(s,:).*lowPU);
 end
 
 % SAVE

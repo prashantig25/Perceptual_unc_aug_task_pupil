@@ -38,13 +38,13 @@ for b = 1:nbins
         bins_subj = bins(run_id == id_subjs(n));
         y_data_subj = y_data(run_id == id_subjs(n));
         binned_data_subj = binned_data(run_id == id_subjs(n));
-        avg_behv_bins(b,n) = nanmean(binned_data_subj(bins_subj == b));
-        avg_ydata_bins(b,n) = nanmean(y_data_subj(bins_subj == b));
+        avg_behv_bins(b,n) = mean(binned_data_subj(bins_subj == b));
+        avg_ydata_bins(b,n) = mean(y_data_subj(bins_subj == b));
     end
 end
-avg_ydata = nanmean(avg_ydata_bins,2);
-avg_binneddata = nanmean(avg_behv_bins,2);
-sem_ydata = nanstd(avg_ydata_bins,0,2)./sqrt(num_subjs);
+avg_ydata = mean(avg_ydata_bins,2);
+avg_binneddata = mean(avg_behv_bins,2);
+sem_ydata = std(avg_ydata_bins,0,2)./sqrt(num_subjs);
 y = [avg_ydata_bins(1,:).';avg_ydata_bins(2,:).'];
 set(gca,'color','none','FontName',font_name,'FontSize',font_size,'YLim',[0,0.5], ...
     'LineWidth',linewidth_axes,'YTick',[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1], ...
