@@ -95,6 +95,6 @@ preprocessing_fun(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
     save_dirASC, using_DAT, noFiltering, linearInt)
 
 preproc_dir = save_dir_alt;
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added saccade correction and urai params PG');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', filesep, 'preprocessed trials and events added PG inconsistency check new');
 add_eventstrials;
 disp('===== PREPROCESSING COMPLETE =====');
