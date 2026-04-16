@@ -1,8 +1,8 @@
 classdef lr_analysis_obj < lr_vars
 % LR_ANALYSIS_OBJ fits a linear regression model to single trial updates.
+
     methods
         function obj = lr_analysis_obj()
-            
             % The contructor methods initialises all other properties of
             % the class that are computed based on exisitng static properties of
             % the class.
@@ -11,9 +11,9 @@ classdef lr_analysis_obj < lr_vars
         end
 
         function compute_numvars(obj)
-
             % function compute_numvars computes the number of variables in
             % the model definition.
+            %
             % INPUT:
             %   obj: current object
 
@@ -28,7 +28,6 @@ classdef lr_analysis_obj < lr_vars
         end
 
         function model_definition(obj)
-
             % function model_definition defines the regression model
             % equation for the desired analysis.
             %
@@ -57,7 +56,6 @@ classdef lr_analysis_obj < lr_vars
         end
 
         function [betas,rsquared,residuals,coeffs_name,lm,loglikelihood,SSE] = linear_fit(obj,tbl,fit_fn,varargin)
-            
             % function linear_fit fits a linear regression model to the updates as a
             % function of prediction error and other task based computational
             % variables.
@@ -104,8 +102,7 @@ classdef lr_analysis_obj < lr_vars
             coeffs_name = lm.CoefficientNames;
         end
 
-        function [betas_all,rsquared_full,residuals_all,coeffs_name,posterior_all,loglikelihood_full,SSE_full] = get_coeffs(obj,fit_fn)
-            
+        function [betas_all,rsquared_full,residuals_all,coeffs_name,posterior_all,loglikelihood_full,SSE_full] = get_coeffs(obj,fit_fn)  
             % function get_coeffs fits the linear regression model by running non-weighted
             % and weighted regressions to get the beta coefficients across
             % subjects

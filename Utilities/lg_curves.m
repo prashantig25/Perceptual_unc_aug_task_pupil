@@ -1,6 +1,5 @@
 function lg_curves(x,mean_curves,sem_curves,colors_name,legend_names,title_name, ...
     xlabelname,ylabelname,fontsize,linewidth,fontname)
-
     % function lg_curves plots mean of data across participants, across trials in a block.
     %
     % INPUTS:

@@ -1,39 +1,51 @@
 classdef PupilRegression_intHet < pupilReg_Vars
 
     properties
-        betas_struct
-        perm_results
-        residuals_all
-        predicted_all
+        % Results storage (inherited from original PupilRegression)
+        betas_struct        % structure containing regression beta coefficients
+        perm_results        % permutation test results
+        residuals_all       % model residuals for all subjects
+        predicted_all       % model-predicted pupil responses for all subjects
         % aic_values
         % bic_values
         % logL_values
         % rsquaredOrdinary
         % rsquaredAdjusted
-        starting_points
+        starting_points     % [n_subj x col x n_sp x num_params], pre-generated
 
         % Heteroskedastic model properties
-        model_type
-        n_sp
-        minBound
-        maxBound
-        lb
-        ub
-        fmincon_options
-        negLL_values
+        model_type          % 'OLS' (default) or 'heteroskedastic'
+        n_sp                % number of random starting points for fmincon
+        minBound            % lower edge for uniform random start sampling
+        maxBound            % upper edge for uniform random start sampling
+        lb                  % hard lower bounds for fmincon
+        ub                  % hard upper bounds for fmincon
+        fmincon_options     % optimoptions object for fmincon
+        negLL_values        % negative log-likelihood values (heteroskedastic model only)
 
         % ── Progress-bar bookkeeping ──────────────────────────────────────
         wb                % waitbar handle
         total_steps       % total increments expected
         completed_steps   % running counter (main thread only)
+        
+        % Default handle to the external function
+        % This allows obj.ExternalFitFcn(data) to work like a normal call
+        externalFitFcn = @linear_fit
+        saveFcn = @safe_saveall;
     end
 
     methods
 
-        %% ----------------------------------------------------------------
-        %  CONSTRUCTOR
-        %% ----------------------------------------------------------------
         function obj = PupilRegression_intHet(config)
+            % Constructor - Creates a new PupilRegression instance
+            % Can optionally accept a configuration object to initialize parameters
+            %
+            % Parameters:
+            %   config - (optional) PupilRegressionConfig object with analysis parameters
+            %
+            % Returns:
+            %   obj - PupilRegression object ready for analysis
+
             obj = obj@pupilReg_Vars();
 
             if nargin > 0 && isa(config, 'PupilRegressionConfig')
@@ -48,10 +60,13 @@ classdef PupilRegression_intHet < pupilReg_Vars
             obj.completed_steps = 0;
         end
 
-        %% ----------------------------------------------------------------
-        %  COPY CONFIG
-        %% ----------------------------------------------------------------
         function copyFromConfig(obj, config)
+            % Copy properties from another configuration object
+            % Transfers all matching properties from config object to this instance
+            %
+            % Parameters:
+            %   config - Source configuration object containing analysis parameters
+            
             props = properties(config);
             for i = 1:length(props)
                 if isprop(obj, props{i})
@@ -129,10 +144,17 @@ classdef PupilRegression_intHet < pupilReg_Vars
         %  RUN ANALYSIS
         %% ----------------------------------------------------------------
         function runAnalysis(obj)
-
+            % Main method to run the complete pupil regression analysis pipeline
+            % Processes all subjects, fits regression models, and runs permutation tests
+            %
+            % Returns:
+            %   betas_struct - Structure containing regression coefficients for all subjects
+            %   perm - Permutation test results with statistical significance
+            
+            % Validate configuration before starting analysis
             obj.validateConfig();
 
-            % ── Resolve bin count ──────────────────────────────────────
+            % Choose number of bins
             if obj.binned == 1
                 num_bins = length(obj.bins_array);
             elseif obj.binned_accuracy == 1
@@ -140,17 +162,21 @@ classdef PupilRegression_intHet < pupilReg_Vars
             else
                 num_bins = 1;
             end
-
-            % ── Pre-allocate outputs ───────────────────────────────────
+            
+            % Initialize variables depending on model
+            % todo: why are these only initialized for the het model?
             if strcmp(obj.model_type, 'heteroskedastic')
                 obj.betas_struct.with_intercept = nan(num_bins, obj.num_vars+1, obj.num_subs, obj.col);
                 obj.negLL_values = nan(num_bins, obj.num_subs, obj.col);
                 % obj.aic_values   = nan(num_bins, obj.num_subs, obj.col);
                 % obj.bic_values   = nan(num_bins, obj.num_subs, obj.col);
             else
+                % todo: preallocate R2 etc.
                 obj.betas_struct.with_intercept = nan(num_bins, obj.num_vars+1, obj.num_subs, obj.col);
             end
-
+            
+            % Initialize output variables
+            % todo: unnecessary?
             obj.residuals_all = cell(obj.num_subs, 1);
             obj.predicted_all = cell(obj.num_subs, 1);
 
@@ -166,7 +192,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 obj.processSubject(i, obj.binned);
             end
 
-            % ── Permutation test (OLS only) ────────────────────────────
+            % Permutation test only meaningful for OLS betas
+            % Todo: not true, we also need it for het model
             if strcmp(obj.model_type, 'OLS')
                 obj.updateProgress('Running permutation test…');
                 % obj.runPermutationTest();
@@ -201,112 +228,189 @@ classdef PupilRegression_intHet < pupilReg_Vars
             % betas_struct = obj.betas_struct;
             % perm         = obj.perm_results;
         end
-
-        %% ----------------------------------------------------------------
-        %  PROCESS SUBJECT
-        %% ----------------------------------------------------------------
         function processSubject(obj, subj_idx, binnedAnalysis)
+            % Process a single subject through the complete analysis pipeline
+            % Loads data, handles missing trials, applies preprocessing, and fits models
+            % Parameters:
+            %
+            %   subj_idx - Index of subject to process (1 to num_subs)
+            %   binnedAnalysis - Boolean indicating whether we run binned
+            %       or regular analysis 
+            %
+            
 
             obj.updateProgress(sprintf('[%d/%d] Loading %s…', ...
                 subj_idx, obj.num_subs, obj.subj_ids{subj_idx}));
-
+                
+            % Load and preprocess behavioral data
             behv_data = obj.loadBehavioralData(subj_idx);
-            [behv_data, missedtrials_slider] = obj.handleMissedTrials(behv_data);
-            [zsc_pupil, xgaze_signal, ygaze_signal] = obj.loadPupilGazeData(subj_idx, missedtrials_slider);
 
+            % Handle missed trials (remove NaN responses)
+            [behv_data, missedtrials_slider] = obj.handleMissedTrials(behv_data);
+            
+            % Load pupil diameter and eye gaze data
+            [zsc_pupil, xgaze_signal, ygaze_signal] = obj.loadPupilGazeData(subj_idx, missedtrials_slider);
+            
+            % Regress out reaction time effects if requested
             if obj.regress_rt == 1
                 zsc_pupil = obj.regressRTEffects(zsc_pupil, behv_data);
             end
 
+            % Load baseline pupil data if needed for model
             zsc_base = obj.loadBaselineData(subj_idx);
 
+            % Extract behavioral predictors and align with pupil data
             [preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base] = ...
                 obj.getBehavioralPredictors(subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, missedtrials_slider);
 
+            % Apply binning to continuous variables if requested
             if obj.binned == 1
                 preds.bin_columns = discretize(preds.con_diff, obj.bins);
             end
 
+            % Process data through bins and timepoints to fit regression models
             obj.processBinsAndTimepoints(preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis);
 
             % residuals_subj = [];
             % predicted_subj = [];
         end
 
-        %% ----------------------------------------------------------------
-        %  LOAD BEHAVIORAL DATA
-        %% ----------------------------------------------------------------
         function behv_data = loadBehavioralData(obj, subj_idx)
+            % Load behavioral data from Excel files for a specific subject
+            % Concatenates data across multiple experimental sessions
+            %
+            % Parameters:
+            %   subj_idx - Index of subject to load data for
+            %
+            % Returns:
+            %   behv_data - Table containing all behavioral data for the subject
 
             behv_data = [];
+
+            % Loop through all sessions for this subject
             for j = 1:obj.num_sess(subj_idx)
+
+                % Construct filename (special case for subject 4672)
                 filename = fullfile(obj.behv_dir, [obj.subj_ids{subj_idx}, '_main', num2str(j), '.xlsx']);
                 if strcmp(obj.subj_ids{subj_idx}, '4672')
                     filename = fullfile(obj.behv_dir, [obj.subj_ids{subj_idx}, '_main', num2str(j), '_red.xlsx']);
                 end
+
+                % Load session data and extract relevant columns
+                % data_run = readtable(filename);
                 data_run = readtable(filename, 'VariableNamingRule', 'preserve');
-                rt        = table(data_run.("choice.rt"),                   'VariableNames', {'rt'});
-                slider    = table(data_run.("slider_respond.response"),     'VariableNames', {'slider'});
-                data_run  = [data_run(:, 1:16), rt, slider];
+                % rt       = table(data_run.choice_rt, 'VariableNames', {'rt'});
+                rt = table(data_run.('choice.rt'), 'VariableNames', {'rt'});
+                % slider   = table(data_run.slider_respond_response, 'VariableNames', {'slider'});
+                slider = table(data_run.('slider_respond.response'), 'VariableNames', {'slider'});
+                data_run = [data_run(:, 1:16), rt, slider];
+                
+                % Concatenate with previous sessions
                 behv_data = [behv_data; data_run];
             end
         end
 
-        %% ----------------------------------------------------------------
-        %  HANDLE MISSED TRIALS
-        %% ----------------------------------------------------------------
         function [behv_data, missedtrials_slider] = handleMissedTrials(obj, behv_data)
-            missedtrials_rt     = isnan(behv_data.rt);
-            behvdata_missedRT   = behv_data(missedtrials_rt == 0, :);
+            % Identify and remove trials with missing behavioral responses
+            % Creates indices for trials with missing RT or slider responses
+            %
+            % Parameters:
+            %   behv_data - Raw behavioral data table
+            %
+            % Returns:
+            %   behv_data - Behavioral data with missed trials removed
+            %   missedtrials - Logical index of all missed trials (RT or slider)
+            %   missedtrials_slider - Logical index of missed slider responses only
+            
+            % Identify missed reaction time trials
+            missedtrials_rt = isnan(behv_data.rt);
+            behvdata_missedRT = behv_data(missedtrials_rt == 0, :);
+            
+            % Identify missed slider response trials
             missedtrials_slider = isnan(behvdata_missedRT.slider);
-            missedtrials        = isnan(behv_data.rt) | isnan(behv_data.slider);
+            
+            % Create combined index of all missed trials
+            missedtrials = isnan(behv_data.rt) | isnan(behv_data.slider);
+            
+            % Remove all missed trials from behavioral data
             behv_data(missedtrials == 1, :) = [];
+
         end
 
-        %% ----------------------------------------------------------------
-        %  LOAD PUPIL / GAZE DATA
-        %% ----------------------------------------------------------------
         function [zsc_pupil, xgaze_signal, ygaze_signal] = loadPupilGazeData(obj, subj_idx, missedtrials_slider)
+            % Load pupil diameter and eye gaze position data
+            % Extracts relevant time window and removes trials with missing behavioral data
+            %
+            % Parameters:
+            %   subj_idx - Index of subject to load data for
+            %   missedtrials_slider - Logical index of missed slider trials
+            %
+            % Returns:
+            %   zsc_pupil - Z-scored pupil diameter time series
+            %   xgaze_signal - Horizontal eye gaze position time series  
+            %   ygaze_signal - Vertical eye gaze position time series
 
+            % Load pupil diameter data
             filename   = fullfile(obj.pupil_dir, [obj.subj_ids{subj_idx}, '.mat']);
             pupil      = importdata(filename);
             size_pupil = size(pupil);
 
-            filename    = fullfile(obj.xgaze_dir, [obj.subj_ids{subj_idx}, '.mat']);
-            xgaze_event = importdata(filename);
+            % Load horizontal gaze data
+            filename     = fullfile(obj.xgaze_dir, [obj.subj_ids{subj_idx}, '.mat']);
+            xgaze_event  = importdata(filename);
 
-            filename    = fullfile(obj.ygaze_dir, [obj.subj_ids{subj_idx}, '.mat']);
-            ygaze_event = importdata(filename);
+            % Load vertical gaze data
+            filename     = fullfile(obj.ygaze_dir, [obj.subj_ids{subj_idx}, '.mat']);
+            ygaze_event  = importdata(filename);
 
+            % Extract relevant time window based on analysis timewindow
             if strcmp(obj.timewindow, 'patch')
-                zsc_pupil    = pupil;
-                xgaze_signal = xgaze_event;
-                ygaze_signal = ygaze_event;
-                obj.col      = size_pupil(2);
+                % Use entire signal for patch-locked analysis
+                zsc_pupil     = pupil;
+                xgaze_signal  = xgaze_event;
+                ygaze_signal  = ygaze_event;
+                obj.col       = size_pupil(2);
             elseif strcmp(obj.timewindow, 'feedback')
-                zsc_pupil    = pupil(:, 1:obj.col);
-                xgaze_signal = xgaze_event(:, 1:obj.col);
-                ygaze_signal = ygaze_event(:, 1:obj.col);
+                % Use first 'col' timepoints for feedback-locked analysis
+                zsc_pupil     = pupil(:, 1:obj.col);
+                xgaze_signal  = xgaze_event(:, 1:obj.col);
+                ygaze_signal  = ygaze_event(:, 1:obj.col);
             end
 
-            zsc_pupil(missedtrials_slider == 1, :)    = [];
+            % Remove trials with missing behavioral responses
+            zsc_pupil(missedtrials_slider == 1, :) = [];
             xgaze_signal(missedtrials_slider == 1, :) = [];
             ygaze_signal(missedtrials_slider == 1, :) = [];
         end
 
-        %% ----------------------------------------------------------------
-        %  REGRESS RT EFFECTS
-        %% ----------------------------------------------------------------
         function zsc_pupil = regressRTEffects(obj, zsc_pupil, behv_data)
+            % Remove reaction time effects from pupil signal
+            % Regresses out log RT from each timepoint to isolate non-RT related variance
+            %
+            % Parameters:
+            %   zsc_pupil - Original pupil signal matrix (trials x timepoints)
+            %   behv_data - Behavioral data containing reaction times
+            %
+            % Returns:
+            %   zsc_pupil - Pupil signal with RT effects removed
+
+            % Apply RT regression to each timepoint
             for c = 1:obj.col
                 zsc_pupil(:, c) = remove_rt_effects(zsc_pupil(:, c), log(behv_data.rt));
             end
         end
 
-        %% ----------------------------------------------------------------
-        %  LOAD BASELINE DATA
-        %% ----------------------------------------------------------------
         function zsc_base = loadBaselineData(obj, subj_idx)
+            % Load baseline pupil measurements if required by the model
+            % Baseline data is used as a covariate to control for individual differences
+            %
+            % Parameters:
+            %   subj_idx - Index of subject to load baseline data for
+            %   missedtrials_slider - Logical index of trials to exclude
+            %
+            % Returns:
+            %   zsc_base - Baseline pupil measurements, or empty if not needed
+
             zsc_base = [];
             if obj.baseline_mdl == 1
                 filename = fullfile(obj.base_dir, [obj.subj_ids{subj_idx}, '.mat']);
@@ -314,30 +418,63 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-        %% ----------------------------------------------------------------
-        %  GET BEHAVIORAL PREDICTORS
-        %% ----------------------------------------------------------------
-        function [preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base] = ...
-                getBehavioralPredictors(obj, subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, missedtrials_slider)
+        function [preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base] = getBehavioralPredictors(obj, subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, missedtrials_slider)
+            % Extract behavioral predictors and align with physiological data
+            % Removes trials with zero prediction errors and aligns data matrices
+            %
+            % Parameters:
+            %   subj_idx - Index of current subject
+            %   zsc_pupil - Pupil diameter data
+            %   xgaze_signal - Horizontal gaze data
+            %   ygaze_signal - Vertical gaze data  
+            %   behv_data - Behavioral data
+            %   zsc_base - Baseline data (if applicable)
+            %
+            % Returns:
+            %   preds - Table of behavioral predictors for regression
+            %   zsc_pupil - Aligned pupil data
+            %   xgaze_signal - Aligned horizontal gaze data
+            %   ygaze_signal - Aligned vertical gaze data
+            %   behv_data - Aligned behavioral data
+            %   zsc_base - Aligned baseline data
 
-            preds        = obj.preds_all(obj.preds_all.id == str2double(obj.subj_ids{subj_idx}), :);
-            validIndices = find(preds.pe == 0);
+            % fprintf('Get predictors from behavioural data...\n');
 
-            preds(validIndices, :)        = [];
-            zsc_pupil(validIndices, :)    = [];
+            % Extract predictors for current subject
+            preds = obj.preds_all(obj.preds_all.id == str2double(obj.subj_ids{subj_idx}), :);
+            
+            % Remove trials with zero prediction error 
+            % (not useful for regression since predicted UP would be 0 as well)
+            validIndices = find(preds.pe == 0); % todo: just rename since the identified number is the zero PE, not the valide ones
+            preds(validIndices, :) = [];
+            zsc_pupil(validIndices, :) = [];
             xgaze_signal(validIndices, :) = [];
             ygaze_signal(validIndices, :) = [];
-            behv_data(validIndices, :)    = [];
+            behv_data(validIndices, :) = [];
 
+            % Remove corresponding baseline trials if applicable
             if obj.baseline_mdl == 1
                 zsc_base(validIndices, :) = [];
             end
         end
 
-        %% ----------------------------------------------------------------
-        %  PROCESS BINS AND TIMEPOINTS
-        %% ----------------------------------------------------------------
         function processBinsAndTimepoints(obj, preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base, subj_idx, binnedAnalysis)
+            % Process data through bins and timepoints to fit regression models
+            % Handles binned analysis and fits models at each timepoint
+            %
+            % Parameters:
+            %   preds - Behavioral predictors table
+            %   zsc_pupil - Pupil diameter data
+            %   xgaze_signal - Horizontal gaze data
+            %   ygaze_signal - Vertical gaze data
+            %   behv_data - Behavioral data
+            %   zsc_base - Baseline data
+            %   subj_idx - Current subject index
+            %   binnedAnalysis - Boolean indicating whether we run binned
+            %       or regular analysis 
+           
+             
+            % Loop through bins (or single bin if not binned analysis)
 
             numBins  = length(obj.bins_array);
 
@@ -356,7 +493,10 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     ygaze_signal_bins  = ygaze_signal;
                     preds_bins         = preds;
                 end
-
+                
+                % todo: once AIC, BIC etc figured out, both cases should be
+                % similar. That is, store negLL etc in the fitHet function
+                % already, not here. Like for the OLS case.
                 if strcmp(obj.model_type, 'heteroskedastic')
                     %% ── HETEROSKEDASTIC PATH ──────────────────────────
                     obj.updateProgress(sprintf('%s | Het model…', binLabel));
@@ -364,7 +504,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
                         pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, subj_idx);
 
                 else
-                    %% ── OLS PATH ──────────────────────────────────────
+                    
+                    % Fit model at each timepoint
                     for c = 1:obj.col
                         obj.updateProgress(sprintf('%s | t %d/%d', binLabel, c, obj.col));
                         obj.fitModelAtTimepoint(c, ...
@@ -374,40 +515,72 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-        %% ----------------------------------------------------------------
-        %  GET BINNED DATA
-        %% ----------------------------------------------------------------
         function [pupil_bins, xgaze_bins, ygaze_bins, preds_bins] = getBinnedData(obj, r, preds, zsc_pupil, xgaze_signal, ygaze_signal)
+            % Extract data for a specific bin or condition
+            % Supports binning by continuous variables or accuracy-based splitting
+            %
+            % Parameters:
+            %   r - Current bin index
+            %   preds - Behavioral predictors
+            %   zsc_pupil - Pupil data
+            %   xgaze_signal - Horizontal gaze data
+            %   ygaze_signal - Vertical gaze data
+            %   behv_data - Behavioral data
+            %
+            % Returns:
+            %   pupil_bins - Pupil data for current bin
+            %   xgaze_bins - Horizontal gaze data for current bin  
+            %   ygaze_bins - Vertical gaze data for current bin
+            %   behv_bins - Behavioral data for current bin
+            %   preds_bins - Predictors for current bin
 
+            % Determine which trials belong to current bin
             if obj.binned == 1
+                % Use discretized continuous variable bins
                 idx = preds.bin_columns == r;
             elseif obj.binned_accuracy == 1
+                % Use accuracy-based binning
                 idx = preds.correct == r;
             else
+                % Use all trials (no binning)
                 idx = true(height(preds), 1);
             end
 
+            % Extract data for current bin
             pupil_bins  = zsc_pupil(idx, :);
             xgaze_bins  = xgaze_signal(idx, :);
             ygaze_bins  = ygaze_signal(idx, :);
             preds_bins  = preds(idx, :);
         end
 
-        %% ----------------------------------------------------------------
-        %  FIT OLS MODEL AT TIMEPOINT
-        %% ----------------------------------------------------------------
         function fitModelAtTimepoint(obj, c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx)
+            % Fit regression model at a specific timepoint
+            % Creates predictor matrix and fits linear model to pupil data
+            %
+            % Parameters:
+            %   c - Current timepoint index
+            %   pupil_signal_bins - Pupil data for current bin
+            %   xgaze_signal_bins - Horizontal gaze data for current bin
+            %   ygaze_signal_bins - Vertical gaze data for current bin
+            %   preds_bins - Predictors for current bin
+            %   zsc_base - Baseline data
+            %   r - Current bin index
+            %   subj_idx - Current subject index
 
-            y         = pupil_signal_bins(:, c);
+            % Extract dependent variable (pupil diameter at timepoint c)
+            y = pupil_signal_bins(:, c);
+            
+            % Z-score gaze signals
             zsc_xgaze = zscore(xgaze_signal_bins(:, c));
             zsc_ygaze = zscore(ygaze_signal_bins(:, c));
 
-            validIdx    = ~isnan(y) & ~isnan(preds_bins.up);
-            yValid      = y(validIdx);
-            xgazeValid  = zsc_xgaze(validIdx);
-            ygazeValid  = zsc_ygaze(validIdx);
+            % Extract valid data
+            yValid = y(validIdx);
+            xgazeValid = zsc_xgaze(validIdx);
+            ygazeValid = zsc_ygaze(validIdx);
             preds_valid = preds_bins(validIdx, :);
 
+            % Create regression table with all predictors
             tbl = table(yValid, xgazeValid, ygazeValid, ...
                 zscore(preds_valid.con_diff), zscore(preds_valid.pe), ...
                 zscore(abs(preds_valid.pe)), zscore(abs(preds_valid.up)), ...
@@ -420,13 +593,19 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 tbl.baseline = zsc_base(validIdx);
             end
 
-            [betas, ~, ~, ~, lm] = linear_fit(tbl, obj.model_def, ...
+            % Fit linear regression model
+            % [betas, ~, ~, ~, lm] = linear_fit(tbl, obj.model_def, ...
+            %     obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0, 0, 0, 0);
+            
+            [betas, ~, ~, ~, lm] = obj.externalFitFcn(tbl, obj.model_def, ...
                 obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0, 0, 0, 0);
 
-            % Save coefficient names once
+            % Save coefficient names from first subject, first timepoint
+            % todo: not yet tested 
             if subj_idx == 1 && c == 1
                 coeff_names = lm.CoefficientNames;
-                safe_saveall(fullfile(obj.save_dir, [obj.betas_save, '_coeffNames.mat']), coeff_names);
+                obj.saveFcn(fullfile(obj.save_dir, [obj.betas_save, '_coeffNames.mat']), coeff_names);
+                fprintf('Saved coefficient names');
             end
 
             if ~isempty(lm)
@@ -455,7 +634,13 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 % obj.bic_values(storage_r_idx,  subj_idx, c) = bic;
                 % obj.logL_values(storage_r_idx, subj_idx, c) = logL;
             end
+            
+            % Generate model predictions 
+            % todo: I think this needs to be changed for testing
+            % predicted = predict(lm, tbl);
+            predicted = lm.predict(tbl);  % todo: seems to be unused now - can we remove?
 
+            % Store beta coefficients in results structure
             if obj.binned_accuracy == 1
                 obj.betas_struct.with_intercept(r+1, :, subj_idx, c) = betas;
             else
@@ -533,7 +718,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 ygaze = ygaze_z(:, c);
 
                 negLLfun = @(params) PupilRegression_intHet.negativeLogLikelihood( ...
-                    params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); %#ok<PFBNS>
+                    params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); % todo: check this!! %#ok<PFBNS>
 
                 bestNegLL  = inf;
                 bestParams = nan(1, num_params);
@@ -563,16 +748,18 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-        %% ----------------------------------------------------------------
-        %  PERMUTATION TEST
-        %% ----------------------------------------------------------------
-        % function runPermutationTest(obj)
-        %     num_vars = 1:obj.num_vars+1;
-        %     var1     = obj.betas_struct.with_intercept;
-        %     var2     = obj.betas_struct.with_intercept;
-        %     betas    = 1;
-        %     obj.perm_results = get_permtest(num_vars, obj.num_subs, obj.col, var1, var2, obj.two_tailed, betas);
-        % end
+        function runPermutationTest(obj)
+            % Run permutation test for statistical significance testing
+            % Tests significance of regression coefficients across subjects and timepoints
+            
+            num_vars = 1:obj.num_vars+1;
+            var1     = obj.betas_struct.with_intercept;
+            var2     = obj.betas_struct.with_intercept;
+            betas    = 1;
+
+            % Run permutation test using external function
+            obj.perm_results = get_permtest(num_vars, obj.num_subs, obj.col, var1, var2, obj.two_tailed, betas);
+        end
 
         %% ----------------------------------------------------------------
         %  SAVE RESULTS
@@ -592,11 +779,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-    end % methods
+    end
 
-    %% --------------------------------------------------------------------
-    %  STATIC METHODS
-    %% --------------------------------------------------------------------
     methods (Static)
 
         function nLL = negativeLogLikelihood(params, x1, x2, y, x3, x4, x5, x6)
@@ -612,6 +796,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
             nLL   = -sum(logL);
         end
 
-    end % static methods
+    end
 
 end

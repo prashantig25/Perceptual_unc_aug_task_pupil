@@ -1,3 +1,6 @@
+% Todo: integrate into the respective figs to avoid accidentally loading
+% the wrong files?
+
 clc
 clearvars
 % USER-BASED PATH
@@ -35,7 +38,7 @@ results = [results; table({'peCondiff_fig4'}, round(min(perm.prob(peCondiff_idx,
 
 %% figure 5 MS
 
-data_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
+data_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
 perm = importdata(fullfile(data_dir,"perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
 coeffs_name = importdata(fullfile(data_dir,"coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % import coeff names
 

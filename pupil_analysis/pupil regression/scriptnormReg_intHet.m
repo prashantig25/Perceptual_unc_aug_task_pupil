@@ -1,6 +1,8 @@
 clc
 clearvars
 
+% TODO: find out where .mat file without name is saved...
+
 %% =======================================================================
 %                            SETUP COMMON PARAMETERS
 % =======================================================================
@@ -25,7 +27,7 @@ ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pup
 base_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'baseline before fb');
 
 preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
-preds_all  = readtable(preds_file);
+preds_all = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 %% ANALYSIS 1: MAIN MODEL (Figure 4)
@@ -438,7 +440,7 @@ reg.setSubjects(subj_ids, num_sess);
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb linearInt');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
-save_dir  = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 reg.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
 
@@ -478,7 +480,7 @@ reg.setSubjects(subj_ids, num_sess);
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb cubic spline new');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
-save_dir  = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 reg.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
 

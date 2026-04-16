@@ -1,5 +1,6 @@
 % fullTrial saves pupil signal from different events for the entire trial.
 
+% todo: currently no file found
 clc
 clearvars
 
@@ -29,6 +30,10 @@ fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',fi
 patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int'); % directory to get preprocessed data
 resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int'); % directory to get preprocessed data
 mkdir(save_dir);
+
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
 % LOOP OVER SUBJECTS
 for i = 1:num_subjs
