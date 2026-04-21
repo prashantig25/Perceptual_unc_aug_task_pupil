@@ -1,6 +1,5 @@
 function [betas,rsquared,residuals,coeffs_name,lm,SSE] = linear_fit(tbl,mdl,pred_vars,resp_var, ...
     cat_vars,num_vars,weight_y_n,varargin)
-    
     % function linear_fit fits a linear regression model to the updates as a
     % function of prediction error and other task based computational
     % variables.

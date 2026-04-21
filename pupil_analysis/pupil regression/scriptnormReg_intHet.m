@@ -40,7 +40,11 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
-mkdir(save_dir);
+
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
 reg.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
 
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + pe:zsc_condiff + rt + zsc_condiff';
@@ -248,7 +252,9 @@ reg3.preds_all           = preds_all;
 reg3.residuals_predicted = 0;
 reg3.setFileNames('pe_condiff3bins_linearInt', '', '', '');
 reg3.runAnalysis();
-reg3.saveResults();
+
+% Todo: not working
+%reg3.saveResults();
 
 %% 5 BINS
 reg5 = PupilRegression_intHet();
@@ -268,7 +274,9 @@ reg5.preds_all           = preds_all;
 reg5.residuals_predicted = 0;
 reg5.setFileNames('pe_condiff5bins_linearInt', '', '', '');
 reg5.runAnalysis();
-reg5.saveResults();
+
+% Todo: not working
+% reg5.saveResults();
 
 %%
 %%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%

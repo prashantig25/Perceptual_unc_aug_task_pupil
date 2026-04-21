@@ -13,11 +13,9 @@ classdef unit_tests < matlab.mock.TestCase
 
     % Further notes
 
-    % Separate tests for AIC/BIC functions (or getting rid of them)
-    %
     % Don't forget to test linear_fit directly
-    %
-    % Same for functions doing permutation test like test get_permtest
+    % Same for functions doing permutation test like test
+    % get_permtest_updated
     %
     % Finally, we should have integration test with small simulated data set at
     % least for the regression part to test binning and basic regression
@@ -42,11 +40,6 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.verifyEqual(analyzer.predicted_all, [])
 
             % Model comparison and heteroskedastic model
-            testCase.verifyEqual(analyzer.aic_values, [])
-            testCase.verifyEqual(analyzer.bic_values, [])
-            testCase.verifyEqual(analyzer.logL_values, [])
-            testCase.verifyEqual(analyzer.rsquaredOrdinary, [])
-            testCase.verifyEqual(analyzer.rsquaredAdjusted, [])
             testCase.verifyEqual(analyzer.starting_points, [])
             testCase.verifyEqual(analyzer.model_type, 'OLS')
             testCase.verifyEqual(analyzer.n_sp, 20)
@@ -193,27 +186,14 @@ classdef unit_tests < matlab.mock.TestCase
         function testRunAnalysisOLS(testCase)
             % Tests the runAnalysis function with OLS appraoch.
 
-            % Import mocking methods
-            import matlab.mock.actions.Invoke
-
-            % Create mock with which we mock out runPermuationTest
-            % and processSubject. The rest remains consistent with
-            % original function. We use the TestPupilRegression helper
-            % class with mock processSubject function
-            [mockAnalyzer, behavior] = testCase.createMock( ...
-                ?TestPupilRegression, ...
-                "MockedMethods", "runPermutationTest");
-
-            % Define output behavior of mocked runPermutationTest function
-            when( ...
-                withAnyInputs(behavior.runPermutationTest), ...
-                Invoke(@(~) assignSignificance(mockAnalyzer)) ...
-                );
-
-            % Create helper function for permutation-test output
-            function assignSignificance(obj)
-                obj.perm_results = struct('p_value', 0.01);
-            end
+            % Mock PupilRegression
+            [mockAnalyzer, ~] = testCase.createMock(?TestPupilRegression);
+        
+            % Mock permutation test results
+            mockResults = struct('p_value', 0.01);
+        
+            % Overwrite the internal function with the mock function
+            mockAnalyzer.permtestFcn = @(n_vars, n_subs, col, v1) mockResults;
 
             % Set attributes for test case
             mockAnalyzer.col = 1;
@@ -224,9 +204,8 @@ classdef unit_tests < matlab.mock.TestCase
             mockAnalyzer.num_vars = 2;
             mockAnalyzer.num_subs = 3;
 
-            % obj.betas_struct.with_intercept is filled in function
-            % processSubject. Therefore also sequentially fill this when mocking.
-            [betas, perm] = mockAnalyzer.runAnalysis();
+            % Call function
+            mockAnalyzer.runAnalysis();
 
             % Expected output
             num_bins = 1;
@@ -235,8 +214,7 @@ classdef unit_tests < matlab.mock.TestCase
             expected_betas(:,:,2) = 2;
             expected_betas(:,:,3) = 3;
 
-            testCase.verifyEqual(perm.p_value, 0.01)
-            testCase.verifyEqual(betas.with_intercept, expected_betas)
+            testCase.verifyEqual(mockAnalyzer.perm_results.p_value, 0.01)
             testCase.verifyEqual(mockAnalyzer.betas_struct.with_intercept, expected_betas)
 
         end
@@ -245,28 +223,15 @@ classdef unit_tests < matlab.mock.TestCase
         function testRunAnalysisHet(testCase)
             % Tests the runAnalysis function with regression accounting for
             % heteroskedasticity.
-
-            % Import mocking methods
-            import matlab.mock.actions.Invoke
-
-            % Create mock with which we mock out runPermuationTest
-            % and processSubject. The rest remains consistent with
-            % original function. We use the TestPupilRegression helper
-            % class with mock processSubject function
-            [mockAnalyzer, behavior] = testCase.createMock( ...
-                ?TestPupilRegression, ...
-                "MockedMethods", "runPermutationTest");
-
-            % Define output behavior of mocked runPermutationTest function
-            when( ...
-                withAnyInputs(behavior.runPermutationTest), ...
-                Invoke(@(~) assignSignificance(mockAnalyzer)) ...
-                );
-
-            % Create helper function for permutation-test output
-            function assignSignificance(obj)
-                obj.perm_results = struct('p_value', 0.01);
-            end
+          
+            % Mock PupilRegression
+            [mockAnalyzer, ~] = testCase.createMock(?TestPupilRegression);
+        
+            % Mock permutation test results
+            mockResults = struct('p_value', 0.01);
+        
+            % Overwrite the internal function with the mock function
+            mockAnalyzer.permtestFcn = @(n_vars, n_subs, col, v1) mockResults;
 
             % Set attributes for test case
             mockAnalyzer.model_type = 'heteroskedastic';
@@ -278,9 +243,10 @@ classdef unit_tests < matlab.mock.TestCase
             mockAnalyzer.num_vars = 2;
             mockAnalyzer.num_subs = 3;
 
-            % obj.betas_struct.with_intercept is filled in function
-            % processSubject. Therefore also sequentially fill this when mocking.
-            [betas, perm] = mockAnalyzer.runAnalysis();
+            % Call function
+            mockAnalyzer.runAnalysis();
+
+            % var1 seems to be undefined in new version
 
             % Expected output
             num_bins = 1;
@@ -292,7 +258,11 @@ classdef unit_tests < matlab.mock.TestCase
             % Todo: Het currently does not compute the p-value within the
             % function, but this should absolutely be done.
             % testCase.verifyEqual(perm.p_value, 0.01)
-            testCase.verifyEqual(betas.with_intercept, expected_betas)
+            %testCase.verifyEqual(betas.with_intercept, expected_betas)
+            % Update --> now p-values should be computed, but need to be
+            % implemented in test!
+
+            % only test currently:
             testCase.verifyEqual(mockAnalyzer.betas_struct.with_intercept, expected_betas)
 
         end
@@ -315,7 +285,7 @@ classdef unit_tests < matlab.mock.TestCase
             testCase.assignOutputsWhen(withAnyInputs(behavior.handleMissedTrials), 1,2,3);
             testCase.assignOutputsWhen(withAnyInputs(behavior.loadPupilGazeData), 1,2,3);
             testCase.assignOutputsWhen(withAnyInputs(behavior.loadBaselineData), 1);
-            testCase.assignOutputsWhen(withAnyInputs(behavior.getBehavioralPredictors), 1,2,3,4,5,6);
+            testCase.assignOutputsWhen(withAnyInputs(behavior.getBehavioralPredictors), 1,2,3,4,6);
             testCase.assignOutputsWhen(withAnyInputs(behavior.processBinsAndTimepoints), 0);
 
             mockPupilRegression.subj_ids = {"001", "002", "003"};
@@ -338,7 +308,6 @@ classdef unit_tests < matlab.mock.TestCase
                 2, ... % zsc_pupil
                 3, ... % xgaze_signal
                 4, ... % ygaze_signal
-                5, ... % behv_data
                 6, ... % zsc_base
                 1, ... % subj_idx
                 1));   % binnedAnalysiss
@@ -511,9 +480,6 @@ classdef unit_tests < matlab.mock.TestCase
             preds_all = table(id, rt, group, slider, pe,...
                 'VariableNames', {'id', 'rt', 'group', 'slider', 'pe'});
 
-            % For simplicity, take the same for behv_data
-            behv_data = preds_all;
-
             % Create other input variables; nothing removed yet
             zsc_pupil = zeros(5, 5);
             xgaze_signal = zeros(5, 5);
@@ -528,15 +494,14 @@ classdef unit_tests < matlab.mock.TestCase
             analyzer.preds_all = preds_all; % defined in config file
             analyzer.subj_ids = {"001"; "002"; "003"; "004"; "005"};
 
-            [preds, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base]...
-                = analyzer.getBehavioralPredictors(subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, behv_data, zsc_base);
+            [preds, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base]...
+                = analyzer.getBehavioralPredictors(subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base);
 
             % We expect 4 rows left (PE = 0)
             verifyTrue(testCase, all(size(preds) == [4,5]));
             verifyTrue(testCase, all(size(zsc_pupil) == [4,5]));
             verifyTrue(testCase, all(size(xgaze_signal) == [4,5]));
             verifyTrue(testCase, all(size(ygaze_signal) == [4,5]));
-            verifyTrue(testCase, all(size(behv_data) == [4,5]));
             testCase.verifyEmpty(zsc_base);
         end
 
@@ -556,10 +521,11 @@ classdef unit_tests < matlab.mock.TestCase
             % Add attributes for testing
             mockPupilRegression.residuals_predicted = 1;
             mockPupilRegression.col = 3;
+            mockPupilRegression.num_subs = 10;
+            mockPupilRegression.subj_ids = repmat({'1'}, 10, 1); ones(10,1);
 
-            % Todo: function has not output anymore. Adjust test
-            % accordingly
-            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 5, 6, 7, true);
+            % Call the function
+            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 6, 7, true);
             
             % Verify input to fitModelAtTimepoint, where regression
             % model is implemented
@@ -589,10 +555,11 @@ classdef unit_tests < matlab.mock.TestCase
             % Add attributes for testing
             mockPupilRegression.residuals_predicted = 1;
             mockPupilRegression.col = 3;
+            mockPupilRegression.num_subs = 10;
+            mockPupilRegression.subj_ids = repmat({'1'}, 10, 1); ones(10,1);
 
-            % Todo: function has not output anymore. Adjust test
-            % accordingly
-            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 5, 6, 7, false);
+            % Call the function
+            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 6, 7, false);
            
             % Verify input to fitModelAtTimepoint, where regression
             % model is implemented
@@ -639,6 +606,7 @@ classdef unit_tests < matlab.mock.TestCase
             verifyTrue(testCase, all(size(ygaze_bins) == size(ygaze_signal)));
             verifyTrue(testCase, all(size(preds_bins) == size(preds)));
         end
+
 
         function testFitModelAtTimepoint(testCase)
             % Test fitModelAtTimepoint function
@@ -719,24 +687,18 @@ classdef unit_tests < matlab.mock.TestCase
             analyzer.num_subs = 1;
             analyzer.col = 1;
             analyzer.betas_struct.with_intercept = nan(n_bins, analyzer.num_vars+1, analyzer.num_subs, analyzer.col);
-            
             analyzer.betas_save = 'unit_test';
+            
             % Run function
             analyzer.fitModelAtTimepoint(c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx);
            
             % Expected properties
             expected_betas_struct = nan(n_bins, analyzer.num_vars+1, analyzer.num_subs, analyzer.col);
             expected_betas_struct(r, :) = mockBetas;
-            expectedRsquaredAdjusted = zeros(5, 1);
-            expectedRsquaredAdjusted(end,1) = mockLM.Rsquared.Adjusted;
-            expectedRsquaredOrdinary = zeros(5, 1);
-            expectedRsquaredOrdinary(end,1) = mockLM.Rsquared.Ordinary;
-            
+                      
             % Test updated properties
             testCase.verifyEqual(analyzer.betas_struct.with_intercept, expected_betas_struct);
-            testCase.verifyEqual(analyzer.rsquaredAdjusted, expectedRsquaredAdjusted) % todo: preallocate in class like beta_struct
-            testCase.verifyEqual(analyzer.rsquaredOrdinary, expectedRsquaredOrdinary) % todo: preallocate in class like beta_struct
-            
+             
             % Check that the path contains the expected string
             testCase.verifyTrue(contains(capturedPath, '_coeffNames.mat'));
             
