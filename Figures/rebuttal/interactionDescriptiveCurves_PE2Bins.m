@@ -14,13 +14,13 @@ num_subs = length(subj_ids);
 % Storage: [num_subs x col] for each PE bin x condiff bin combination
 % PE bins: 1=low, 2=med, 3=high | condiff bins: 1=low, 2=high
 subj_pupil = struct();
-for pe = 1:3
+for pe = 1:2
     for c = 1:2
         subj_pupil(pe,c).signal = NaN(num_subs, col);
     end
 end
 
-pe_binedges   = [0, 0.2,0.4,0.6,0.8, 1];   % 3 PE bins
+pe_binedges   = [0, 0.5, 1];   % 3 PE bins
 cd_binedges   = [0, 0.05, 0.1];        % 2 condiff bins
 
 % USER-BASED PATH
@@ -81,7 +81,7 @@ for i = 1:num_subs
     preds.cd_bins = discretize(abs(preds.con_diff), cd_binedges);
 
     % AVERAGE PUPIL SIGNAL PER PE BIN x CONDIFF BIN
-    for pe = 1:5
+    for pe = 1:3
         for cd = 1:2
             idx = (preds.pe_bins == pe) & (preds.cd_bins == cd);
             if any(idx)
@@ -99,7 +99,7 @@ two_tailed = 1;
 betas     = 0;
 
 perm_results = struct();
-for pe = 1:5
+for pe = 1:2
     var1 = subj_pupil(pe,1).signal;
     var2 = subj_pupil(pe,2).signal;
     perm_results(pe).perm = get_permtest(num_vars, num_subs, col, var1, var2, two_tailed, betas);
@@ -113,22 +113,22 @@ output.pe_binedges = pe_binedges;
 output.cd_binedges = cd_binedges;
 output.subj_pupil  = subj_pupil;
 output.perm        = perm_results;
-safe_saveall(strcat(save_dir, filesep, 'fb_PE5bins_condiff2bins_linearInt.mat'), output);
+safe_saveall(strcat(save_dir, filesep, 'fb_PE3bins_condiff2bins_linearInt.mat'), output);
 
 %% -------------------------------------------------------------------------
 % PLOT
 % -------------------------------------------------------------------------
 time_axis  = linspace(0, col-1, col); % x-axis in samples; adjust to ms if needed
-pe_labels  = {'PE 0 - 0.2', 'PE 0.2 - 0.4', 'PE 0.4 - 0.6', 'PE 0.6 - 0.8', 'PE 0.8 - 1'};
+pe_labels  = {'PE 0 - 0.5', 'PE 0.5 - 1', 'PE 0.66 - 1'};
 cd_colors  = {[0.2 0.5 0.8], [0.9 0.3 0.2]};   % blue = low condiff, red = high condiff
-cd_labels  = {'Contrast difference 0 - 0.05', 'Contrast difference 0.05 - 0.1'};
+cd_labels  = {'Condiff 0 - 0.05', 'Condiff 0.05 - 0.01'};
 alpha_fill = 0.15;
 
 figure('Units','normalized','Position',[0.05 0.2 0.9 0.55]);
 
-for pe = 1:5
+for pe = 1:2
 
-    ax = subplot(1, 5, pe);
+    ax = subplot(1, 2, pe);
     hold on;
 
     for cd = 1:2

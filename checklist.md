@@ -2,7 +2,7 @@
 
 | Task Description | PG's checklist | RB's checklist |
 | :--- | :---: | :---: |
-| **Task A:** [Describe task A here] | [ ] | [ ] |
+| **Reboot computer:** [Before deconvolution-based preprocessing check] | [ ] | [ ] |
 | **Task B:** [Describe task B here] | [ ] | [ ] |
 | **Task C:** [Describe task C here] | [ ] | [ ] |
 | **Task D:** [Describe task D here] | [ ] | [ ] |
