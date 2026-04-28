@@ -30,9 +30,9 @@ preds_all = readtable(strcat(desiredPath, filesep, "data", filesep, "GB data two
 betas_field = betas_struct.with_intercept;
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
-highPU = -1.5; % high BS uncertainty
+highPU = -1; % high BS uncertainty
 midPU = 0.015; % medium BS uncertainty
-lowPU = 1.5; % low BS uncertainty
+lowPU = 1; % low BS uncertainty
 
 highPE = 0.8; % high PE 
 lowPE = 0.2; % low PE
@@ -61,5 +61,5 @@ for s = 1:num_subjs
 end
 
 % SAVE
-safe_saveall(strcat(save_dir, filesep, "4c_MathotComments.mat"),posterior);
+safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_diffVals.mat"),posterior);
 

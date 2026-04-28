@@ -193,6 +193,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             elseif strcmp(obj.model_type, 'heteroskedastic')
                 num_vars = 1:obj.num_vars+1;
                 obj.updateProgress('Running permutation test…');
+                var1 = squeeze(reg_het3.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
                 obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
             end
 

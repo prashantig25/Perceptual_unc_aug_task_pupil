@@ -41,25 +41,25 @@ betas_linearInt        = importdata(fullfile(main_dir, 'pe_condiff_linearInt.mat
 perm_linearInt         = importdata(fullfile(main_dir, 'perm_pe_condiff_linearInt.mat'));
 betas_cubicSpline      = importdata(fullfile(main_dir, 'pe_condiff_cubicSplineNew.mat'));
 perm_cubicSpline       = importdata(fullfile(main_dir, 'perm_pe_condiff_cubicSplineNew.mat'));
-betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat.mat'));
-perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat.mat'));
+betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG.mat'));
+perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG.mat'));
 betas_linearInt_RT     = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_linearInt.mat'));
 perm_linearInt_RT      = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_linearInt.mat'));
 betas_cubicSpline_RT   = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_cubicSplineNew.mat'));
 perm_cubicSpline_RT    = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_cubicSplineNew.mat'));
-betas_deconv_RT        = importdata(fullfile(alt_dir,  'pe_condiff_regressedRT_deconvolution.mat'));
-perm_deconv_RT         = importdata(fullfile(alt_dir,  'perm_pe_condiff_regressedRT_deconvolution.mat'));
+betas_deconv_RT        = importdata(fullfile(alt_dir,  'pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG.mat'));
+perm_deconv_RT         = importdata(fullfile(alt_dir,  'perm_pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG.mat'));
 betas_linearInt_noBL   = importdata(fullfile(alt_dir,  'pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
 perm_linearInt_noBL    = importdata(fullfile(alt_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
 betas_cubicSpline_noBL = importdata(fullfile(alt_dir,  'pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
 perm_cubicSpline_noBL  = importdata(fullfile(alt_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
-betas_deconv_noBL      = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_nonBaselineCorrected.mat'));
-perm_deconv_noBL       = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_nonBaselineCorrected.mat'));
+betas_deconv_noBL      = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG.mat'));
+perm_deconv_noBL       = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG.mat'));
 
 fprintf('Loading heteroskedasticity specifications...\n');
 betas_linear_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'));
 betas_cubic_het  = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'));
-betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'));
+betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat'));
 
 fprintf('Running permutation tests for heteroskedasticity analyses...\n');
 

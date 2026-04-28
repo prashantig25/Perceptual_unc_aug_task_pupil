@@ -40,7 +40,7 @@ for s = 1:num_subs
         coeffs.up(s,c) = betas.with_intercept(1,up_idx,s,c);
     end
 end
-posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments.mat"));
+posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_diffVals.mat"));
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat")); % add PE bin curves
 pe_pval = perm.mask(pe_idx,:);
 pecondiff_pval = perm.prob(peCondiff_idx,:);
@@ -65,13 +65,12 @@ end
 
 %% INITIALIZE TILE LAYOUT
 
-figure(Position=[200,200,400,400])
+figure(Position=[200,200,450,175])
 hold on
-t = tiledlayout(2,2,"TileSpacing","compact");
+t = tiledlayout(1,3,"Padding","compact","TileSpacing","compact");
 ax1 = nexttile(1,[1,1]);
 ax2 = nexttile(2,[1,1]);
 ax3 = nexttile(3,[1,1]);
-ax4 = nexttile(4,[1,1]);
 
 sg = sgtitle('Pupil dilation = \beta_0 + \beta_1 \cdot |\delta| + \beta_2 \cdot |\delta| \cdot |Contrast difference| + \beta_3 \cdot |Update| + ... + \epsilon', ...
     'Interpreter','Tex','FontSize',8,'FontName','Arial');
@@ -80,7 +79,7 @@ sg = sgtitle('Pupil dilation = \beta_0 + \beta_1 \cdot |\delta| + \beta_2 \cdot 
 
 % POSITION CHANGE
 
-new_pos = change_position(ax1,[0,0,0.002,0]);
+new_pos = change_position(ax1,[0,0,0,0]);
 ax1_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax1);
 
@@ -118,7 +117,7 @@ text(mean(xaxis(pe_pval == 1)), pval_pos + -0.01, pe_pval_str, ...
 
 % POSITION CHANGE
 
-new_pos = change_position(ax2,[0.02,0,0.002,0]);
+new_pos = change_position(ax2,[-0.005,0,0,0]);
 ax2_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax2);
 ylim_axes = [-0.01,0.023];
@@ -158,9 +157,29 @@ text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + -0.003, pecondiff_pval_str, 
 std_diff1 = interaction.subj_pupil(1,2).signal - interaction.subj_pupil(1,1).signal;
 std_diff2 = interaction.subj_pupil(2,2).signal - interaction.subj_pupil(2,1).signal;
 
+% 1. Calculate the difference waves for the pupil (interaction) data
+pupil_diff1 = mean(interaction.subj_pupil(1,2).signal) - mean(interaction.subj_pupil(1,1).signal);
+pupil_diff2 = mean(interaction.subj_pupil(2,2).signal) - mean(interaction.subj_pupil(2,1).signal);
+
+% 2. Calculate the difference waves for the posterior data
+post_diff1 = mean(posterior.highPU_highPE) - mean(posterior.highPU_lowPE);
+post_diff2 = mean(posterior.lowPU_highPE) - mean(posterior.lowPU_lowPE);
+
+% 3. Find the scaling factor
+% We find the max absolute value across both pupil curves to maintain the relative 
+% magnitude between High and Low PU conditions.
+max_pupil = max([abs(pupil_diff1), abs(pupil_diff2)]);
+max_post  = max([abs(post_diff1), abs(post_diff2)]);
+
+scaling_factor = max_pupil / max_post;
+
+% 4. Apply scaling to the posterior curves
+post_diff1_rescaled = post_diff1 * scaling_factor;
+post_diff2_rescaled = post_diff2 * scaling_factor;
+
 % POSITION CHANGE
 
-new_pos = change_position(ax3,[0,0,0.002,0]);
+new_pos = change_position(ax3,[0.015,0,0.01,0]);
 ax3_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax3);
 
@@ -175,72 +194,39 @@ h1 = shadedErrorBar(xaxis, mean(interaction.subj_pupil(1,2).signal) - mean(inter
 h2 = shadedErrorBar(xaxis, mean(interaction.subj_pupil(2,2).signal) - mean(interaction.subj_pupil(2,1).signal), ...
     std(std_diff2)./sqrt(num_subs), {'Color', low_PU, 'LineWidth', linewidth_curves}, 1);
 
-% 2. Create the legend using ONLY the mainLine handles
-% This ignores the patches/shaded areas entirely
-l = legend([h1.mainLine, h2.mainLine], ...
-    {'Contrast-difference range = [0 - 0.05]', 'Contrast-difference range = [0.05 - 0.1]'}, ...
-    'Location', 'best', 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
-    'FontSize', fontsize-0.5, 'FontName', fontname, 'Color', 'none');
+% 2. Capture handles for the posterior curves (Model Data)
+p1 = plot(xaxis, post_diff1_rescaled, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
+p2 = plot(xaxis, post_diff2_rescaled, 'Color', low_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 
-l.ItemTokenSize = [5 5]; % Adjusted first value so the line segment is visible
+% 3. Create the legend using all four handles
+% Arrange them in an order that makes sense (e.g., Data then Model)
+l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
+    {'Empirical (Contrast-difference: [0 - 0.05))', 'Empirical (Contrast-difference: [0.05 - 0.1])', ...
+     'Posterior-predicted (Contrast difference = 0.02)', 'Posterior-predicted (Contrast difference = 0.08)'}, ...
+    'Location', 'best', 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
+    'FontSize', fontsize-1.25, 'FontName', fontname, 'Color', 'none');
+
+l.ItemTokenSize = [7 7]; % Adjusted first value so the line segment is visible
 set(gca,'Color','none','FontName','Arial','FontSize',fontsize)
 xline(0,'--','LineWidth',0.5)
 yline(0,'--','LineWidth',0.5)
 xlim([-300,2700])
-ylim([-30,110])
+ylim([-30,120])
 xlabel('Time from feedback onset (ms)')
 % ylabel('Empirical pupil difference curves (high - low PE)')
-ylabel({'Empirical pupil difference curves', '(high - low PE)'});
+ylabel({'Pupil difference curves', '(high - low PE)'});
 hold on
-a1 = annotation("arrow",[0.2,0.2],[0.32,0.37],'LineWidth',0.5,'Color',low_PU);
-a2 = annotation("arrow",[0.2,0.2],[0.28,0.23],'LineWidth',0.5,'Color',high_PU);
+a1 = annotation("arrow",[0.78,0.78],[0.52,0.62],'LineWidth',0.5,'Color',low_PU);
+a2 = annotation("arrow",[0.78,0.78],[0.49,0.39],'LineWidth',0.5,'Color',high_PU);
 a1.HeadLength = 5; a2.HeadLength = 5;
 adjust_figprops(ax3_new,fontname,fontsize,linewidth_plot);
-
-%%
-
-% POSITION CHANGE
-
-new_pos = change_position(ax4,[0.025,0,0.002,0]);
-ax4_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
-delete(ax4);
-
-% PLOT
-
-hold on 
-plot(xaxis,mean(posterior.highPU_highPE) - mean(posterior.highPU_lowPE),'Color',high_PU,'LineWidth',1.5)
-plot(xaxis,mean(posterior.lowPU_highPE) - mean(posterior.lowPU_lowPE),'Color',low_PU,'LineWidth',1.5)
-
-% ADJUST FIGURE PROPERTIES
-
-% 1. Create the legend with standard single-line placeholders
-l = legend('Line 1', 'Line 2', 'Line 3','Line 4', 'Location', 'best', 'EdgeColor', 'none', ...
-    'AutoUpdate', 'off', 'FontSize', fontsize-0.5, 'FontName', fontname, 'Color', 'none');
-l.ItemTokenSize = [5 5];
-% 2. Manually update the String property using a cell array and 'newline'
-% This bypasses the initial input error.
-l.String = {['Contrast difference = 0.01'], ...
-            ['Contrast difference = 0.1']};
-set(gca,'Color','none','FontName','Arial','FontSize',fontsize)
-xline(0,'--','LineWidth',0.5)
-yline(0,'--','LineWidth',0.5)
-xlim([-300,2700])
-ylim([-10,40])
-xlabel('Time from feedback onset (ms)')
-% ylabel('Posterior-predicted difference curves (high - low PE)')
-ylabel({'Posterior-predicted difference curves', '(high - low PE)'});
-hold on
-a1 = annotation("arrow",[0.65,0.65],[0.32,0.37],'LineWidth',0.5,'Color',low_PU);
-a2 = annotation("arrow",[0.65,0.65],[0.28,0.23],'LineWidth',0.5,'Color',high_PU);
-a1.HeadLength = 5; a2.HeadLength = 5;
-adjust_figprops(ax4_new,fontname,fontsize,linewidth_plot);
 
 
 %% ADD SUBPLOT LABELS
 
 ax1_pos = ax1_new.Position;
-adjust_x = -0.08; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)-0.02; % adjusted y-position for subplot label
+adjust_x = -0.065; % adjusted x-position for subplot label
+adjust_y = ax1_pos(4)+0.05; % adjusted y-position for subplot label
 [label_x,label_y] = change_plotlabel(ax1_new,adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
@@ -253,12 +239,8 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'c','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
 
-[label_x,label_y] = change_plotlabel(ax4_new,adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'd','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
-
 %% SAVE
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'regression_pupil_linearInt1New.png', '-dpng', '-r600') 
+print(fig, 'regression_pupil_linearInt1New_3panels.png', '-dpng', '-r600') 

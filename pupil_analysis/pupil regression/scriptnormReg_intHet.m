@@ -514,7 +514,7 @@ fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb seed fixed');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
@@ -542,7 +542,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_deconvolution_updatedClusterStat', 'perm_pe_condiff_deconvolution_updatedClusterStat', '', '');
+reg.setFileNames('pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG', 'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG', '', '');
 
 reg.runAnalysis();
 reg.saveResults();
@@ -554,7 +554,7 @@ fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb seed fixed');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected saccade correction and urai params PG');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
@@ -582,7 +582,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_deconvolution_nonBaselineCorrected', 'perm_pe_condiff_deconvolution_nonBaselineCorrected', '', '');
+reg.setFileNames('pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG', 'perm_pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG', '', '');
 
 reg.runAnalysis();
 reg.saveResults();
@@ -594,7 +594,7 @@ fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) ===\n');
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb seed fixed');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
@@ -622,7 +622,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_regressedRT_deconvolution', 'perm_pe_condiff_regressedRT_deconvolution', '', '');
+reg.setFileNames('pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG', 'perm_pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG', '', '');
 
 reg.runAnalysis();
 reg.saveResults();
@@ -634,7 +634,7 @@ fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) ===\n'
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb seed fixed');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
@@ -665,7 +665,7 @@ reg.two_tailed          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff2bins_deconv', 'perm_pe_condiff2bins_deconv', '', '');
+reg.setFileNames('pe_condiff2bins_deconv_saccCorr_uraiParamsPG', 'perm_pe_condiff2bins_deconv_saccCorr_uraiParamsPG', '', '');
 
 reg.runAnalysis();
 reg.saveResults();

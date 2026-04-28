@@ -14,7 +14,7 @@ end
 % Initialize results table
 results = table({}, [], 'VariableNames', {'term', 'pval'});
 
-%% figure 3 MS
+%% figure 3 MS - descriptive analysis
 
 condiffbin = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "descriptive", filesep, "fb_PE2bins_linearInt.mat"));
 coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat"));
@@ -28,11 +28,11 @@ perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pip
 pe_idx = find(strcmp(coeff_names,'pe'));
 results = [results; table({'peBinned_condiff_cubicSpline'}, round(min(perm.prob(pe_idx, perm.prob(pe_idx,:) < 0.1)), 3), 'VariableNames', {'term', 'pval'})];
 
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff2bins_deconv.mat"));
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff2bins_deconv_saccCorr_uraiParamsPG.mat"));
 pe_idx = find(strcmp(coeff_names,'pe'));
 results = [results; table({'peBinned_condiff_deconv'}, round(min(perm.prob(pe_idx, perm.mask(pe_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
-%% figure 4 MS
+%% figure 4 MS - main regression model
 
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat"));
 coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat"));
@@ -42,7 +42,7 @@ peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
 results = [results; table({'pe_main'}, round(min(perm.prob(pe_idx, perm.mask(pe_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'peCondiff_main'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
-%% figure 5 MS
+%% figure 5 MS - learning residual analysis
 
 data_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
 perm = importdata(fullfile(data_dir,"perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
@@ -54,7 +54,7 @@ pupil_idx = find(strcmp(coeffs_name, 'pupil'));
 results = [results; table({'post_up'}, round(min(perm.prob(post_up_idx, perm.mask(post_up_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'pupil'},   round(min(perm.prob(pupil_idx,   perm.mask(pupil_idx,:)   == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
-%% figure S10 MS
+%% figure S10 MS - non-baseline corrected
 
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat"));
 coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat"));
@@ -64,7 +64,7 @@ peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
 results = [results; table({'pe_NBC'},       round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'peCondiff_NBC'}, round(min(perm.prob(peCondiff_idx, perm.prob(peCondiff_idx,:) < 0.05)), 3), 'VariableNames', {'term', 'pval'})];
 
-%% figure S12 MS
+%% figure S12 MS - regressed RT
 
 coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_regressedRT_linearInt_coeffNames.mat"));
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_regressedRT_linearInt.mat"));
@@ -95,20 +95,20 @@ results = [results; table({'pe_het_linearInt'},        round(min(perm.prob(pe_id
 results = [results; table({'peCondiff_het_linearInt'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
 %% figure Het model, cubic spline
-coeff_names = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
-perm = importdata(fullfile(het_save_dir,"permHet_CSnew_20SPAbs3Width.mat"));
-pe_idx = find(strcmp(coeff_names,'PE'));
-peCondiff_idx = find(strcmp(coeff_names,'PExCondiff'));
-results = [results; table({'pe_het_cubicSpline'},        round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
-results = [results; table({'peCondiff_het_cubicSpline'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
+% coeff_names = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
+% perm = importdata(fullfile(het_save_dir,"permHet_CSnew_20SPAbs3Width.mat"));
+% pe_idx = find(strcmp(coeff_names,'PE'));
+% peCondiff_idx = find(strcmp(coeff_names,'PExCondiff'));
+% results = [results; table({'pe_het_cubicSpline'},        round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
+% results = [results; table({'peCondiff_het_cubicSpline'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
 %% figure Het model, deconvolution
-coeff_names = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
-perm = importdata(fullfile(het_save_dir,"permHet_deconv_20SPAbs3Width.mat"));
-pe_idx = find(strcmp(coeff_names,'PE'));
-peCondiff_idx = find(strcmp(coeff_names,'PExCondiff'));
-results = [results; table({'pe_het_deconvolution'},        round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
-results = [results; table({'peCondiff_het_deconvolution'}, round(min(perm.prob(peCondiff_idx, perm.prob(peCondiff_idx,:) < 0.05)), 3), 'VariableNames', {'term', 'pval'})];
+% coeff_names = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
+% perm = importdata(fullfile(het_save_dir,"permHet_deconv_20SPAbs3Width.mat"));
+% pe_idx = find(strcmp(coeff_names,'PE'));
+% peCondiff_idx = find(strcmp(coeff_names,'PExCondiff'));
+% results = [results; table({'pe_het_deconvolution'},        round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
+% results = [results; table({'peCondiff_het_deconvolution'}, round(min(perm.prob(peCondiff_idx, perm.prob(peCondiff_idx,:) < 0.05)), 3), 'VariableNames', {'term', 'pval'})];
 
 %% SAVE ALL
 

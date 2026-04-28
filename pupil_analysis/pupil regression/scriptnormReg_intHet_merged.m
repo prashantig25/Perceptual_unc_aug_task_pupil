@@ -473,7 +473,7 @@ fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade inconsistency check PG');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
@@ -501,7 +501,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_deconvolution_inconsistencyCheckPG', 'perm_pe_condiff_deconvolution_inconsistencyCheckPG', '', '');
+reg.setFileNames('pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG', 'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG', '', '');
 
 [betas, perm] = reg.runAnalysis();
 reg.saveResults();

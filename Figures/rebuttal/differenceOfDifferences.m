@@ -84,6 +84,8 @@ for i = 1:num_subs
     % BIN PE AND CONDIFF
     preds.pe_bins = discretize(abs(preds.pe),      pe_binedges);
     preds.cd_bins = discretize(abs(preds.con_diff), cd_binedges);
+    pupil_signal(preds.pe == 0,:) = [];
+    preds(preds.pe == 0,:) = [];
 
     % AVERAGE PUPIL SIGNAL PER CONDIFF BIN x PE BIN
     % First loop over condiff bins, then within each condiff bin, loop over PE bins
@@ -268,6 +270,13 @@ diff_cd2 = subj_pupil(2, 2).signal - subj_pupil(2, 1).signal;  % [num_subs x col
 between_perm = get_permtest(1, num_subs, col, diff_cd2, diff_cd1, 1, 0);
 mask = logical(between_perm.mask);
 
+diff_cd1_win = diff_cd1(:,101:200);
+diff_cd2_win = diff_cd2(:,101:200);
+% 
+% % Permutation test: is the PE effect larger in CD bin 2 than CD bin 1?
+% between_perm_win = get_permtest(1, num_subs, 100, diff_cd2_win, diff_cd1_win, 1, 0);
+% mask_win = logical(between_perm_win.mask);
+
 % Add significance bar to the existing plot
 if any(mask)
     yl = ylim;
@@ -313,6 +322,32 @@ plot_bar_with_dots(diff_cd1_mean, diff_cd2_mean, 'Mean Pupil Difference', p_mean
 % --- Plot 2: Max Differences ---
 subplot(1,2,2); hold on;
 plot_bar_with_dots(diff_cd1_max, diff_cd2_max, 'Max Pupil Difference', p_max);
+
+%% averaged and max
+ 
+diff_cd2_mean = mean(diff_cd2_win,2);
+diff_cd1_mean = mean(diff_cd1_win,2);
+
+[h,p_mean] = ttest(diff_cd2_mean,diff_cd1_mean);
+
+diff_cd2_max = max(diff_cd2_win,[],2);
+diff_cd1_max = max(diff_cd1_win,[],2);
+
+[h,p_max] = ttest(diff_cd2_max,diff_cd1_max);
+
+% Data Preparation (Assuming you have these from your snippet)
+% data1 = diff_cd1_mean; data2 = diff_cd2_mean;
+% data1_max = diff_cd1_max; data2_max = diff_cd2_max;
+
+figure('Color', 'w', 'Position', [100 100 1000 500]);
+
+% --- Plot 1: Mean Differences ---
+subplot(1,2,1); hold on;
+plot_bar_with_dots(diff_cd1_mean, diff_cd2_mean, 'Mean Pupil Difference (time window = 1 to 2 ms)', p_mean);
+
+% --- Plot 2: Max Differences ---
+subplot(1,2,2); hold on;
+plot_bar_with_dots(diff_cd1_max, diff_cd2_max, 'Max Pupil Difference (time window = 1 to 2 ms)', p_max);
 
 % Helper Function for the plotting
 function plot_bar_with_dots(d1, d2, title_str, p_val)
