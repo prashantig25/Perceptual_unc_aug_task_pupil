@@ -45,6 +45,15 @@ for s = 1:num_subjs
         coeffs.up(s,c) = betas_field(1,6,s,c);
         coeffs.con_diff(s,c) = betas_field(1,4,s,c);
     end
+
+    % Idea: Plot the prediction based on
+    % (1) the interaction term between PE and contrast difference
+    % (2) the main effect of PE
+    % (3) the main effect of contrast difference
+    % To do so: 
+    % - take an arbitrarily fixed PE = 1 for a consistent error
+    % - take three different contrast-difference levels
+    % Compute average curves across trials for each subject
     pe_trial = ones(height(preds),1);
     posterior.midPU(s,:) = mean(coeffs.pe_condiff(s,:).*midPU.*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.pe(s,:).*pe_trial(preds.con_diff > 0.033 & preds.con_diff < 0.0666) + coeffs.con_diff(s,:).*midPU);
     posterior.highPU(s,:) = mean(coeffs.pe_condiff(s,:).*highPU.*pe_trial(preds.con_diff < 0.033) + coeffs.pe(s,:).*pe_trial(preds.con_diff < 0.033) + coeffs.con_diff(s,:).*highPU);
