@@ -47,23 +47,8 @@ else
 
     zscoredCondiff = zscore(linspace(0,0.1,160));
 
-    refVals = linspace(0, 0.1, 160);
-    refMean = mean(refVals);
-    refSD   = std(refVals);
-
-    % Z-score highPU and lowPU using the reference distribution's parameters
-    highPU = (highPU - refMean) / refSD;
-    lowPU  = (lowPU  - refMean) / refSD;
-
     highPE = mean(peVals(:,2)); % high PE
     lowPE = mean(peVals(:,1)); % low PE
-
-    refPE     = linspace(0, 1, 160);   % match whatever vector you used for zscore(PE)
-    refPEMean = mean(refPE);
-    refPESD   = std(refPE);
-
-    highPE = (highPE - refPEMean) / refPESD;
-    lowPE  = (lowPE  - refPEMean) / refPESD;
 end
 
 
@@ -90,5 +75,5 @@ for s = 1:num_subjs
 end
 
 % SAVE
-safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_diffVals_zscoredPESubjVals.mat"),posterior);
+safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_diffVals_meanSubjVals.mat"),posterior);
 

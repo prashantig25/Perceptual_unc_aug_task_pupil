@@ -95,20 +95,20 @@ results = [results; table({'pe_het_linearInt'},        round(min(perm.prob(pe_id
 results = [results; table({'peCondiff_het_linearInt'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
 %% figure Het model, cubic spline
-% coeff_names = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
-% perm = importdata(fullfile(het_save_dir,"permHet_CSnew_20SPAbs3Width.mat"));
-% pe_idx = find(strcmp(coeff_names,'PE'));
-% peCondiff_idx = find(strcmp(coeff_names,'PExCondiff'));
-% results = [results; table({'pe_het_cubicSpline'},        round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
-% results = [results; table({'peCondiff_het_cubicSpline'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
+coeff_names = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
+perm = importdata(fullfile(het_save_dir,"permHet_CSnew_20SPAbs3Width.mat"));
+pe_idx = find(strcmp(coeff_names,'PE'));
+peCondiff_idx = find(strcmp(coeff_names,'PExCondiff'));
+results = [results; table({'pe_het_cubicSpline'},        round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
+results = [results; table({'peCondiff_het_cubicSpline'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
 %% figure Het model, deconvolution
-% coeff_names = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
-% perm = importdata(fullfile(het_save_dir,"permHet_deconv_20SPAbs3Width.mat"));
-% pe_idx = find(strcmp(coeff_names,'PE'));
-% peCondiff_idx = find(strcmp(coeff_names,'PExCondiff'));
-% results = [results; table({'pe_het_deconvolution'},        round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
-% results = [results; table({'peCondiff_het_deconvolution'}, round(min(perm.prob(peCondiff_idx, perm.prob(peCondiff_idx,:) < 0.05)), 3), 'VariableNames', {'term', 'pval'})];
+coeff_names = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
+perm = importdata(fullfile(het_save_dir,"permHet_deconv_20SPAbs3Width.mat"));
+pe_idx = find(strcmp(coeff_names,'PE'));
+peCondiff_idx = find(strcmp(coeff_names,'PExCondiff'));
+results = [results; table({'pe_het_deconvolution'},        round(min(perm.prob(pe_idx,       perm.mask(pe_idx,:)       == 1)), 3), 'VariableNames', {'term', 'pval'})];
+results = [results; table({'peCondiff_het_deconvolution'}, round(min(perm.prob(peCondiff_idx, perm.prob(peCondiff_idx,:) < 0.05)), 3), 'VariableNames', {'term', 'pval'})];
 
 %% SAVE ALL
 
