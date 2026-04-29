@@ -1,5 +1,5 @@
 function [pupil,sliderOnset,pupil_pseudobaseline] = run_PupilSignal(num_sess,subj_ids,behv_dir, ...
-    preproc_dir,regress_rt,s,ss,time_pupil,time_base,event_name,pre_duration, ...
+    preproc_dir,s,ss,time_pupil,time_base,event_name,pre_duration, ...
     base_duration,base,base_trialspecific,main)
 % function run_PupilSignal gets event-specific pupil signal for each of the
 % specified events.
@@ -9,7 +9,6 @@ function [pupil,sliderOnset,pupil_pseudobaseline] = run_PupilSignal(num_sess,sub
 %   behv_dir: directory to get behavioral data
 %   preprocessed data is to be used (1)
 %   preproc_dir: directory to get preprocessed data
-%   regress_rt: whether RT to be regressed from pupil signal
 %   s: subject number
 %   ss: session number
 %   time_pupil: duration of pupil signal
@@ -87,8 +86,8 @@ else
 end
 pupil(missedtrials == 0,:) = []; % remove pupil response of missed trials
 pupil_pseudobaseline(missedtrials == 0,:) = []; 
-if regress_rt == 1 % regress out RT
-    for c = 1:col
-        pupil(:,c) = remove_rt_effects(pupil(:,c),log(behv_data.rt));
-    end
-end
+% if regress_rt == 1 % regress out RT
+%     for c = 1:col
+%         pupil(:,c) = remove_rt_effects(pupil(:,c),log(behv_data.rt));
+%     end
+% end

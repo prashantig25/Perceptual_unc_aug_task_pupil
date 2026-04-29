@@ -61,12 +61,13 @@ for i = 1:num_subs
     end
 
     % MISSED TRIALS
-    missed_trials = []; % initialize array for index of missed trials
-    for b = 1:height(behv_data)
-        if isnan(behv_data.rt(b,:)) % || isnan(behv_data.slider(b,:)) % check if participant has not responded
-            missed_trials = [missed_trials;b];
-        end
-    end
+    % missed_trials = []; % initialize array for index of missed trials
+    % for b = 1:height(behv_data)
+    %     if isnan(behv_data.rt(b,:)) % || isnan(behv_data.slider(b,:)) % check if participant has not responded
+    %         missed_trials = [missed_trials;b];
+    %     end
+    % end
+    missed_trials = find(isnan(behv_data.rt));
     behv_data(missed_trials,:) = [];
     missedSlider = isnan(behv_data.slider);
 
