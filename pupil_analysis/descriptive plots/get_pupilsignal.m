@@ -318,8 +318,7 @@ end
 % Update preprocessing directory
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
-    filesep, 'preprocessed trials and events added fixed seed');
-PupilDescriptive.preproc_dir = preproc_dir;
+    filesep, 'preprocessed trials and events added saccade correction and urai params PG');
 
 % 3.1 FEEDBACK-LOCKED PUPIL SIGNAL - EVENT-SPECIFIC BASELINE
 % -------------------------------------------------------------------------
@@ -332,7 +331,8 @@ main = 0;
 
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb seed fixed');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
+mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -355,7 +355,8 @@ baseline = "no correction";
 
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected fb seed fixed');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected saccade correction and urai params PG');
+mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')

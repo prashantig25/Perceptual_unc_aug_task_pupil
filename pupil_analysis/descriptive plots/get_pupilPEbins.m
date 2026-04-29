@@ -56,15 +56,15 @@ for i = 1:num_subs
     behvData = PupilDescriptive.loadBehavioralData(i);
 
     % MISSED TRIALS
-    % todo: is loop really necessary
-    missed_trials = []; % initialize array for index of missed trials
-    for b = 1:height(behvData)
-        if isnan(behvData.rt(b,:)) % || isnan(behvData.slider(b,:)) % check if participant has not responded
-            missed_trials = [missed_trials;b];
-        end
-    end
-    behvData(missed_trials,:) = [];
-    missedSlider = isnan(behvData.slider);
+    % missed_trials = []; % initialize array for index of missed trials
+    % for b = 1:height(behv_data)
+    %     if isnan(behv_data.rt(b,:)) % || isnan(behv_data.slider(b,:)) % check if participant has not responded
+    %         missed_trials = [missed_trials;b];
+    %     end
+    % end
+    missed_trials = find(isnan(behv_data.rt));
+    behv_data(missed_trials,:) = [];
+    missedSlider = isnan(behv_data.slider);
 
     % GET PE DATA
     preds = preds_all(preds_all.id == str2num(subj_ids{i}),:);

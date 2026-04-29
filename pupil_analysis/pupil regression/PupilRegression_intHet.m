@@ -206,9 +206,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
                                   
                 % Like this? rasmus added 17 april
                 num_vars = 1:obj.num_vars+1;
+                obj.updateProgress('Running permutation test…');
                 var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
-                obj.perm_results = obj.permtestFcn(num_vars, obj.num_subs, obj.col, var1);
-
+                obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
             end
             
             % Close progress bar
@@ -366,6 +366,32 @@ classdef PupilRegression_intHet < pupilReg_Vars
             ygaze_signal(missedtrials_slider == 1, :) = [];
         end
 
+        %% ----------------------------------------------------------------
+        %  REGRESS RT EFFECTS
+        %% ----------------------------------------------------------------
+        function residual = remove_rt_effects(obj, pupil,rt)
+
+            % NOTE: code is based on Urai et al., 2017
+            % function REMOVE_RT_EFFECTS removes trial-by-trial variations in pupil
+            % signal caused by very slow/long RTs
+            %
+            % INPUT:
+            %   pupil: signal from which RT needs to be regressed
+            %   rt: reaction-times
+            %
+            % OUTPUT:
+            %   residual: pupil signal after regressing out RTs
+
+            % normalise rt
+            rt_norm = rt/norm(rt);
+
+            % subtract dot product from pupil (formula: y' = y - (y.'r)r)
+            residual = pupil - (pupil'*rt_norm)*rt_norm;
+        end
+
+        %% ----------------------------------------------------------------
+        %  REGRESS RT EFFECTS
+        %% ----------------------------------------------------------------
         function zsc_pupil = regressRTEffects(obj, zsc_pupil, behv_data)
             % Remove reaction time effects from pupil signal
             % Regresses out log RT from each timepoint to isolate non-RT related variance
@@ -379,7 +405,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
             % Apply RT regression to each timepoint
             for c = 1:obj.col
-                zsc_pupil(:, c) = remove_rt_effects(zsc_pupil(:, c), log(behv_data.rt));
+                zsc_pupil(:, c) = obj.remove_rt_effects(zsc_pupil(:, c), log(behv_data.rt));
             end
         end
 

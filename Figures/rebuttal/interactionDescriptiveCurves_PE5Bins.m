@@ -20,7 +20,7 @@ for pe = 1:3
     end
 end
 
-pe_binedges   = [0, 0.2, 0.4,0.6,0.8, 1];   % 3 PE bins
+pe_binedges   = [0, 0.2,0.4,0.6,0.8, 1];   % 3 PE bins
 cd_binedges   = [0, 0.05, 0.1];        % 2 condiff bins
 
 % USER-BASED PATH
@@ -121,7 +121,7 @@ safe_saveall(strcat(save_dir, filesep, 'fb_PE5bins_condiff2bins_linearInt.mat'),
 time_axis  = linspace(0, col-1, col); % x-axis in samples; adjust to ms if needed
 pe_labels  = {'PE 0 - 0.2', 'PE 0.2 - 0.4', 'PE 0.4 - 0.6', 'PE 0.6 - 0.8', 'PE 0.8 - 1'};
 cd_colors  = {[0.2 0.5 0.8], [0.9 0.3 0.2]};   % blue = low condiff, red = high condiff
-cd_labels  = {'Condiff 0 - 0.05', 'Condiff 0.05 - 0.1'};
+cd_labels  = {'Contrast difference 0 - 0.05', 'Contrast difference 0.05 - 0.1'};
 alpha_fill = 0.15;
 
 figure('Units','normalized','Position',[0.05 0.2 0.9 0.55]);
@@ -147,15 +147,15 @@ for pe = 1:5
     end
 
     % ADD PERMUTATION MASK AS SIGNIFICANCE BAR
-    mask = perm_results(pe).perm.mask;       % logical vector [1 x col]
-    if any(mask)
-        % Draw a horizontal bar at a fixed y position where sig. clusters occur
-        yl     = ylim;
-        bar_y  = yl(1) + 0.03 * diff(yl);   % slightly above x-axis
-        sig_x  = time_axis(logical(mask));
-        scatter(sig_x, repmat(bar_y, size(sig_x)), 6, ...
-                [0.15 0.15 0.15], 'filled', 'HandleVisibility', 'off');
-    end
+    % mask = perm_results(pe).perm.mask;       % logical vector [1 x col]
+    % if any(mask)
+    %     % Draw a horizontal bar at a fixed y position where sig. clusters occur
+    %     yl     = ylim;
+    %     bar_y  = yl(1) + 0.03 * diff(yl);   % slightly above x-axis
+    %     sig_x  = time_axis(logical(mask));
+    %     scatter(sig_x, repmat(bar_y, size(sig_x)), 6, ...
+    %             [0.15 0.15 0.15], 'filled', 'HandleVisibility', 'off');
+    % end
 
     % FORMATTING
     xlabel('Time');

@@ -41,7 +41,6 @@ ax3 = nexttile(3,[1,1]);
 
 %% PLOT DESCRIPTIVE CURVE
 
-ax1 = nexttile(1,[1,1]);
 new_pos = change_position(ax1,[-0.005,0.05,0,-0.1]);
 ax1_new = axes('Units', 'Normalized', 'Position', new_pos); % update
 box(ax1_new, 'off'); % remove box
