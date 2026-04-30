@@ -20,6 +20,7 @@ end
 save_behavior    = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'stats', filesep, 'behavior');
 descriptive_path = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'descriptive');
 regression_path  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses');
+
 %% LOAD DATA
 
 % descriptive choice data for study 2
@@ -37,13 +38,13 @@ betas_all = importdata(fullfile(regression_path,"betas_signed.mat")); % betas fr
 
 %% DESCRIPTIVE ANALYSIS FROM STUDY 2
 
-% comparison to chance performance
+% Comparison to chance performance
 chance_level = 0.5; % Specify the chance level (e.g., 0.5 for a binary task)
 
 ecoperf_mix_avg = nanmean(mix_ecoperf,2);
 ecoperf_perc_avg = nanmean(perc_ecoperf,2);
 
-% initialise
+% Initialise variables
 h_vals = NaN(2,2);
 p_vals = NaN(2,2);
 t_vals = NaN(2,1);
@@ -72,6 +73,8 @@ ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
 
 % Save the table as a CSV file
 safe_saveall(strcat(save_behavior,filesep,'allconditions_chance_ttest.csv'), ttestResults);
+disp("Economic-choice performance");
+display(ttestResults);
 
 %% COHEN'S D FOR ECONOMIC PERFORMANCE ACROSS CONDITIONS
 
@@ -86,46 +89,47 @@ end
 cohenResults = table(cond_names, round(cohen_d,2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'ecoperf_cohen.csv'),cohenResults);
+
 %% T-TEST TO COMPARE SLIDER DATA ACROSS UNCERTAINTIES
 
-% initialise
+% Initialise variables
 mix_avg = nanmean(mix_curve,2);
 perc_avg = nanmean(perc_curve,2);
 mean_avg = [mix_avg, perc_avg];
-
-% initialise
 h_vals = NaN(1,1);
 p_vals = NaN(1,1);
 t_vals = NaN(1,1);
 df_vals = NaN(1,1);
 cohen_d = NaN(1,1);
 
-% t-test
+% T-test
 [h_vals(1,:), p_vals(1,:), ~, stats_mixperc] = ttest2(mix_avg, perc_avg); % impact of reward uncertainty
 cond_names = ["mix_perc"];
 
 t_vals(1,:) = stats_mixperc.tstat;
 df_vals(1,:) = stats_mixperc.df;
 
-% cohen's d
+% Cohen's d
 sd_pooled = sqrt((nanstd(perc_avg)^2 + nanstd(mix_avg)^2)./2);
 cohen_d(1,1) = compute_cohend_ttest2(nanmean(perc_avg), nanmean(mix_avg), sd_pooled);
 
-% save
+% Save
 ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
     round(t_vals,2), round(df_vals,2), round(cohen_d,2),...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df','cohen_d'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'mu_uncertainty_ttest.csv'),ttestResults);
+disp("Slider condition comparison");
+display(ttestResults);
 
 %% SAVE MEAN and SEM FOR SLIDER UPDATES ACROSS CONDITIONS
 
-% initialise
+% Initialise variables
 mean_mu = NaN(2,1);
 sem_mu = NaN(2,1);
 cond_names = ["mix";"perc"];
 chance_level = 0.5;
 
-% compute mean and sem
+% Compute mean and SEM
 [mean_mu(1,:),sem_mu(1,:)] = compute_mean_sem(mix_avg);
 [mean_mu(2,:),sem_mu(2,:)] = compute_mean_sem(perc_avg);
 
@@ -143,6 +147,8 @@ ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
     round(t_vals,2), round(df_vals,2), round(mean_mu,2), round(sem_mu,2),...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df', 'mean', 'sem'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'mu_meansem.csv'),ttestResults);
+disp("Slider performance");
+display(ttestResults);
 
 %% COHEN'S D FOR SLIDER UPDATES ACROSS CONDITIONS
 
@@ -159,6 +165,8 @@ end
 cohenResults = table(cond_names, round(cohen_d,2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'mu_cohen.csv'),cohenResults);
+disp("Slider Cohen's d");
+display(cohenResults);
 
 %% T-TEST ON BETA COEFFICIENTS
 
@@ -180,6 +188,8 @@ ttestResults = table(cond_names, round(h_vals,2).', round(p_vals,4).', ...
     round(t_vals,2).', round(df_vals,2).', round(mean_ecoperf,2), round(sem_ecoperf,3),...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df','mean','sem'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'lr_betas_ttest.csv'),ttestResults);
+disp("Learning rate betas");
+display(ttestResults);
 
 %% COHEN'S D FOR BETA COEFFICIENTS
 
@@ -194,3 +204,5 @@ end
 cohenResults = table(cond_names, round(cohen_d,2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'lr_betas_cohen.csv'),cohenResults);
+disp("Learning rate betas Cohen's d");
+display(cohenResults);

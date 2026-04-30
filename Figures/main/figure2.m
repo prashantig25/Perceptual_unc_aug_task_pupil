@@ -325,6 +325,8 @@ if save_csv == 1
     save_figures = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'stats');
     save_table = table("subplot_d",round(rho,2),round(pval,3),8,'VariableNames',{'name','rho','pval','df'});
     writetable(save_table,strcat(save_figures,filesep,'figure1d.csv'));
+    disp("Single-trial LR");
+    display(save_table);
 end
 %% PLOT BETA COEFFICIENTS
 

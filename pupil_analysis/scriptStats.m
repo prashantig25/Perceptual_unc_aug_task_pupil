@@ -5,7 +5,7 @@ clc
 clearvars
 % USER-BASED PATH
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil';
+reqPath = 'Perceptual_unc_aug_task_pupil-main';
 pathParts = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -27,6 +27,9 @@ pe_idx = find(strcmp(coeff_names,'pe'));
 results = [results; table({'peBinned_condiff'}, round(min(perm.prob(pe_idx, perm.mask(pe_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'peBinned'}, round(min(condiffbin.prob(1, condiffbin.stat(1,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
+disp("PE binned")
+results(results.term == "peBinned_condiff", :)
+
 %% figure 4 MS
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat"));
 coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat"));
@@ -35,6 +38,10 @@ peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
 
 results = [results; table({'pe_fig4'}, round(min(perm.prob(pe_idx, perm.mask(pe_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'peCondiff_fig4'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
+
+disp("Fig 4 main regression linear int")
+results(results.term == "pe_fig4", :)
+results(results.term == "peCondiff_fig4", :)
 
 %% figure 5 MS
 
@@ -47,6 +54,9 @@ pupil_idx = find(strcmp(coeffs_name, 'pupil'));
 
 results = [results; table({'post_up'}, round(min(perm.prob(post_up_idx, perm.mask(post_up_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'pupil'},   round(min(perm.prob(pupil_idx,   perm.mask(pupil_idx,:)   == 1)), 3), 'VariableNames', {'term', 'pval'})];
+
+disp("Fig 5 residual analysis")
+results(ismember(results.term, ["post_up", "pupil"]), :)
 
 %% figure S10 MS
 
