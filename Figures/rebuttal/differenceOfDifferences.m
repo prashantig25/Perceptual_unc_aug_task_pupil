@@ -99,6 +99,46 @@ for i = 1:num_subs
     end
 end
 
+% =========================================================================
+% COMPUTE mean PE and mean condiff per bin, per subject
+% =========================================================================
+
+% meanPE_all     [num_subs x num_pe_bins]   — mean of abs(pe) within each PE bin
+% meanCondiff_all [num_subs x num_cd_bins]  — mean of abs(con_diff) within each condiff bin
+
+meanPE_all      = NaN(num_subs, num_pe_bins);
+meanCondiff_all = NaN(num_subs, num_cd_bins);
+
+for i = 1:num_subs
+    preds = preds_all(preds_all.id == str2num(subj_ids{i}), :);
+    
+    % Remove pe == 0 rows (same exclusion as in the main loop)
+    preds(preds.pe == 0, :) = [];
+    
+    % Re-bin (same edges as main loop)
+    preds.pe_bins = discretize(abs(preds.pe),       pe_binedges);
+    preds.cd_bins = discretize(abs(preds.con_diff),  cd_binedges);
+    
+    % Mean PE per bin
+    for pe = 1:num_pe_bins
+        idx = preds.pe_bins == pe;
+        if any(idx)
+            meanPE_all(i, pe) = mean(abs(preds.pe(idx)), 'omitnan');
+        end
+    end
+    
+    % Mean condiff per bin
+    for cd = 1:num_cd_bins
+        idx = preds.cd_bins == cd;
+        if any(idx)
+            meanCondiff_all(i, cd) = mean(abs(preds.con_diff(idx)), 'omitnan');
+        end
+    end
+end
+
+% SAVE
+safe_saveall(fullfile(save_dir, 'meanPE_all.mat'),      meanPE_all);
+safe_saveall(fullfile(save_dir, 'meanCondiff_all.mat'), meanCondiff_all);
 
 % -------------------------------------------------------------------------
 % PERMUTATION TESTS: for each PE bin, compare condiff bin 1 vs bin 2

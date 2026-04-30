@@ -40,7 +40,7 @@ for s = 1:num_subs
         coeffs.up(s,c) = betas.with_intercept(1,up_idx,s,c);
     end
 end
-posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_diffVals.mat"));
+posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_diffVals_zscoredPESubjVals.mat"));
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat")); % add PE bin curves
 pe_pval = perm.mask(pe_idx,:);
 pecondiff_pval = perm.prob(peCondiff_idx,:);
@@ -171,7 +171,7 @@ post_diff2 = mean(posterior.lowPU_highPE) - mean(posterior.lowPU_lowPE);
 max_pupil = max([abs(pupil_diff1), abs(pupil_diff2)]);
 max_post  = max([abs(post_diff1), abs(post_diff2)]);
 
-scaling_factor = max_pupil / max_post;
+scaling_factor = 1; %max_pupil / max_post;
 
 % 4. Apply scaling to the posterior curves
 post_diff1_rescaled = post_diff1 * scaling_factor;
