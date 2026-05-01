@@ -19,7 +19,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-%%
+%% Load data
 
 save_dir = strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
     filesep, "pupil", filesep, "regression", filesep, "main");
@@ -43,9 +43,12 @@ if useSubjMeans == 0
     highPE = 0.8; % high PE
     lowPE = 0.2; % low PE
 else
-    highPU = mean(condiffVals(:,1)); % high BS uncertainty
-    lowPU = mean(condiffVals(:,2)); % low BS uncertainty
 
+    % Contrast differences
+    highPU = mean(condiffVals(:,1)); % high state uncertainty
+    lowPU = mean(condiffVals(:,2)); % low state uncertainty
+
+    % Compute mean and SD
     refVals = linspace(0, 0.1, maxTrials);
     refMean = mean(refVals);
     refSD   = std(refVals);
@@ -53,37 +56,39 @@ else
     % Z-score highPU and lowPU using the reference distribution's parameters
     highPU = (highPU - refMean) / refSD;
     lowPU  = (lowPU  - refMean) / refSD;
-
+    
+    % Prediction errors
     highPE = mean(peVals(:,2)); % high PE
     lowPE = mean(peVals(:,1)); % low PE
-
+    
+    % Compute mean and SD
     refPEMean = mean(abs(preds_all.pe));
     refPESD   = std(abs(preds_all.pe));
 
+    % Z-score highPE and lowPE using the reference distribution's parameters
     highPE = (highPE - refPEMean) / refPESD;
     lowPE  = (lowPE  - refPEMean) / refPESD;
 end
 
-
-% LOOP OVER SUBJECTS
+% GENERATE PREDICTIONS BASED ON COEFFICIENTS
+% Loop over subjects
 for s = 1:num_subjs
-    preds = preds_all(preds_all.id == str2num(subj_ids{s}),:);
-    preds.zsc_condiff = zscore(preds.norm_condiff);
+
+    % Extract coefficients
+    % todo: based on name, not index
     for c = 1:col
         coeffs.pe(s,c) = betas_field(1,5,s,c);
         coeffs.pe_condiff(s,c) = betas_field(1,8,s,c);
         coeffs.intercept(s,c) = betas_field(1,1,s,c);
         coeffs.con_diff(s,c) = betas_field(1,4,s,c);
     end
+    
+    % Compute predictions for the four conditions
+    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE + coeffs.pe(s,:).*highPE + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE + coeffs.pe(s,:).*lowPE + coeffs.con_diff(s,:).*lowPU;
 
-    highPE_vec = highPE;
-    lowPE_vec  = lowPE;
-
-    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*highPU;
-    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*lowPU;
-
-    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*highPU;
-    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*lowPU;
+    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE + coeffs.pe(s,:).*lowPE + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE + coeffs.pe(s,:).*highPE + coeffs.con_diff(s,:).*lowPU;
 
 end
 
