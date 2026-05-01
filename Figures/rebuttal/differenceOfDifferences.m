@@ -48,6 +48,8 @@ mkdir(save_dir);
 % -------------------------------------------------------------------------
 for i = 1:num_subs
 
+    % todo: should be based on descriptive object    
+
     % GET BEHAVIORAL DATA
     behv_data = [];
     for j = 1:num_sess(i)
@@ -82,7 +84,7 @@ for i = 1:num_subs
     pupil_signal(missedSlider == 1, :) = [];
 
     % BIN PE AND CONDIFF
-    preds.pe_bins = discretize(abs(preds.pe),      pe_binedges);
+    preds.pe_bins = discretize(abs(preds.pe), pe_binedges);
     preds.cd_bins = discretize(abs(preds.con_diff), cd_binedges);
     pupil_signal(preds.pe == 0,:) = [];
     preds(preds.pe == 0,:) = [];
@@ -103,10 +105,10 @@ end
 % COMPUTE mean PE and mean condiff per bin, per subject
 % =========================================================================
 
-% meanPE_all     [num_subs x num_pe_bins]   — mean of abs(pe) within each PE bin
-% meanCondiff_all [num_subs x num_cd_bins]  — mean of abs(con_diff) within each condiff bin
+% meanPE_all [num_subs x num_pe_bins] — mean of abs(pe) within each PE bin
+% meanCondiff_all [num_subs x num_cd_bins] — mean of abs(con_diff) within each condiff bin
 
-meanPE_all      = NaN(num_subs, num_pe_bins);
+meanPE_all = NaN(num_subs, num_pe_bins);
 meanCondiff_all = NaN(num_subs, num_cd_bins);
 
 for i = 1:num_subs
@@ -116,8 +118,8 @@ for i = 1:num_subs
     preds(preds.pe == 0, :) = [];
     
     % Re-bin (same edges as main loop)
-    preds.pe_bins = discretize(abs(preds.pe),       pe_binedges);
-    preds.cd_bins = discretize(abs(preds.con_diff),  cd_binedges);
+    preds.pe_bins = discretize(abs(preds.pe), pe_binedges);
+    preds.cd_bins = discretize(abs(preds.con_diff), cd_binedges);
     
     % Mean PE per bin
     for pe = 1:num_pe_bins

@@ -9,7 +9,7 @@ num_subjs = 47; % number of subjects
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -28,8 +28,8 @@ betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data
 preds_all = readtable(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
     filesep, "behavior", filesep, "LR analyses", filesep, "preprocessed_lr_pupil_no_zerope.xlsx"));
 descriptive_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'descriptive');
-peVals = importdata(fullfile(descriptive_dir, 'meanPE_all.mat'));
-condiffVals = importdata(fullfile(descriptive_dir, 'meanCondiff_all.mat'));
+peVals = importdata(fullfile(descriptive_dir, 'meanPE_all.mat'));  % precomputed in differenceOfDifferences.m
+condiffVals = importdata(fullfile(descriptive_dir, 'meanCondiff_all.mat')); % precomputed in differenceOfDifferences.m
 betas_field = betas_struct.with_intercept;
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");

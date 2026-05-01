@@ -56,8 +56,10 @@ regression_path  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behav
 % load all required data
 mix_curve = importdata(fullfile(descriptive_path,"mix_curve.mat")); % learning curves
 perc_curve = importdata(fullfile(descriptive_path,"perc_curve.mat"));
-mean_curves(1,:) = nanmean(mix_curve);mean_curves(2,:) = nanmean(perc_curve);
-sem_curves(1,:) = nanstd(mix_curve)./sqrt(num_subjs);sem_curves(2,:) = nanstd(perc_curve)./sqrt(num_subjs);
+mean_curves(1,:) = nanmean(mix_curve);
+mean_curves(2,:) = nanmean(perc_curve);
+sem_curves(1,:) = nanstd(mix_curve)./sqrt(num_subjs);
+sem_curves(2,:) = nanstd(perc_curve)./sqrt(num_subjs);
 data_subjs = readtable(fullfile(regression_path,"preprocessed_lr_pupil_no_zerope.xlsx")); % preprocessed LR data
 betas_all = importdata(fullfile(regression_path,"betas_signed.mat")); % betas from signed analysis
 [~,p_vals] = ttest(betas_all);
@@ -415,10 +417,11 @@ h(3).Color = low_PU;
 h(2).Color = mid_PU;
 h(1).Color = high_PU;
 xlabel('Prediction error')
-title('Update','FontWeight','normal')
+ylabel('Update')
+%title('Update','FontWeight','normal')
 ylabel('')
 adjust_figprops(ax15_new,font_name,font_size,line_width);
-l = legend('Contrast-difference','0','0.5','1','Location','best','AutoUpdate','off');
+l = legend('Contrast difference','0','0.5','1','Location','best','AutoUpdate','off');
 l.EdgeColor = 'none';
 l.Color = 'none';
 l.ItemTokenSize = [7 7];
@@ -500,7 +503,6 @@ for n = 1:num_plots
     set(gca,'color','none','LineWidth',linewidth_axes,'FontName',font_name)
     set(gca,'Xticklabel',["High","Low"],'FontSize',font_size,'Yticklabel',["50","100"])
     title(["Reward","uncertainty"],"FontWeight","normal","FontSize",font_size)
-%     xlabel(["Reward","uncertainty"])
     box off
 end
 % ADD TEXT ON BARS
