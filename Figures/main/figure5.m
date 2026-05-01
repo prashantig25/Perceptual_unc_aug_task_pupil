@@ -56,7 +56,7 @@ t = tiledlayout(1,2,"Padding","compact","TileSpacing","compact");
 ax1 = nexttile(1);
 ax2 = nexttile(2);
 
-sgtitle('|Update| = \beta_0 + \beta_1 \cdot |Posterior update| + \beta_2 \cdot Pupil + ... + \epsilon', ...
+sgtitle('|Update| = \beta_0 + \beta_1 \cdot |Predicted update| + \beta_2 \cdot Pupil + ... + \epsilon', ...
     'Interpreter','Tex','FontSize',8,'FontName','Arial')
 %% PLOT COEFFS FOR POSTERIOR UPDATES
 
@@ -76,7 +76,7 @@ coeffs = squeeze(mean(betas_pupil.with_intercept(1, postUP_idx, :, :), 4));
 [avg,sd,coeffs] = prepare_betas(coeffs,1,num_subjs);
 h = bar_plots_pval(coeffs,avg,sd,num_subjs, ...
         1,1,{'','Example participant','Normative agent'}, ...
-        xticks,{'','',''},"\itp\rm < 0.001",'','Posterior update ({\bf\beta_1})',0,1, ...s
+        xticks,{'','',''},"\itp\rm < 0.001",'','Predicted update ({\bf\beta_1})',0,1, ...s
         10,1,font_size,linewidth_plot,font_name,0,colors_name,{'*'},0.1);
 h.BarWidth = 0.4;
 ylim_vals = [0 0.85];

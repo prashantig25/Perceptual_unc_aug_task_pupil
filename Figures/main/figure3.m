@@ -50,15 +50,12 @@ delete(ax1); % delete old axis
 patch_tp = repelem(1,1,100);
 resp_tp = [zeros(1,30),repelem(2,1,200)];
 fb_tp = [zeros(1,30),repelem(3,1,270)];
-
 trial_tp = [patch_tp,resp_tp,fb_tp];
-trial_all = [trial_all];
 
 % PLOT 
 x = 1:630;
 hold on
 plot(mean(trial_all,1),"Color",neutral,"LineWidth",2,"LineStyle","-")
-hold on
 shadedErrorBar(x,mean(trial_all,1),std(trial_all,1)./sqrt(num_subjs),{"Color",neutral},1)
 % ylim([-0.1,0.55])
 xlim([1,630])
@@ -105,7 +102,7 @@ delete(ax2); % delete old axis
 % GET POSITION FOR P-VALUE
 x = linspace(-300,2700,300); % x-axis
 ylim_axes = [-0.1,0.45];
-[pval_pos] = create_pvalpos(ylim_axes);
+pval_pos = create_pvalpos(ylim_axes);
 
 avg_bin1= mean(condiffbin.pebin1);
 sem_bin1 = std(condiffbin.pebin1)./sqrt(num_subjs);
@@ -116,14 +113,9 @@ sem_bin2 = std(condiffbin.pebin2)./sqrt(num_subjs);
 % PLOT
 hold on
 plot(x,avg_bin1,'LineStyle','-','Color',light_violet,'LineWidth',2)
-hold on
 plot(x,avg_bin2,'LineStyle','-','Color',mid_violet,'LineWidth',2)
-
-hold on
 shadedErrorBar(x,avg_bin1,sem_bin1,{'LineWidth',2,'Color',light_violet},1)
-hold on
 shadedErrorBar(x,avg_bin2,sem_bin2,{'LineWidth',2,'Color',mid_violet},1)
-hold on
 
 % ADJUST PLOT PROPERTIES
 xline(0,'--')
@@ -228,7 +220,7 @@ l.ItemTokenSize = [7 7];
 xline(0,'--')
 yline(0,'--')
 xlabel('Time since feedback onset (ms)')
-ylabel('PE-modulated pupil (a.u.)')
+ylabel('PE-modulated pupil')
 
 %% ADD EXTERNAL PNGs
 
