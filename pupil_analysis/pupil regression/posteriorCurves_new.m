@@ -33,6 +33,7 @@ condiffVals = importdata(fullfile(descriptive_dir, 'meanCondiff_all.mat')); % pr
 betas_field = betas_struct.with_intercept;
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
+maxTrials = 160; % max trials presented to a participant
 
 useSubjMeans = 1;
 if useSubjMeans == 0
@@ -45,9 +46,7 @@ else
     highPU = mean(condiffVals(:,1)); % high BS uncertainty
     lowPU = mean(condiffVals(:,2)); % low BS uncertainty
 
-    zscoredCondiff = zscore(linspace(0,0.1,160));
-
-    refVals = linspace(0, 0.1, 160);
+    refVals = linspace(0, 0.1, maxTrials);
     refMean = mean(refVals);
     refSD   = std(refVals);
 
@@ -58,9 +57,8 @@ else
     highPE = mean(peVals(:,2)); % high PE
     lowPE = mean(peVals(:,1)); % low PE
 
-    refPE     = linspace(0, 1, 160);   % match whatever vector you used for zscore(PE)
-    refPEMean = mean(refPE);
-    refPESD   = std(refPE);
+    refPEMean = mean(abs(preds_all.pe));
+    refPESD   = std(abs(preds_all.pe));
 
     highPE = (highPE - refPEMean) / refPESD;
     lowPE  = (lowPE  - refPEMean) / refPESD;
@@ -77,18 +75,18 @@ for s = 1:num_subjs
         coeffs.intercept(s,c) = betas_field(1,1,s,c);
         coeffs.con_diff(s,c) = betas_field(1,4,s,c);
     end
-    % Using the height of preds to ensure a perfect match
-    highPE_vec = ones(height(preds), 1) * highPE;
-    lowPE_vec  = ones(height(preds), 1) * lowPE;
 
-    posterior.highPU_highPE(s,:) = mean(coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*highPU);
-    posterior.lowPU_lowPE(s,:) = mean(coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*lowPU);
+    highPE_vec = highPE;
+    lowPE_vec  = lowPE;
 
-    posterior.highPU_lowPE(s,:) = mean(coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*highPU);
-    posterior.lowPU_highPE(s,:) = mean(coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*lowPU);
+    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*lowPU;
+
+    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*lowPU;
 
 end
 
 % SAVE
-safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_diffVals_zscoredPESubjVals.mat"),posterior);
+safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_zscoredValues.mat"),posterior);
 
