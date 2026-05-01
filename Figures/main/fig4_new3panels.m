@@ -40,7 +40,7 @@ for s = 1:num_subs
         coeffs.up(s,c) = betas.with_intercept(1,up_idx,s,c);
     end
 end
-posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_diffVals_zscoredPESubjVals.mat"));
+posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_zscoredValues.mat"));
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat")); % add PE bin curves
 pe_pval = perm.mask(pe_idx,:);
 pecondiff_pval = perm.prob(peCondiff_idx,:);
@@ -189,10 +189,10 @@ hold on
 % 1. Capture handles for the lines ONLY
 % Note: shadedErrorBar returns a struct. We want the 'mainLine' field.
 h1 = shadedErrorBar(xaxis, mean(interaction.subj_pupil(1,2).signal) - mean(interaction.subj_pupil(1,1).signal), ...
-    std(std_diff1)./sqrt(num_subs), {'Color', high_PU, 'LineWidth', linewidth_curves}, 1);
+    std(std_diff1)./sqrt(num_subs), {'Color', high_PU, 'LineWidth', linewidth_curves}, 0.15);
 
 h2 = shadedErrorBar(xaxis, mean(interaction.subj_pupil(2,2).signal) - mean(interaction.subj_pupil(2,1).signal), ...
-    std(std_diff2)./sqrt(num_subs), {'Color', low_PU, 'LineWidth', linewidth_curves}, 1);
+    std(std_diff2)./sqrt(num_subs), {'Color', low_PU, 'LineWidth', linewidth_curves}, 0.15);
 
 % 2. Capture handles for the posterior curves (Model Data)
 p1 = plot(xaxis, post_diff1_rescaled, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
