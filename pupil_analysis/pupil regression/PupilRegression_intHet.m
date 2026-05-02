@@ -480,9 +480,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
             % Save coefficient names once
             if subj_idx == 1 && c == 1
                 coeff_names = lm.CoefficientNames;
-                safe_saveall(fullfile(obj.save_dir, [obj.betas_save, '_coeffNames.mat']), coeff_names);
+                % safe_saveall(fullfile(obj.save_dir, [obj.betas_save, '_coeffNames.mat']), coeff_names);
+                obj.betas_struct.coeff_names = coeff_names;
             end
-
             if ~isempty(lm)
                 %     if isa(lm, 'LinearModel')
                 %         negLL     = -lm.LogLikelihood;

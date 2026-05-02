@@ -7,7 +7,7 @@ linewidth_axes = 0.5; % arrow width
 font_name = 'Arial'; % font name
 horz_align = 'center'; % alignment
 vert_align = 'middle';
-font_size = 6; 
+font_size = 7; 
 [~,~,~,~,color_screen,fb_green,darkblue_muted,mix,perc,rew,~,~,~,~,...
     ~,~,~,~,~] = colors_rgb(); % colors
 

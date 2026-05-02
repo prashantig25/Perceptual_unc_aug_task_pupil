@@ -15,7 +15,7 @@ else
 end
 data_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 betas_struct = importdata(fullfile(data_dir,"additiveMdl_linearInt.mat")); 
-coeff_names = importdata(fullfile(data_dir,"additiveMdl_linearInt_coeffNames.mat")); 
+coeff_names = betas_struct.coeff_names; % importdata(fullfile(data_dir,"additiveMdl_linearInt_coeffNames.mat")); 
 perm = importdata(fullfile(data_dir,"perm_additiveMdl_linearInt.mat")); 
 x = linspace(-300,2700,300); % x-axis
 subj_ids = importdata("subj_ids.mat");
@@ -48,7 +48,7 @@ axes_old = [ax1,ax2,ax3,ax4,ax5,ax6];
 
 %% PLOT COEFFICIENT CURVES
 
-ylabel_strings = [{"Uncertainty-modulated";"pupil (a.u.)"},{"PE-modulated";"pupil (a.u.)"},{"x-gaze-modulated";"pupil (a.u.)"},{"y-gaze-modulated";"pupil (a.u.)"},{"UP-modulated";"pupil (a.u.)"},{"RT-modulated";"pupil (a.u.)"}];
+ylabel_strings = [{"Uncertainty-modulated";"pupil"},{"PE-modulated";"pupil"},{"x-gaze-modulated";"pupil"},{"y-gaze-modulated";"pupil"},{"UP-modulated";"pupil"},{"RT-modulated";"pupil"}];
 pe_idx = find(strcmp(coeff_names,'pe'));
 condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
 ygaze_idx = find(strcmp(coeff_names,'ygaze'));

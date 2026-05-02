@@ -4,7 +4,7 @@ clc
 clearvars
 
 line_width = 0.5; % line width for axes
-font_size = 6; % font size
+font_size = 7; % font size
 font_name = 'Arial'; % font name
 linewidth_axes = 0.5; % line width for plot lines
 fontsize_label = 12; % fontsize for subplot labels

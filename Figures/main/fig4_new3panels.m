@@ -29,7 +29,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 betas = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt.mat")); % add PE bin curves
-coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas.coeff_names; %importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat")); % add PE bin curves
 pe_idx = find(strcmp(coeff_names,'pe'));
 up_idx = find(strcmp(coeff_names,'zsc_up'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
@@ -160,13 +160,13 @@ yline(0,'LineStyle','--','LineWidth',0.5);
 
 adjust_figprops(ax1_new,fontname,fontsize,linewidth_plot);
 hold on
-plot(xaxis(find(pe_pval==1)),pval_pos + -0.01*ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
+plot(xaxis(find(pe_pval==1)),pval_pos + ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
 % ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
 ylabel('Absolute PE modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-text(mean(xaxis(pe_pval == 1)), pval_pos + -0.01, pe_pval_str, ...
+text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 %% PLOT BS-WEIGHTED PE
@@ -195,7 +195,7 @@ xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 adjust_figprops(ax2_new,fontname,fontsize,linewidth_plot);
 hold on
-plot(xaxis(find(pecondiff_pval < 0.05)), pval_pos + -0.003*ones(1,length(pecondiff_pval(pecondiff_pval < 0.05))), '.', 'color', ...
+plot(xaxis(find(pecondiff_pval < 0.05)), pval_pos + ones(1,length(pecondiff_pval(pecondiff_pval < 0.05))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
 % ylim(ylim_axes)
@@ -204,7 +204,7 @@ xlabel('Time since feedback onset (ms)')
 ylabel('Uncertainty-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 % text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.024","FontName",fontname,"FontSize", ...
 %     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
-text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + -0.003, pecondiff_pval_str, ...
+text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + 1.1, pecondiff_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 

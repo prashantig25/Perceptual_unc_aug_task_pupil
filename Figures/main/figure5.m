@@ -28,7 +28,7 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-data_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
+data_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
 coeffs_name = importdata(fullfile(data_dir,"coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % import coeff names
 pupil_idx = find(strcmp(coeffs_name, 'pupil')); % GET INDEX OF PUPIL COEFFICIENT
 postUP_idx = find(strcmp(coeffs_name, 'post_up')); % GET INDEX OF PUPIL COEFFICIENT
@@ -56,7 +56,7 @@ t = tiledlayout(1,2,"Padding","compact","TileSpacing","compact");
 ax1 = nexttile(1);
 ax2 = nexttile(2);
 
-sgtitle('|Update| = \beta_0 + \beta_1 \cdot |Posterior update| + \beta_2 \cdot Pupil + ... + \epsilon', ...
+sgtitle('|Update| = \beta_0 + \beta_1 \cdot |Predicted update| + \beta_2 \cdot Pupil + ... + \epsilon', ...
     'Interpreter','Tex','FontSize',8,'FontName','Arial')
 %% PLOT COEFFS FOR POSTERIOR UPDATES
 
@@ -68,16 +68,15 @@ box(ax1_new, 'off'); % remove box
 delete(ax1); % delete old axis
 
 % PLOT
-for s = 1:num_subjs
-    for c = 1:col
-        data_plot(s,c) = betas_pupil.with_intercept(1,postUP_idx,s,c);
-    end
-end
-coeffs = mean(data_plot,2);
+coeffs = squeeze(mean(betas_pupil.with_intercept(1, postUP_idx, :, :), 4));
+
+% Run t-test
+[h, pVals] = ttest(coeffs);
+
 [avg,sd,coeffs] = prepare_betas(coeffs,1,num_subjs);
 h = bar_plots_pval(coeffs,avg,sd,num_subjs, ...
         1,1,{'','Example participant','Normative agent'}, ...
-        xticks,{'','',''},"\itp\rm < 0.001",'','Posterior update ({\bf\beta_1})',0,1, ...s
+        xticks,{'','',''},"\itp\rm < 0.001",'','Predicted update ({\bf\beta_1})',0,1, ...s
         10,1,font_size,linewidth_plot,font_name,0,colors_name,{'*'},0.1);
 h.BarWidth = 0.4;
 ylim_vals = [0 0.85];
@@ -96,12 +95,8 @@ delete(ax2); % delete old axis
 ylim_axes = [-0.02,0.07];
 [pval_pos] = create_pvalpos(ylim_axes);
 
-for s = 1:num_subjs
-    for c = 1:col
-        data_plot(s,c) = betas_pupil.with_intercept(1,pupil_idx,s,c);
-    end
-end
-coeffs = data_plot;
+% Squeeze data
+coeffs = squeeze(betas_pupil.with_intercept(1, pupil_idx, :, :));
 
 % PLOT
 hold on 
@@ -114,13 +109,13 @@ xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 adjust_figprops(ax2_new,font_name,font_size,linewidth_plot);
 hold on
-plot(xaxis(find(perm.mask(3,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(3,:)==1)))), '.', 'color', ...
+plot(xaxis(find(perm.mask(3,:)==1)), -0.01 * ones(1,length(xaxis(find(perm.mask(3,:)==1)))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
 ylim([-0.02,0.08])
 xlabel('Time since feedback onset (ms)')
 ylabel('Pupil dilation ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
-text(mean(xaxis(perm.mask(pupil_idx,:) == 1)),pval_pos + -0.003, pval_str, ...
+text(mean(xaxis(perm.mask(pupil_idx,:) == 1)),pval_pos + 0.0085, pval_str, ...
     "FontName",font_name,"FontSize",font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 %% ADD SUBPLOT LABELS
