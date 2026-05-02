@@ -2,9 +2,19 @@ clc
 clearvars
 
 % =================== 1. INITIAL SETUP AND BASELINE MODEL FIT ========================
-data = readtable("/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/" + ...
-    "Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil-main/data/" + ...
-    "GB data peak corrected/behavior/model fitting/preprocessed_lr_pupil_no_zerope.xlsx");
+
+currentDir = cd;
+reqPath    = 'Perceptual_unc_aug_task_pupil';
+pathParts  = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
+preds_all  = readtable(preds_file);
+data = readtable(fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil_no_zerope.xlsx'));
 uniqueID = unique(data.id);
 data.ID = data.id;
 
@@ -23,25 +33,6 @@ data.condiff_relative = (data.contrast_left - data.contrast_right) ./ 2;
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 num_blocks = 8;
-
-% Initialization
-betas_baseline = NaN(numSubjs, 3);
-subj_AIC       = NaN(numSubjs, 1);
-subj_BIC       = NaN(numSubjs, 1);
-subj_Rsquared  = NaN(numSubjs, 1);
-subj_residuals = cell(numSubjs, 1);
-
-currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil-main';
-pathParts  = strsplit(currentDir, filesep);
-if strcmp(pathParts{end}, reqPath)
-    disp('Current directory is already the desired path. No need to run createSavePaths.');
-    desiredPath = currentDir;
-else
-    desiredPath = createSavePaths(currentDir, reqPath);
-end
-preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
-preds_all  = readtable(preds_file);
 
 %% --- Fit Model: RT (current) ~ 1 + condiffZsc (current) + condition (current) + PE (previous trial, within block) ---
 

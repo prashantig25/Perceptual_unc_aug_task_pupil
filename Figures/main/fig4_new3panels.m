@@ -33,6 +33,7 @@ coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data 
 pe_idx = find(strcmp(coeff_names,'pe'));
 up_idx = find(strcmp(coeff_names,'zsc_up'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
+condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
 for s = 1:num_subs
     for c = 1:col
         coeffs.pe(s,c) = betas.with_intercept(1,pe_idx,s,c);
@@ -40,11 +41,11 @@ for s = 1:num_subs
         coeffs.up(s,c) = betas.with_intercept(1,up_idx,s,c);
     end
 end
-posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_zscoredValues.mat"));
+% posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_zscoredValues.mat"));
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat")); % add PE bin curves
 pe_pval = perm.mask(pe_idx,:);
 pecondiff_pval = perm.prob(peCondiff_idx,:);
-interaction = importdata("/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil/data/GB data two pipelines/pupil/descriptive/fb_PE2bins_condiff2bins_linearInt.mat");
+interaction = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"descriptive",filesep,"fb_PE2bins_condiff2bins_linearInt.mat"));
 
 % Compute summary p-values (minimum across timepoints), rounded to 3 decimal places
 pe_min_pval       = round(min(perm.prob(pe_idx,:)), 3);
@@ -62,6 +63,61 @@ if pecondiff_min_pval < 0.001
 else
     pecondiff_pval_str = sprintf("\\itp\\rm = %.3f", pecondiff_min_pval);
 end
+
+preds_all = readtable(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
+    filesep, "behavior", filesep, "LR analyses", filesep, "preprocessed_lr_pupil_no_zerope.xlsx"));
+save_dir = strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
+    filesep, "pupil", filesep, "regression", filesep, "main");
+descriptive_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'descriptive');
+peVals = importdata(fullfile(descriptive_dir, 'meanPE_all.mat'));
+condiffVals = importdata(fullfile(descriptive_dir, 'meanCondiff_all.mat'));
+betas_field = betas.with_intercept;
+maxTrials = 160; % max trials presented to a participant
+
+highPU = mean(condiffVals(:,1)); % high BS uncertainty
+lowPU = mean(condiffVals(:,2)); % low BS uncertainty
+
+refVals = linspace(0, 0.1, maxTrials);
+refMean = mean(refVals);
+refSD   = std(refVals);
+
+% Z-score highPU and lowPU using the reference distribution's parameters
+highPU = (highPU - refMean) / refSD;
+lowPU  = (lowPU  - refMean) / refSD;
+
+highPE = mean(peVals(:,2)); % high PE
+lowPE = mean(peVals(:,1)); % low PE
+
+refPEMean = mean(abs(preds_all.pe));
+refPESD   = std(abs(preds_all.pe));
+
+highPE = (highPE - refPEMean) / refPESD;
+lowPE  = (lowPE  - refPEMean) / refPESD;
+
+% LOOP OVER SUBJECTS
+for s = 1:num_subs
+    preds = preds_all(preds_all.id == str2num(subj_ids{s}),:);
+    preds.zsc_condiff = zscore(preds.norm_condiff);
+    for c = 1:col
+        coeffs.pe(s,c) = betas_field(1,pe_idx,s,c);
+        coeffs.pe_condiff(s,c) = betas_field(1,peCondiff_idx,s,c);
+        coeffs.intercept(s,c) = betas_field(1,1,s,c);
+        coeffs.con_diff(s,c) = betas_field(1,condiff_idx,s,c);
+    end
+
+    highPE_vec = highPE;
+    lowPE_vec  = lowPE;
+
+    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*lowPU;
+
+    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*lowPU;
+
+end
+
+% SAVE
+safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_zscoredValues.mat"),posterior);
 
 %% INITIALIZE TILE LAYOUT
 

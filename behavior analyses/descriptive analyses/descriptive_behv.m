@@ -41,6 +41,9 @@ perc_curve = NaN(num_subjs,t);
 for n = 1:num_subjs
 
     % GET BEHAVIORAL DATA
+    if strcmp(subj_ids{n},"0806")
+        subj_ids{n} = "806";
+    end
     tsv_file = fullfile(behv_dir,strcat('sub_',num2str(subj_ids{n})),'behav', ...
             strcat('sub_',num2str(subj_ids{n}),".tsv")); % path and file name for TSV file
     data = readtable(tsv_file,"FileType","text",'Delimiter', '\t'); % read file
