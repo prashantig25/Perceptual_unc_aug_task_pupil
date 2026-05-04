@@ -109,13 +109,13 @@ xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 adjust_figprops(ax2_new,font_name,font_size,linewidth_plot);
 hold on
-plot(xaxis(find(perm.mask(3,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(3,:)==1)))), '.', 'color', ...
+plot(xaxis(find(perm.mask(3,:)==1)), -0.01 * ones(1,length(xaxis(find(perm.mask(3,:)==1)))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
 ylim([-0.02,0.08])
 xlabel('Time since feedback onset (ms)')
 ylabel('Pupil dilation ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
-text(mean(xaxis(perm.mask(pupil_idx,:) == 1)),pval_pos + -0.003, pval_str, ...
+text(mean(xaxis(perm.mask(pupil_idx,:) == 1)),pval_pos + 0.0085, pval_str, ...
     "FontName",font_name,"FontSize",font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 %% ADD SUBPLOT LABELS

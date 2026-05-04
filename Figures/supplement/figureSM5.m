@@ -83,7 +83,7 @@ if any(perm.mask(pupil_condiff_idx,:) == 1)
     else
         pval_str_a = sprintf("\\itp\\rm = %.3f", pval_a);
     end
-    text(mean(xaxis(perm.mask(pupil_condiff_idx,:) == 1)),-0.003 + pval_pos, pval_str_a, ...
+    text(mean(xaxis(perm.mask(pupil_condiff_idx,:) == 1)),pval_pos + 0.004, pval_str_a, ...
         "FontName",font_name,"FontSize",font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
 end
 

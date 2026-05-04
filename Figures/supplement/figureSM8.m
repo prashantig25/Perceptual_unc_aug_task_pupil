@@ -15,7 +15,7 @@ else
 end
 
 betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_regressedRT_linearInt.mat")); % add PE bin curves
-coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_regressedRT_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas_struct.coeff_names; %importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_regressedRT_linearInt_coeffNames.mat")); % add PE bin curves
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_regressedRT_linearInt.mat")); % add PE bin curves
 
 pe_idx = find(strcmp(coeff_names,'pe'));
@@ -59,7 +59,7 @@ axes_old = [ax1,ax2,ax3,ax4,ax5,ax6,ax7];
 
 %% PLOT COEFFICIENT CURVES
 
-ylabel_strings = [{"Uncertainty-modulated";"pupil (a.u.)"},{"PE-modulated";"pupil (a.u.)"},{"Uncertainty-weighted PE";"pupil (a.u.)"},{"UP-modulated";"pupil (a.u.)"},{"RT-modulated";"pupil (a.u.)"},{"x-gaze-modulated";"pupil (a.u.)"},{"y-gaze-modulated";"pupil (a.u.)"}];
+ylabel_strings = [{"Uncertainty-modulated";"pupil"},{"PE-modulated";"pupil"},{"Uncertainty-weighted PE";"pupil"},{"UP-modulated";"pupil"},{"RT-modulated";"pupil"},{"x-gaze-modulated";"pupil"},{"y-gaze-modulated";"pupil"}];
 ncoeffs = [condiff_idx,pe_idx,peCondiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
 
 xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02]; % position change for axes

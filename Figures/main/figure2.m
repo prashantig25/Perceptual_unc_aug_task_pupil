@@ -242,8 +242,6 @@ ax5_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax5_new, 'on');
 delete(ax5);
 
-addpath("C:\Users\prash\Nextcloud\Thesis_laptop\Semester 6\behv_manuscript\code\results")
-
 % PLOT SLIDER DATA
 colors_name = [mix;perc]; % colors for plot lines
 legend_names = {'High reward uncertainty','Low reward uncertainty'}; % legend names
@@ -418,8 +416,8 @@ h(2).Color = mid_PU;
 h(1).Color = high_PU;
 xlabel('Prediction error')
 ylabel('Update')
-%title('Update','FontWeight','normal')
-ylabel('')
+% title('Update','FontWeight','normal')
+title('')
 adjust_figprops(ax15_new,font_name,font_size,line_width);
 l = legend('Contrast difference','0','0.5','1','Location','best','AutoUpdate','off');
 l.EdgeColor = 'none';

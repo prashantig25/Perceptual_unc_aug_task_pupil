@@ -15,7 +15,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt.mat")); % add PE bin curves
-coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas_struct.coeff_names; % importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff2bins_linearInt.mat")); % add PE bin curves
 
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
@@ -46,7 +46,7 @@ axes_new = [ax1_new,ax2_new,ax3_new,ax4_new];
 
 %% PLOT COEFFICIENTS
 
-ylabel_strings = {'UP-modulated pupil (a.u.)','RT-modulated pupil (a.u.)','x-gaze-modulated pupil (a.u.)','y-gaze-modulated pupil (a.u.)'};
+ylabel_strings = {'UP-modulated pupil','RT-modulated pupil','x-gaze-modulated pupil','y-gaze-modulated pupil'};
 
 up_idx = find(strcmp(coeff_names,'zsc_up'));
 rt_idx = find(strcmp(coeff_names,'rt'));
@@ -104,7 +104,7 @@ for a = 1:length(ncoeffs)
     if disp_perm == 1
         ylim_axes = [ylim_lower(a),ylim_upper(a)];
         [pval_pos] = create_pvalpos(ylim_axes); % get position for p-value
-        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 0.095*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
+        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 35 * ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
             [119, 119, 119]./255, 'markersize', 4);
     end
 
@@ -118,7 +118,7 @@ for a = 1:length(ncoeffs)
         else
             pval_str_a = sprintf("\\itp\\rm = %.3f", pval_a);
         end
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.095, pval_str_a, "FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 35.5, pval_str_a, "FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
     end
     
     % ADJUST FIGURE PROPERTIES
@@ -131,7 +131,7 @@ for a = 1:length(ncoeffs)
     ylabel(ylabel_strings(:,a))
 end
 
-l = legend('High BS uncertainty','Low BS uncertainty','Location','best','EdgeColor', ...
+l = legend('High state uncertainty','Low state uncertainty','Location','best','EdgeColor', ...
     'none','AutoUpdate','off','FontSize',7,'FontName','Arial','Color','none');
 l.ItemTokenSize = [7 7];
 

@@ -61,7 +61,7 @@ function bar_plots(y,mean_all,SEM_all,n,x_groups,bars,legend_names,xticks,xtickl
     for b = 1:bars
         for i = 1:x_groups
             scatter(repmat(h(b).XEndPoints(i), sum(x==i),1), y(x==i,b),10,"o", ...
-                'MarkerEdgeColor','k','MarkerFaceColor','auto','XJitter', ...
+                'MarkerEdgeColor',[184, 184, 184]./255,'MarkerFaceColor',[220, 220, 220]./255,'XJitter', ...
                 'randn','XJitterWidth',.2)
         end
     end
@@ -74,7 +74,7 @@ function bar_plots(y,mean_all,SEM_all,n,x_groups,bars,legend_names,xticks,xtickl
     % PLOTTING ERROR BARS
     for i = 1:nbars
         a = (1:ngroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*nbars);
-        errorbar(a, mean_all(:,i),SEM_all(:,i),  'k', 'linestyle', 'none','LineWidth',2);
+        errorbar(a, mean_all(:,i),SEM_all(:,i),  'k', 'linestyle', 'none','LineWidth',1);
     end
     hold on
 

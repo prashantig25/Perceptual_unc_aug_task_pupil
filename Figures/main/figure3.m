@@ -16,7 +16,7 @@ end
 
 condiffbin = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "descriptive", filesep, "fb_PE2bins_linearInt.mat")); % add PE bin curves
 betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt.mat")); % add PE bin curves
-coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas_struct.coeff_names; % importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff2bins_linearInt.mat")); % add PE bin curves
 trial_all = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "descriptive", filesep, "full_trial_linearInt.mat")); % add PE bin curves
 
@@ -48,8 +48,13 @@ delete(ax1); % delete old axis
 
 % TIME POINTS FOR EACH EVENT
 patch_tp = repelem(1,1,100);
-resp_tp = [zeros(1,30),repelem(2,1,200)];
-fb_tp = [zeros(1,30),repelem(3,1,270)];
+pre_resp = zeros(1,30);
+resp = repelem(2,1,200);
+resp_tp = [pre_resp,resp];
+pre_fb = zeros(1,30);
+fb = repelem(3,1,270);
+fb_tp = [pre_fb,fb];
+
 trial_tp = [patch_tp,resp_tp,fb_tp];
 
 % PLOT 
@@ -58,7 +63,7 @@ hold on
 plot(mean(trial_all,1),"Color",neutral,"LineWidth",2,"LineStyle","-")
 shadedErrorBar(x,mean(trial_all,1),std(trial_all,1)./sqrt(num_subjs),{"Color",neutral},1)
 % ylim([-0.1,0.55])
-xlim([1,630])
+xlim([1,length(trial_tp)])
 
 % ADD LINES TO SEPARATE EVENTS
 ylims = get(gca, 'ylim'); ylims(1) = ylims(1)*1.1;
@@ -75,8 +80,24 @@ l = line([x x], ylims); set(l, 'Color', 'k', 'LineStyle', '-', 'LineWidth', 0.5)
 x = length(patch_tp) + length(resp_tp) + 30;
 l = line([x x], ylims); set(l, 'Color', 'k', 'LineStyle', '-', 'LineWidth', 0.5);
 
-xlabels = {'0','500','0','1000','0','1000','2000'};
-xticks = [0,50,130,230,360,460,560];
+% xticks = [0,50,130,230,360,460,560];
+% xticks = [0,length(patch_tp)./2,length(patch_tp) + length(pre_resp),length(patch_tp) + length(pre_resp) + length(resp)./2,length(patch_tp) + length(pre_resp) + length(resp) + length(pre_fb),length(patch_tp) + length(pre_resp) + length(resp) + length(pre_fb) + length(fb(:,1:100)),length(patch_tp) + length(pre_resp) + length(resp) + length(pre_fb) + length(fb(:,1:100)) + length(fb(:,1:100))];
+
+% Define segment lengths in order
+segments = [patch_tp, resp_tp, fb_tp];  % already defined
+seg_lengths = [length(patch_tp), length(pre_resp), length(resp), length(pre_fb), length(fb(1,:))];
+cum_lengths = cumsum([0, seg_lengths]);  % cumulative endpoints: [0, 100, 130, 330, 360, 630]
+
+% Midpoints of each event (patch, resp, fb)
+patch_mid = cum_lengths(1) + seg_lengths(1)/2;
+resp_mid  = cum_lengths(3) + seg_lengths(3)/2;
+fb_mid    = cum_lengths(5) + seg_lengths(1);   % mid of first fb half
+fb_mid2    = cum_lengths(5) + seg_lengths(1) + seg_lengths(1);   % mid of first fb half
+
+xticks = [0, patch_mid, cum_lengths(3), resp_mid, cum_lengths(5), fb_mid, fb_mid2];
+samples_per_100ms = 10; % Time within each event (in ms, at 10 samples/100ms rate)
+xticks_within = (xticks - cum_lengths([1,1,3,3,5,5,5])) * (100/samples_per_100ms);
+xlabels = arrayfun(@(t) num2str(round(t)), xticks_within, 'UniformOutput', false);
 set(gca,  'XTick', xticks, 'XTickLabel', xlabels,'box', 'off');
 
 text(length(patch_tp), ylims(1) +  0.05, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
@@ -132,7 +153,7 @@ l.ItemTokenSize = [7 7];
 % PERMUTATION TEST P-VALUE
 disp_perm = 1;
 if disp_perm == 1
-    plot(x(find(condiffbin.stat==1)), -0.05*ones(1, length(find(condiffbin.stat==1))), '.', 'color', ...
+    plot(x(find(condiffbin.stat==1)), -16*ones(1, length(find(condiffbin.stat==1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
 permPE_prob = condiffbin.prob(1,:);
@@ -144,7 +165,7 @@ else
     pval_str = sprintf("\\itp\\rm = %.3f", pval);
 end
 
-text(mean(x(condiffbin.stat == 1)),-0.1,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(condiffbin.stat == 1)),-15,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 %% PLOT BINNED REGRESSION RESULTS
 
 % POSITION CHANGE
@@ -205,10 +226,10 @@ end
 % DISPLAY PERMUTATION TEST RESULTS
 disp_perm = 1;
 if disp_perm == 1
-    plot(x(find(perm.mask(ncoeffs,:) == 1)), -0.02*ones(1, length(find(perm.mask(ncoeffs,:) == 1))), '.', 'color', ...
+    plot(x(find(perm.mask(ncoeffs,:) == 1)), ones(1, length(find(perm.mask(ncoeffs,:) == 1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos - 0.02,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos + 1.5,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax5_new,'Arial',7,0.5)

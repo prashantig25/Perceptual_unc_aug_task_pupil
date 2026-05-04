@@ -43,9 +43,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
             obj = obj@pupilReg_Vars();
 
-            if nargin > 0 && isa(config, 'PupilRegressionConfig')
-                obj.copyFromConfig(config);
-            end
+            % if nargin > 0 && isa(config, 'PupilRegressionConfig')
+            %     obj.copyFromConfig(config);
+            % end
 
             obj.betas_struct    = struct();
             obj.model_type      = 'OLS';
@@ -55,20 +55,17 @@ classdef PupilRegression_intHet < pupilReg_Vars
             obj.completed_steps = 0;
         end
 
-        function copyFromConfig(obj, config)
-            % Copy properties from another configuration object
-            % Transfers all matching properties from config object to this instance
-            %
-            % Parameters:
-            %   config - Source configuration object containing analysis parameters
-            
-            props = properties(config);
-            for i = 1:length(props)
-                if isprop(obj, props{i})
-                    obj.(props{i}) = config.(props{i});
-                end
-            end
-        end
+        %% ----------------------------------------------------------------
+        %  COPY CONFIG
+        %% ----------------------------------------------------------------
+        % function copyFromConfig(obj, config)
+        %     props = properties(config);
+        %     for i = 1:length(props)
+        %         if isprop(obj, props{i})
+        %             obj.(props{i}) = config.(props{i});
+        %         end
+        %     end
+        % end
 
         %% ----------------------------------------------------------------
         %  HETEROSKEDASTIC CONFIGURATION SETTER
@@ -89,8 +86,17 @@ classdef PupilRegression_intHet < pupilReg_Vars
         end
 
         function initProgress(obj, total, titleStr)
-            % Open a new waitbar. Call once at the start of runAnalysis.
-            obj.total_steps = total;
+            % INITPROGRESS Open a new waitbar. Call once at the start of runAnalysis.
+            %
+            %   initProgress(OBJ, TOTAL, TITLESTR) initialises the progress tracking
+            %   by setting the total number of expected steps to TOTAL, resetting the
+            %   completed step counter to zero, and opening a waitbar dialog with the
+            %   title TITLESTR and a Cancel button.
+            %
+            %   Inputs:
+            %     total    - (numeric) Total number of steps expected in the analysis.
+            %     titleStr - (char) Message string displayed inside the waitbar dialog.
+            obj.total_steps     = total;
             obj.completed_steps = 0;
             obj.wb = waitbar(0, titleStr, ...
                 'Name', 'Pupil Regression', ...
@@ -99,8 +105,16 @@ classdef PupilRegression_intHet < pupilReg_Vars
         end
 
         function updateProgress(obj, msg)
-            % Increment the counter by 1 and refresh the bar.
-            % Safe to call from the main thread only (not inside parfor).
+            % UPDATEPROGRESS Increment the step counter by 1 and refresh the waitbar.
+            %
+            %   updateProgress(OBJ, MSG) increments the completed step count by one,
+            %   recomputes the fractional progress, and updates the waitbar label to
+            %   MSG.  If the user has pressed Cancel, the waitbar is closed and an
+            %   error is thrown.  Safe to call from the main thread only — do NOT
+            %   call from inside a parfor loop.
+            %
+            %   Inputs:
+            %     msg - (char) Status message displayed in the waitbar on this update.
             if isempty(obj.wb) || ~isvalid(obj.wb)
                 return
             end
@@ -115,8 +129,16 @@ classdef PupilRegression_intHet < pupilReg_Vars
         end
 
         function incrementProgress(obj, n)
-            % Add n to the counter without changing the message.
-            % Used to absorb increments forwarded from a DataQueue.
+            % INCREMENTPROGRESS Add N steps to the counter without changing the message.
+            %
+            %   incrementProgress(OBJ, N) adds N to the completed step count and
+            %   recomputes the fractional progress on the waitbar.  The existing
+            %   waitbar message is left unchanged.  Intended for absorbing batched
+            %   step increments forwarded from a DataQueue (e.g. from worker threads
+            %   inside a parfor loop).
+            %
+            %   Inputs:
+            %     n - (numeric) Number of steps to add to the completed step count.
             if isempty(obj.wb) || ~isvalid(obj.wb)
                 return
             end
@@ -126,6 +148,12 @@ classdef PupilRegression_intHet < pupilReg_Vars
         end
 
         function closeProgress(obj)
+            % CLOSEPROGRESS Delete the waitbar dialog and reset the handle to empty.
+            %
+            %   closeProgress(OBJ) closes the waitbar window if it is still open and
+            %   valid, then sets the internal handle OBJ.wb to [] so subsequent
+            %   guard checks in updateProgress and incrementProgress exit cleanly.
+            %   Call once after runAnalysis completes (or errors out).
             if ~isempty(obj.wb) && isvalid(obj.wb)
                 delete(obj.wb);
             end
@@ -194,9 +222,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     num_vars = 1:obj.num_vars+1;
                     var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
                     var2 = squeeze(obj.betas_struct.with_intercept(2, :, :, :)); % [num_vars x num_subjs x col]
-                    obj.perm_results = obj.permtestFcn(num_vars, obj.num_subs, obj.col, var1, var2);
-
-                else 
+                    obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1, var2);
+                else
                     obj.perm_results = [];
                 end
             elseif strcmp(obj.model_type, 'heteroskedastic')
@@ -591,7 +618,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 zscore(log(preds_valid.rt)), preds_valid.condition, preds_valid.ecoperf, ...
                 preds_valid.correct, zscore(preds_valid.pe_condiff), ...
                 'VariableNames', {'pupil','xgaze','ygaze','zsc_condiff','signed_pe', ...
-                                  'pe','zsc_up','rt','condition','ecoperf','reward','pe_condiff'});
+                'pe','zsc_up','rt','condition','ecoperf','reward','pe_condiff'});
 
             if obj.baseline_mdl == 1
                 tbl.baseline = zsc_base(validIdx);
@@ -732,7 +759,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             beta5  = params(9);  beta6  = params(10);
 
             yhat  = beta0 + beta1*x1 + beta2*x2 + beta21*(x1.*x2) ...
-                  + beta3*x3 + beta4*x4 + beta5*x5 + beta6*x6;
+                + beta3*x3 + beta4*x4 + beta5*x5 + beta6*x6;
             sigma = max(omik0 + omik1.*abs(x2), 1e-6);
             logL  = -0.5*log(2*pi) - log(sigma) - 0.5*((y - yhat)./sigma).^2;
             nLL   = -sum(logL);

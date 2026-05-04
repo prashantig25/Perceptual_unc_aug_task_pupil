@@ -14,7 +14,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt.mat")); % add PE bin curves
-coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas_struct.coeff_names; % importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat")); % add PE bin curves
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat")); % add PE bin curves
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
     ~,~,~,~,study2_blue] = colors_rgb(); % colors
@@ -43,7 +43,7 @@ axes_old = [ax1,ax2,ax3,ax4,ax5];
 
 %% PLOT COEFFICIENT CURVES 
 
-ylabel_strings = {'Uncertainty-modulated pupil (a.u.)','UP-modulated pupil (a.u.)','RT-modulated pupil (a.u.)','x-gaze-modulated pupil (a.u.)','y-gaze-modulated pupil (a.u.)'};
+ylabel_strings = {'Uncertainty-modulated pupil','UP-modulated pupil','RT-modulated pupil','x-gaze-modulated pupil','y-gaze-modulated pupil'};
 condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
 ygaze_idx = find(strcmp(coeff_names,'ygaze'));
 xgaze_idx = find(strcmp(coeff_names,'xgaze'));

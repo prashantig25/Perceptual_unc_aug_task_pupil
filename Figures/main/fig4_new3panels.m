@@ -29,10 +29,11 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 betas = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt.mat")); % add PE bin curves
-coeff_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas.coeff_names; %importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat")); % add PE bin curves
 pe_idx = find(strcmp(coeff_names,'pe'));
 up_idx = find(strcmp(coeff_names,'zsc_up'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
+condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
 for s = 1:num_subs
     for c = 1:col
         coeffs.pe(s,c) = betas.with_intercept(1,pe_idx,s,c);
@@ -40,11 +41,11 @@ for s = 1:num_subs
         coeffs.up(s,c) = betas.with_intercept(1,up_idx,s,c);
     end
 end
-posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_zscoredValues.mat"));
+% posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"regression",filesep,"main",filesep,"4c_MathotComments_zscoredValues.mat"));
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat")); % add PE bin curves
 pe_pval = perm.mask(pe_idx,:);
 pecondiff_pval = perm.prob(peCondiff_idx,:);
-interaction = importdata("/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil/data/GB data two pipelines/pupil/descriptive/fb_PE2bins_condiff2bins_linearInt.mat");
+interaction = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"descriptive",filesep,"fb_PE2bins_condiff2bins_linearInt.mat"));
 
 % Compute summary p-values (minimum across timepoints), rounded to 3 decimal places
 pe_min_pval       = round(min(perm.prob(pe_idx,:)), 3);
@@ -62,6 +63,61 @@ if pecondiff_min_pval < 0.001
 else
     pecondiff_pval_str = sprintf("\\itp\\rm = %.3f", pecondiff_min_pval);
 end
+
+preds_all = readtable(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
+    filesep, "behavior", filesep, "LR analyses", filesep, "preprocessed_lr_pupil_no_zerope.xlsx"));
+save_dir = strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines",...
+    filesep, "pupil", filesep, "regression", filesep, "main");
+descriptive_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'descriptive');
+peVals = importdata(fullfile(descriptive_dir, 'meanPE_all.mat'));
+condiffVals = importdata(fullfile(descriptive_dir, 'meanCondiff_all.mat'));
+betas_field = betas.with_intercept;
+maxTrials = 160; % max trials presented to a participant
+
+highPU = mean(condiffVals(:,1)); % high BS uncertainty
+lowPU = mean(condiffVals(:,2)); % low BS uncertainty
+
+refVals = linspace(0, 0.1, maxTrials);
+refMean = mean(refVals);
+refSD   = std(refVals);
+
+% Z-score highPU and lowPU using the reference distribution's parameters
+highPU = (highPU - refMean) / refSD;
+lowPU  = (lowPU  - refMean) / refSD;
+
+highPE = mean(peVals(:,2)); % high PE
+lowPE = mean(peVals(:,1)); % low PE
+
+refPEMean = mean(abs(preds_all.pe));
+refPESD   = std(abs(preds_all.pe));
+
+highPE = (highPE - refPEMean) / refPESD;
+lowPE  = (lowPE  - refPEMean) / refPESD;
+
+% LOOP OVER SUBJECTS
+for s = 1:num_subs
+    preds = preds_all(preds_all.id == str2num(subj_ids{s}),:);
+    preds.zsc_condiff = zscore(preds.norm_condiff);
+    for c = 1:col
+        coeffs.pe(s,c) = betas_field(1,pe_idx,s,c);
+        coeffs.pe_condiff(s,c) = betas_field(1,peCondiff_idx,s,c);
+        coeffs.intercept(s,c) = betas_field(1,1,s,c);
+        coeffs.con_diff(s,c) = betas_field(1,condiff_idx,s,c);
+    end
+
+    highPE_vec = highPE;
+    lowPE_vec  = lowPE;
+
+    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*lowPU;
+
+    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*lowPU;
+
+end
+
+% SAVE
+safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_zscoredValues.mat"),posterior);
 
 %% INITIALIZE TILE LAYOUT
 
@@ -104,13 +160,13 @@ yline(0,'LineStyle','--','LineWidth',0.5);
 
 adjust_figprops(ax1_new,fontname,fontsize,linewidth_plot);
 hold on
-plot(xaxis(find(pe_pval==1)),pval_pos + -0.01*ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
+plot(xaxis(find(pe_pval==1)),pval_pos + ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
 % ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
 ylabel('Absolute PE modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-text(mean(xaxis(pe_pval == 1)), pval_pos + -0.01, pe_pval_str, ...
+text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 %% PLOT BS-WEIGHTED PE
@@ -139,7 +195,7 @@ xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 adjust_figprops(ax2_new,fontname,fontsize,linewidth_plot);
 hold on
-plot(xaxis(find(pecondiff_pval < 0.05)), pval_pos + -0.003*ones(1,length(pecondiff_pval(pecondiff_pval < 0.05))), '.', 'color', ...
+plot(xaxis(find(pecondiff_pval < 0.05)), pval_pos + ones(1,length(pecondiff_pval(pecondiff_pval < 0.05))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
 % ylim(ylim_axes)
@@ -148,7 +204,7 @@ xlabel('Time since feedback onset (ms)')
 ylabel('Uncertainty-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 % text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.024","FontName",fontname,"FontSize", ...
 %     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
-text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + -0.003, pecondiff_pval_str, ...
+text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + 1.1, pecondiff_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 

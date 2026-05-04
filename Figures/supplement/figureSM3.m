@@ -8,7 +8,21 @@ clearvars
 line_width = 0.5; % line width for plots 
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
-data_subjs = readtable("preprocessed_lr_pupil.xlsx");
+
+% USER-BASED PATH
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if startsWith(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses');
+
+data_subjs = readtable(strcat(behv_dir,filesep,"preprocessed_lr_pupil_no_zerope.xlsx"));
 id_subjs = unique(data_subjs.id);
 font_name = 'Arial'; % font name
 font_size = 7; % font size

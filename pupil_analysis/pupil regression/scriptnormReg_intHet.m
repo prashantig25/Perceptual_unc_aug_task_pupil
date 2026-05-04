@@ -233,51 +233,6 @@ reg.setFileNames('pe_condiff2bins_linearInt', 'perm_pe_condiff2bins_linearInt', 
 reg.runAnalysis();
 reg.saveResults();
 
-%% 3 BINS
-
-reg3 = PupilRegression_intHet();
-reg3.setSubjects(subj_ids, num_sess);
-reg3.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
-reg3.setModel(model_def, pred_vars, cat_vars, num_vars);
-reg3.timewindow          = 'feedback';
-reg3.col                 = 300;
-reg3.regress_rt          = 0;
-reg3.baseline_mdl        = 0;
-reg3.binned              = 1;
-reg3.bins                = prctile(preds_all.con_diff, 0:33.33:100);
-reg3.bins_array          = 1:3;
-reg3.binned_accuracy     = 0;
-reg3.two_tailed          = 1;
-reg3.preds_all           = preds_all;
-reg3.residuals_predicted = 0;
-reg3.setFileNames('pe_condiff3bins_linearInt', '', '', '');
-reg3.runAnalysis();
-
-% Todo: not working
-%reg3.saveResults();
-
-%% 5 BINS
-reg5 = PupilRegression_intHet();
-reg5.setSubjects(subj_ids, num_sess);
-reg5.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
-reg5.setModel(model_def, pred_vars, cat_vars, num_vars);
-reg5.timewindow          = 'feedback';
-reg5.col                 = 300;
-reg5.regress_rt          = 0;
-reg5.baseline_mdl        = 0;
-reg5.binned              = 1;
-reg5.bins                = prctile(preds_all.con_diff, 0:20:100);
-reg5.bins_array          = 1:5;
-reg5.binned_accuracy     = 0;
-reg5.two_tailed          = 1;
-reg5.preds_all           = preds_all;
-reg5.residuals_predicted = 0;
-reg5.setFileNames('pe_condiff5bins_linearInt', '', '', '');
-reg5.runAnalysis();
-
-% Todo: not working
-% reg5.saveResults();
-
 %%
 %%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%
 
