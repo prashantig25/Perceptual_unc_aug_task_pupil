@@ -89,6 +89,8 @@ end
 cohenResults = table(cond_names, round(cohen_d,2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'ecoperf_cohen.csv'),cohenResults);
+disp("Economic-choice performance Cohen's d");
+display(cohenResults);
 
 %% T-TEST TO COMPARE SLIDER DATA ACROSS UNCERTAINTIES
 

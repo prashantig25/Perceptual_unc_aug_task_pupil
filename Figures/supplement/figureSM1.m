@@ -7,7 +7,7 @@ linewidth_axes = 0.5; % arrow width
 font_name = 'Arial'; % font name
 horz_align = 'center'; % alignment
 vert_align = 'middle';
-font_size = 6; 
+font_size = 7; 
 [~,~,~,~,color_screen,fb_green,darkblue_muted,mix,perc,rew,~,~,~,~,...
     ~,~,~,~,~] = colors_rgb(); % colors
 
@@ -36,7 +36,7 @@ xticks = [1:length(mean_sd)];
 
 % FIGURE PROPERTIES
 xticklabs = {'High','Low'};% x-axis tick labels
-title_name = {'Economic performance'}; % figure title
+title_name = {''}; % figure title
 legend_names = {''}; % legend names
 xlabelname = {'Reward uncertainty'}; % x-axis label name
 ylabelname = {'P(Correct)'};%{'Mean economic'; 'performance'}; % y-axis label name
@@ -45,6 +45,7 @@ colors_name = darkblue_muted; % bar colors
 y = mean(y,2);
 mean_avg = mean(mean_avg,2);
 mean_sd = mean(mean_sd,2);
+
 % PLOT CHOICE DATA
 bar_plots(y,mean_avg,mean_sd,num_subjs,length(mean_avg),length(legend_names), ...
     legend_names,xticks,xticklabs,title_name,xlabelname,ylabelname,7,1,'Arial',darkblue_muted) 

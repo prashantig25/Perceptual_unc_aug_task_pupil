@@ -1,6 +1,5 @@
 function bar_plots(y,mean_all,SEM_all,n,x_groups,bars,legend_names,xticks,xticklabs,title_name, ...
     xlabelname,ylabelname,fontsize,linewidth,fontname,varargin) 
-    
     % function bar_plots creates bar plots with multiple bars, single data scatter
     % points, and SEM bars.
     %
