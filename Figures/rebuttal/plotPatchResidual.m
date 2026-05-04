@@ -22,11 +22,11 @@ subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 
 % Initialization for Baseline Model
-betas_baseline = NaN(numSubjs, 3);
-subj_AIC = NaN(numSubjs, 1);
-subj_BIC = NaN(numSubjs, 1);
-subj_Rsquared = NaN(numSubjs, 1);
-subj_residuals = cell(numSubjs,1);
+% betas_baseline = NaN(numSubjs, 3);
+% subj_AIC = NaN(numSubjs, 1);
+% subj_BIC = NaN(numSubjs, 1);
+% subj_Rsquared = NaN(numSubjs, 1);
+% subj_residuals = cell(numSubjs,1);
 
 currentDir = cd; % current directory
 reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in

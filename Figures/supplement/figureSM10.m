@@ -1,3 +1,5 @@
+% Figure S5: Example pupil curves
+
 clc
 clearvars
 

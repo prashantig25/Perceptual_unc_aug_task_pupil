@@ -122,7 +122,7 @@ l = legend('','','High arousal-high uncertainty','High arousal-low uncertainty',
     'Location','best','EdgeColor','none','AutoUpdate','off','Color','none','FontName',font_name,'FontSize',font_size);
 l.ItemTokenSize = [20, 20];
 xlabel('Time since feedback onset (ms)')
-ylabel('Model predicted absolute UP')
+ylabel('Model-predicted absolute UP')
 adjust_figprops(ax4_new,font_name,font_size,linewidth_plot);
 hold on
 xlim([-300,2700])
@@ -215,7 +215,7 @@ adjust_figprops(ax2_new,font_name,font_size,linewidth_plot);
 hold on
 xlim([-300,2700])
 xlabel('Time since feedback onset (ms)')
-ylabel('Uncertainty and PE-modulated pupil','FontWeight','normal','FontName',font_name,'FontSize',font_size)
+ylabel('Uncertainty- and PE-modulated pupil','FontWeight','normal','FontName',font_name,'FontSize',font_size)
 
 %% ADD SUBPLOT LABELS
 

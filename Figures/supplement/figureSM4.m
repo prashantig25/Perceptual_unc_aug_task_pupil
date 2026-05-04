@@ -50,7 +50,7 @@ xgaze_idx = find(strcmp(coeff_names,'xgaze'));
 up_idx = find(strcmp(coeff_names,'zsc_up'));
 rt_idx = find(strcmp(coeff_names,'rt'));
 ncoeffs = [condiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients 
-pval = {'',' = 0.03','< 0.001',' = 0.04',' < 0.001'};
+%pval = {'',' = 0.03','< 0.001',' = 0.04',' < 0.001'};
 xpos_change = [-0.07,-0.0325,0,-0.07,-0.0325]; % change in axis position
 ylim_lower = [-0.02,-0.02,-0.1,-0.1,-0.1]; % lower limit of y-axis
 ylim_upper = [0.01,0.08,0.1,0.1,0.1]; % upper limit of y-axis

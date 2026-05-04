@@ -1,3 +1,5 @@
+% Figure S3: Illustration of belief-state difference and mean learning rate
+
 clc
 clearvars
 
@@ -24,7 +26,7 @@ subplot(1,3,1)
 data = importdata("preprocessed_agent.mat");
 uniqueID = unique(data.ID);
 numSubjs = length(uniqueID);
-sigma = 0.06; %importdata("sigmaNoReward_simpleRL.mat");
+sigma = 0.06; 
 dataContrast = data;
 dataContrast = dataContrast(dataContrast.choice_cond ~= 3,:);
 dataContrast.condiff_relative = dataContrast.contrast_diff;
@@ -193,11 +195,8 @@ sem_ydata = std(avg_ydata_bins,0,2)./sqrt(num_subjs);
 scatter(1:nbins, avg_ydata,"filled",'MarkerEdgeColor',"none",'MarkerFaceColor',"none");
 hold on
 ls = lsline;
-hold on
 errorbar(1:nbins, avg_ydata, sem_ydata, 'k', 'LineWidth', 1, 'LineStyle', 'none');
-hold on
 scatter(1:nbins, avg_ydata, 50, binned_dots, 'filled', 'MarkerEdgeColor', 'k');
-
 
 % Calculate correlation
 [rho_c, pval_c] = corrcoef(avg_ydata.', avg_binneddata.');

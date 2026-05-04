@@ -106,12 +106,12 @@ h1(1).FaceColor = [37, 50, 55]/255;
 % PLOT PROPERTIES
 set(ax1_new,'Color','none','FontName',font_name,'FontSize',font_size)
 set(ax1_new,'LineWidth',linewidth_axes)
-l = legend('Regression fits','','Absolute empirical updates','','EdgeColor','none','Color','none');
+l = legend('Model predictions','','Absolute empirical updates','','EdgeColor','none','Color','none');
 l.ItemTokenSize = [7 7];
 xlabel('Update')
 ylabel('Frequency (x 10^3)','Interpreter','tex')
 yticklabels({'0','1','2','3','4','5'})
-title('Posterior and empirical distribution','FontWeight','normal')
+title('Posterior-predicted and empirical distribution','FontWeight','normal')
 set(gca,'Color','none')
 box off
 %% ADD SUBPLOT LABELS

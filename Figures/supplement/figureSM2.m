@@ -1,4 +1,4 @@
-% figureSM2 plots results from all regressors of the binned pupil analysis.
+% figureSM6 plots results from all regressors of the binned pupil analysis.
 
 clc
 clearvars
