@@ -1,17 +1,8 @@
+% figureSM8 plots betas from pupil model after regressing out RTs.
+
 clc
 clearvars
 
-% INITIALIZE VARS
-subj_ids = importdata("subj_ids.mat");
-num_sess = importdata("num_sess.mat");
-num_subjs = length(subj_ids); % number of subjects
-num_break = 30; % how long should the pupil signal be broken
-col_patch = 100; % how long should the patch-related pupil signal
-col_fb = 300; % how long should the patch-related pupil signal
-total = 630; % how long should the entire trial be
-trial_all = NaN(num_subjs,total);
-
-% USER-BASED PATH
 currentDir = cd; % current directory
 reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
@@ -22,32 +13,149 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
-xaxis = linspace(-0.3,9.7,1000);
 
-% LOOP OVER SUBJECTS
-figure("Position",[100,100,400,400],"Visible","on")
-participants = [1,26,31,35,15,43];
-for i = 1:length(participants)
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_mathot_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
+coeff_names = betas_struct.coeff_names; %importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_regressedRT_linearInt_coeffNames.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
 
-    filename = strcat(fb_dir,filesep,subj_ids{participants(i)},'.mat');
-    fb = importdata(filename); 
+pe_idx = find(strcmp(coeff_names,'pe'));
+xgaze_idx = find(strcmp(coeff_names,'xgaze'));
+ygaze_idx = find(strcmp(coeff_names,'ygaze'));
+up_idx = find(strcmp(coeff_names,'zsc_up'));
+condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
+rt_idx = find(strcmp(coeff_names,'rt'));
+peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
 
-    % CONCATANATE
-    trial_subj = nanmean(fb(:,1:1000),1);
+x = linspace(-300,2700,300); % x-axis
+subj_ids = importdata("subj_ids.mat");
+num_subjs = length(subj_ids); % number of subjects
+neutral = [7, 53, 94]/255;
+font_name = 'Arial'; % font name
+font_size = 7; % font size
+fontsize_label = 12; % font size for subplot labels
+line_style = '-'; % line style
+
+%% TILED LAYOUT
+
+figure(Position=[200,200,450,300])
+hold on
+tiledlayout(2,4);
+ax1 = nexttile(1,[1,1]);
+ax2 = nexttile(2,[1,1]);
+ax3 = nexttile(3,[1,1]);
+ax4 = nexttile(4,[1,1]);
+ax5 = nexttile(5,[1,1]);
+ax6 = nexttile(6,[1,1]);
+ax7 = nexttile(7,[1,1]);
+ax1_new = ax1;
+ax2_new = ax2;
+ax3_new = ax3;
+ax4_new = ax4;
+ax5_new = ax5;
+ax6_new = ax6;
+ax7_new = ax7;
+axes_new = [ax1_new,ax2_new,ax3_new,ax4_new,ax5_new,ax6_new,ax7_new];
+axes_old = [ax1,ax2,ax3,ax4,ax5,ax6,ax7];
+
+%% PLOT COEFFICIENT CURVES
+
+ylabel_strings = [{"Uncertainty-modulated";"pupil"},{"PE-modulated";"pupil"},{"Uncertainty-weighted PE";"pupil"},{"UP-modulated";"pupil"},{"RT-modulated";"pupil"},{"x-gaze-modulated";"pupil"},{"y-gaze-modulated";"pupil"}];
+ncoeffs = [condiff_idx,pe_idx,peCondiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
+
+xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02]; % position change for axes
+pval_position = [NaN,0.025,0.0125,0.04,0.12,0.1,0.01] * 100; % position to plot p-values
+ylim_lower = [-0.02,-0.04,-0.02,-0.025,-0.17,-0.1,-0.1]; % lower limit for y-axis
+ylim_upper = [0.01,0.07,0.025,0.05,0.15,0.15,0.05,-0.1]; % upper limit for y-axis
+
+for a = 1:length(ncoeffs)
+
+    % POSITION CHANGE
+    new_pos = change_position(axes_old(a),[xpos_change(a),0,0,-0.02]);
+    axes_new(a) = axes('Units', 'Normalized', 'Position', new_pos); % update
+    box(axes_new(a), 'off'); % remove box
+    delete(axes_old(a)); % delete old axis
+
+    color_cell = {neutral}; % colors for low and high perceptual uncertainty data
+    col = 300; % length of x-axis
+
+    % PLOT
+    data_plot = zeros(num_subjs,col);
+    for s = 1:num_subjs
+        for c = 1:col
+            data_plot(s,c) = betas_struct.with_intercept(1,ncoeffs(a),s,c);
+        end
+    end
     hold on
-    subplot(2,3,i)
+    color = color_cell;
+    ySmoothed = mean(data_plot);
+    plot(x,ySmoothed,"Color",color{1,:},'LineWidth',2)
     hold on
-    plot(xaxis,fb(:,1:1000),"Color",[200,200,200]./255,'LineWidth',0.5)
+    color = cell2mat(color_cell);
+    shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
     hold on
-    plot(xaxis,trial_subj,"Color",'k','LineWidth',2)
-    xlim([-0.3,6])
-    xline(0,'LineStyle','--','LineWidth',0.5)
-    xlabel('Time from feedback onset (s)')
-    title(strcat("Participant"," ",subj_ids{participants(i)}),'FontWeight','Normal')
-    set(gca,'FontName','Arial','FontSize',7)
+
+    % PLOT PERMUTATION TEST
+    disp_perm = 1;
+    if disp_perm == 1
+        ylim_axes = [ylim_lower(a),ylim_upper(a)];
+        [pval_pos] = create_pvalpos(ylim_axes);
+        plot(x(find(perm.prob(ncoeffs(a),:) < 0.05)), (pval_pos)*ones(1, length(find(perm.prob(ncoeffs(a),:) < 0.05))), '.', 'color', ...
+            [119, 119, 119]./255, 'markersize', 4);
+        p_val = min(unique(perm.prob(ncoeffs(a),perm.prob(ncoeffs(a),:) < 0.05)));
+    end
+    if p_val < 0.001
+        text(mean(x(perm.prob(ncoeffs(a),:) < 0.05)),pval_position(a) + pval_pos,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+    elseif p_val < 0.01
+            text(mean(x(perm.prob(ncoeffs(a),:) < 0.05)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+    elseif p_val < 0.05 & p_val > 0.01
+            text(mean(x(perm.prob(ncoeffs(a),:) < 0.05)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+    end
+
+    % ADJUST FIGURE PROPERTIES
+    adjust_figprops(axes_new(a),'Arial',7,0.5)
+    xlim([-300,2700])
+    % ylim([ylim_lower(a),ylim_upper(a)])
+    xline(0,'--')
+    yline(0,'--')
+    xlabel('Time since feedback (ms)')
+    ylabel(ylabel_strings(:,a))
 end
+
+%% ADD SUBPLOT LABELS
+
+ax1_pos = axes_new(a).Position;
+adjust_x = -0.07; % adjusted x-position for subplot label
+adjust_y = ax1_pos(4)+0.03; % adjusted y-position for subplot label
+[label_x,label_y] = change_plotlabel(axes_new(1),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+[label_x,label_y] = change_plotlabel(axes_new(2),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'b','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+[label_x,label_y] = change_plotlabel(axes_new(3),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'c','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+[label_x,label_y] = change_plotlabel(axes_new(4),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'd','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+[label_x,label_y] = change_plotlabel(axes_new(5),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'e','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+[label_x,label_y] = change_plotlabel(axes_new(6),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'f','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+[label_x,label_y] = change_plotlabel(axes_new(7),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'g','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+%% SAVE AS PNG
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'fb_singleSubj_fullDuration_linearInt1.png', '-dpng', '-r600') 
+print(fig, 'mdl_NBC_linearInt1.png', '-dpng', '-r600') 

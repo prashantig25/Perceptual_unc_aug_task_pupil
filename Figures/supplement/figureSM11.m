@@ -23,10 +23,8 @@ num_params = 10;
 col = 300;
 % [num_subjs, num_params, col] = size(betas_struct);
 
-% PREPARE AND RUN PERMUTATION TEST
-fprintf('Running cluster-corrected permutation tests...\n');
-perm = get_permtest(1:num_params, num_subjs, col, betas_struct.with_intercept, [], 0, 1);
-% safe_saveall(fullfile(het_save_dir,"permHet_deconv_20SPAbs3Width.mat"),perm);
+% PREPARE AND GET PERMUTATION TEST
+perm = importdata(fullfile(het_save_dir,"perm_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat"));
 
 %% PLOT SETTINGS
 neutral = [7, 53, 94]/255;
@@ -59,7 +57,8 @@ ylabel_strings = [ ...
     "Residual slope"];
 
 xpos_change = [-0.05,-0.02,0.02, 0.05,-0.05,-0.02, 0.05, 0.05, 0.05]; 
-pval_position = [0.005, 0.005, -0.01, -0.01, -0.12, 0.01, 0.01, 0.01, 0.01]; 
+pval_position = [0.005, 0.005, -0.01, -0.01, -0.12, 0.01, 0.01, 0.01, 0.01] * 100; 
+pval_position_text = [4, 1.5, -2, 1, -0.15, 3, 3, 20, 2]; 
 
 %% TILED LAYOUT
 
@@ -114,7 +113,7 @@ for a = ncoeffs-1
         end
         
         % Position text in the middle of the significant cluster
-        text(mean(x(sig_mask)), pval_position(a) + (0.05 * pval_position(a)), ...
+        text(mean(x(sig_mask)), pval_position(a) + (pval_position_text(a) * pval_position(a)), ...
             p_text, 'FontSize', 7, 'HorizontalAlignment', 'center');
     end
     

@@ -15,7 +15,7 @@ else
 end
 data_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 betas_struct = importdata(fullfile(data_dir,"additiveMdl_linearInt.mat")); 
-coeff_names = betas_struct.coeff_names; % importdata(fullfile(data_dir,"additiveMdl_linearInt_coeffNames.mat")); 
+coeff_names = betas_struct.coeff_names; 
 perm = importdata(fullfile(data_dir,"perm_additiveMdl_linearInt.mat")); 
 x = linspace(-300,2700,300); % x-axis
 subj_ids = importdata("subj_ids.mat");

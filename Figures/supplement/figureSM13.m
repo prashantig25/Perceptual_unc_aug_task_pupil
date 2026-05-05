@@ -26,10 +26,6 @@ end
 main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 
-% Load OLS coefficient names and find pe:zsc_condiff index dynamically
-ols_coeff_names = importdata(fullfile(main_dir, 'pe_condiff_linearInt_coeffNames.mat'));
-pe_condiff_idx  = find(strcmp(ols_coeff_names, 'zsc_condiff:pe'));
-
 % Load hetero coefficient names and find PExCondiff index dynamically
 het_coeff_names    = importdata(fullfile(alt_dir, 'coeff_names_hetero.mat'));
 pe_condiff_idx_het = find(strcmp(het_coeff_names, 'PExCondiff'));
@@ -56,19 +52,19 @@ perm_cubicSpline_noBL  = importdata(fullfile(alt_dir,  'perm_pe_condiff_mathot_n
 betas_deconv_noBL      = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG.mat'));
 perm_deconv_noBL       = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG.mat'));
 
+% Load OLS coefficient names and find pe:zsc_condiff index dynamically
+ols_coeff_names = betas_linearInt.coeff_names;
+pe_condiff_idx  = find(strcmp(ols_coeff_names, 'zsc_condiff:pe'));
+
 fprintf('Loading heteroskedasticity specifications...\n');
 betas_linear_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'));
 betas_cubic_het  = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'));
 betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat'));
 
-fprintf('Running permutation tests for heteroskedasticity analyses...\n');
-
 % Heteroskedastic permutation test
-perm_linear_het = get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
-perm_cubic_het = get_permtest(1:size(betas_cubic_het.with_intercept,2), num_subjs, col, betas_cubic_het.with_intercept, [], 0, 1);
-perm_deconv_het = get_permtest(1:size(betas_deconv_het.with_intercept,2), num_subjs, col, betas_deconv_het.with_intercept, [], 0, 1);
-
-fprintf('Permutation tests complete!\n');
+perm_linear_het = importdata(fullfile(alt_dir,"perm_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_cubic_het = importdata(fullfile(alt_dir,"perm_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_deconv_het = importdata(fullfile(alt_dir,"perm_param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
 
 %% EXTRACT COEFFICIENTS
 

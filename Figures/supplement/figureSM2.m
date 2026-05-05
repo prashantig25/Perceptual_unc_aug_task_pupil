@@ -1,163 +1,179 @@
-% figureSM2 plots results from all regressors of the binned pupil analysis.
-
 clc
 clearvars
 
-% USER-BASED PATH
-currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
-pathParts = strsplit(currentDir, filesep);
-if startsWith(pathParts{end}, reqPath)
+% =================== 1. INITIAL SETUP AND BASELINE MODEL FIT ========================
+
+currentDir = cd;
+reqPath    = 'Perceptual_unc_aug_task_pupil';
+pathParts  = strsplit(currentDir, filesep);
+if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
 else
-    % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt.mat")); % add PE bin curves
-coeff_names = betas_struct.coeff_names; % importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff2bins_linearInt.mat")); % add PE bin curves
+preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
+preds_all  = readtable(preds_file);
+data = readtable(fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil_no_zerope.xlsx'));
+uniqueID = unique(data.id);
+data.ID = data.id;
 
-[~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
-    ~,~,~,~,study2_blue] = colors_rgb(); % colors
-x = linspace(-300,2700,300); % x-axis 
+% Pre-calculate mu_congruence
+for h = 1:height(data)
+    if data.congruence(h) == 0
+        data.mu_congruence(h) = 1-data.mu(h);
+    else
+        data.mu_congruence(h) = data.mu(h);
+    end
+end
+numSubjs = length(uniqueID);
+data.condiff_relative = (data.contrast_left - data.contrast_right) ./ 2;
+
+% Load auxiliary data
 subj_ids = importdata("subj_ids.mat");
-num_subjs = length(subj_ids); % number of subjects
-font_name = 'Arial'; % font name
-font_size = 7; % font size
-fontsize_label = 12; % font size for subplot labels
-line_style = '-'; % line style
+num_sess = importdata("num_sess.mat");
+num_blocks = 8;
 
-%% TILED LAYOUT
+%% --- Fit Model: RT (current) ~ 1 + condiffZsc (current) + condition (current) + PE (previous trial, within block) ---
 
-figure(Position=[200,200,450,150])
-hold on
-tiledlayout(1,4);
-ax1 = nexttile(1,[1,1]);
-ax2 = nexttile(2,[1,1]);
-ax3 = nexttile(3,[1,1]);
-ax4 = nexttile(4,[1,1]);
-axes_old = [ax1,ax2,ax3,ax4];
-ax1_new = ax1;
-ax2_new = ax2;
-ax3_new = ax3;
-ax4_new = ax4;
-axes_new = [ax1_new,ax2_new,ax3_new,ax4_new];
+betas_RT = NaN(length(subj_ids), 3);
 
-%% PLOT COEFFICIENTS
+for s = 1:length(subj_ids)
 
-ylabel_strings = {'UP-modulated pupil','RT-modulated pupil','x-gaze-modulated pupil','y-gaze-modulated pupil'};
-
-up_idx = find(strcmp(coeff_names,'zsc_up'));
-rt_idx = find(strcmp(coeff_names,'rt'));
-xgaze_idx = find(strcmp(coeff_names,'xgaze'));
-ygaze_idx = find(strcmp(coeff_names,'ygaze'));
-
-ncoeffs = [up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
-xpos_change = [-0.07,-0.035,0,0.04]; % change in position of tile
-ylim_lower = [-0.05,-0.08,-0.2,-0.1]; % y-axis lower limit
-ylim_upper = [0.1,0.05,0.12,0.1]; % y-axisx upper limit
-
-for a = 1:length(ncoeffs)
-
-    % POSITION CHANGE
-    new_pos = change_position(axes_old(a),[xpos_change(a),0,0.02,0]);
-    axes_new(a) = axes('Units', 'Normalized', 'Position', new_pos); % update
-    box(axes_new(a), 'off'); % remove box
-    delete(axes_old(a)); % delete old axis
-
-    cats = [1,2]; % number of categories
-    color_cell = {high_PU; low_PU}; % colors for low and high perceptual uncertainty data
-    col = 300; % number of time points
-
-    % PLOT FOR EACH OF THE BIN CATEGORIES
-    for j = cats
-        data_plot = zeros(num_subjs,col);
-        for s = 1:num_subjs
-            for c = 1:col
-                data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs(a),s,c);
-            end
-        end
-        hold on
-        color = color_cell;
-        ySmoothed = mean(data_plot);
-        plot(x,ySmoothed,"Color",color{j,:},'LineWidth',2)
-        hold on
-    end
-
-    % PLOT ERROR BARS FOR EACH BIN 
-    for j = cats
-        data_plot = zeros(num_subjs,col);
-        for s = 1:num_subjs
-            for c = 1:col
-                data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs(a),s,c);
-            end
-        end
-        ySmoothed = mean(data_plot);
-        color = cell2mat(color_cell);
-        shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
-        hold on
-    end
-
-    % PLOT PERMUTATION TEST RESULTS
-    disp_perm = 1;
-    if disp_perm == 1
-        ylim_axes = [ylim_lower(a),ylim_upper(a)];
-        [pval_pos] = create_pvalpos(ylim_axes); % get position for p-value
-        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 35 * ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
-            [119, 119, 119]./255, 'markersize', 4);
-    end
-
-    % Compute dynamic p-value string for this coefficient
-    if any(perm.mask(ncoeffs(a),:) == 1)
-        perm_prob_a = perm.prob(ncoeffs(a),:);
-        perm_mask_a = perm.mask(ncoeffs(a),:);
-        pval_a = min(perm_prob_a(perm_mask_a == 1));
-        if pval_a < 0.001
-            pval_str_a = "\itp\rm < 0.001";
+    preds = preds_all(preds_all.id == str2double(subj_ids{s}), :);
+    for h = 1:height(preds)
+        if preds.congruence(h) == 0
+            preds.mu_congruence(h) = 1-preds.mu(h);
         else
-            pval_str_a = sprintf("\\itp\\rm = %.3f", pval_a);
+            preds.mu_congruence(h) = preds.mu(h);
         end
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 35.5, pval_str_a, "FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
     end
-    
-    % ADJUST FIGURE PROPERTIES
-    adjust_figprops(axes_new(a),'Arial',7,0.5)
-    xlim([-300,2700])
-    % ylim([ylim_lower(a),ylim_upper(a)])
-    xline(0,'--')
-    yline(0,'--')
-    xlabel('Time since feedback (ms)')
-    ylabel(ylabel_strings(:,a))
+
+    subjData     = preds;
+    subjData_all = [];
+
+    for b = 1:num_blocks
+        blockData = subjData(subjData.blocks == b, :);
+
+        % Delete trial 1 within this block
+        blockData = blockData(blockData.trial ~= 1, :);
+
+        if height(blockData) < 2; continue; end
+
+        % Shift PE within this block only — no cross-block associations
+        pe_prev          = [NaN; blockData.pe(1:end-1)];
+        blockData.pe_prev = pe_prev;
+
+        % Remove first row (NaN pe_prev)
+        blockData = blockData(~isnan(blockData.pe_prev), :);
+
+        subjData_all = [subjData_all; blockData];
+    end
+
+    if isempty(subjData_all); continue; end
+
+    subjData_all.condiffZsc = nanzscore(subjData_all.con_diff);
+    subjData_all.muZsc      = nanzscore(subjData_all.mu_congruence);
+    subjData_all.logRT      = log(subjData_all.rt);
+    subjData_all.pe_prevZsc = nanzscore(subjData_all.pe_prev);
+
+    mdlRT = fitlm(subjData_all, 'logRT ~ 1 + condiffZsc + condition + pe_prevZsc', ...
+        'CategoricalVars', 'condition');
+
+    betas_RT(s,:) = mdlRT.Coefficients.Estimate(2:end);
+
 end
 
-l = legend('High state uncertainty','Low state uncertainty','Location','best','EdgeColor', ...
-    'none','AutoUpdate','off','FontSize',7,'FontName','Arial','Color','none');
-l.ItemTokenSize = [7 7];
+% =================== 2. STATISTICAL ANALYSIS AND PLOTTING ========================
 
-%% ADD SUBPLOT LABELS
+% 1. Calculate Mean and SEM
+mean_betas = mean(betas_RT, 1);
+SEM_betas  = std(betas_RT, 0, 1) / sqrt(numSubjs);
 
-ax1_pos = axes_new(a).Position;
-adjust_x = -0.04; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.08; % adjusted y-position for subplot label
-[label_x,label_y] = change_plotlabel(axes_new(1),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+% 2. One-Sample T-tests against 0
+p_values = NaN(1, size(betas_RT, 2));
+t_stats  = NaN(1, size(betas_RT, 2));
 
-[label_x,label_y] = change_plotlabel(axes_new(2),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'b','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+for i = 1:size(betas_RT, 2)
+    [~, p_values(i), ~, stats] = ttest(betas_RT(:, i));
+    t_stats(i) = stats.tstat;
+end
 
-[label_x,label_y] = change_plotlabel(axes_new(3),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'c','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+% 3. Prepare data for bar_plots_pval
+y        = [betas_RT(:,1); betas_RT(:,2); betas_RT(:,3)];
+mean_all = mean_betas';
+SEM_all  = SEM_betas';
 
-[label_x,label_y] = change_plotlabel(axes_new(4),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'd','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+% Significance labels
+bar_labels = cell(1, 3);
+for i = 1:3
+    if p_values(i) < 0.001
+        bar_labels{i} = '\itp\rm < 0.001';
+    else
+        bar_labels{i} = ['\itp\rm = ' num2str(round(p_values(i), 3))];
+    end
+end
 
-%% SAVE AS PNG
+% Max y positions for significance stars
+max_vals = zeros(1, 3);
+for i = 1:3
+    max_beta    = max(betas_RT(:, i));
+    max_vals(i) = max(mean_betas(i) + SEM_betas(i), max_beta) + 0.01;
+end
+max_vals = repelem(max(max_vals),3);
 
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'binnedreg_full2_linearInt1.png', '-dpng', '-r600')
+% Predictor labels
+xticklabs = {
+    ['Perceptual'], ...
+    ['Uncertainty'], ...
+    ['Previous trial |PE|']
+};
+
+% Colors
+[~,high_PU,mid_PU,low_PU,color_screen,fb_green,darkblue_muted,mix,perc,rew,~,~,binned_dots,~,...
+    ~,~,~,~,~] = colors_rgb();
+
+% 4. Bar Plot
+
+xticklabs = {'', '', ''};
+figure('Position',[100,100,250,250])
+h = bar_plots_pval(y, mean_all, SEM_all, numSubjs, 3, 1, {''}, ...
+    [1,2,3], xticklabs, '', '', ...
+    'Regression coefficient', 1, 1, 10, 1, 7, 0.5, 'Arial', 0, ...
+    darkblue_muted, bar_labels, max_vals);
+
+ylim([-0.25, 0.29])
+xlim([0.5, 3.5])
+hold on
+plot(xlim, [0 0], 'k--', 'LineWidth', 1);
+hold off
+
+% Manually draw multiline x-tick labels
+multiline_labs = {
+    sprintf('Perceptual\ncondition'), ...
+    sprintf('Contrast\ndifference'), ...
+    sprintf('Absolute PE\n(previous trial)')
+};
+
+% set(gcf, 'XTickLabels', {});   % clear any residual labels
+yl = ylim(gca);
+label_y = yl(1) - 0.02 * diff(yl); % adjust vertical offset as needed
+
+for i = 1:3
+    text(gca, i, label_y, multiline_labs{i}, ...
+        'HorizontalAlignment', 'center', ...
+        'VerticalAlignment', 'top', ...
+        'FontName', 'Arial', ...
+        'FontSize', 7);
+end
+% 
+% Save statistics
+termString = {"condition"; "condiff"; "PE_prevTrial"};
+T = table(termString, round(p_values,3).', 'VariableNames', {'term', 'pValuesRT'});
+saveStat = fullfile(desiredPath,"data","GB data two pipelines","pupil","stats");
+safe_saveall(strcat(saveStat, filesep, 'RTRegression_previousTrial.csv'), T);
+
+% Save figure
+fig = gcf;
+fig.PaperPositionMode = 'auto';
+print(fig, 'coeffs_logRT_previousTrial.png', '-dpng', '-r600')
