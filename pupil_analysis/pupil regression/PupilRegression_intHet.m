@@ -96,6 +96,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             %   Inputs:
             %     total    - (numeric) Total number of steps expected in the analysis.
             %     titleStr - (char) Message string displayed inside the waitbar dialog.
+            
             obj.total_steps     = total;
             obj.completed_steps = 0;
             obj.wb = waitbar(0, titleStr, ...
