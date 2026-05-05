@@ -17,7 +17,7 @@ function areEqual = compareStructs(struct1, struct2, fieldPath, tol)
 
     % Tolerance on precision
     if nargin < 4 || isempty(tol)
-        tol = 1e-9; %1e-12;
+        tol = 1e-12;
     end
     
     % Check if both inputs are structs

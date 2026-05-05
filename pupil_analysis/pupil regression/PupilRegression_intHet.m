@@ -737,15 +737,23 @@ classdef PupilRegression_intHet < pupilReg_Vars
         end
 
 
-        function saveResults(obj)
+        function saveResults(obj, tol)
             %SAVE RESULTS saves the results of interest for further
             %analysis
+            %
+            % Input
+            %   tol: Optional tolerance for safe_saveall function
+
+            % Tolerance on precision
+            if isempty(tol)
+                tol = 1e-12;
+            end
 
             if ~exist(obj.save_dir, 'dir')
                 mkdir(obj.save_dir);
             end
 
-            safe_saveall(fullfile(obj.save_dir, [obj.betas_save, '.mat']), obj.betas_struct);
+            safe_saveall(fullfile(obj.save_dir, [obj.betas_save, '.mat']), obj.betas_struct, tol);
 
             if strcmp(obj.model_type, 'OLS')
                 safe_saveall(fullfile(obj.save_dir, [obj.perm_save, '.mat']), obj.perm_results);

@@ -1,9 +1,14 @@
-function safe_saveall(filename, newData)
+function safe_saveall(filename, newData, tol)
 % function SAFE_SAVEALL is a custom replacement for MATLAB's save function
 % to ensure that data does not get saved unexpectedly.
 % INPUTS:
 %   filename: input string with filename
 %   newData: input data that needs to be saved
+
+% Tolerance on precision
+if nargin < 3 || isempty(tol)
+    tol = 1e-12;
+end
 
 % Check if file already exists
 if isfile(filename)
@@ -29,7 +34,7 @@ if isfile(filename)
     elseif strcmp(string(class(newData)), "LinearModel") == 1
         equality_check = compare_LinearModels(newData, oldData);
     elseif isstruct(newData)
-        equality_check = compareStructs(newData, oldData);
+        equality_check = compareStructs(newData, oldData, 'root', tol);
     elseif istable(newData)
         % Compare tables with tolerance for numeric columns
         numericCols = varfun(@isnumeric, newData, 'OutputFormat', 'uniform');
