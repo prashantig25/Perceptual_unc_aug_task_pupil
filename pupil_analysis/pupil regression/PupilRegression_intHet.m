@@ -629,14 +629,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
             [betas, ~, ~, ~, lm] = obj.externalFitFcn(tbl, obj.model_def, ...
                 obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0, 0);
 
-            % Save coefficient names from first subject, first timepoint
-            % todo: not yet tested 
-            if subj_idx == 1 && c == 1
-                coeff_names = lm.CoefficientNames;
-                obj.saveFcn(fullfile(obj.save_dir, [obj.betas_save, '_coeffNames.mat']), coeff_names);
-                fprintf('Saved coefficient names');
-            end
-
             % Save coefficient names once
             if subj_idx == 1 && c == 1
                 coeff_names = lm.CoefficientNames;
