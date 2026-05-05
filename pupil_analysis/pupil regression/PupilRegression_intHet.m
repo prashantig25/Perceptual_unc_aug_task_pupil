@@ -31,22 +31,14 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
     methods
 
-        function obj = PupilRegression_intHet(config)
+        function obj = PupilRegression_intHet()
             % Constructor - Creates a new PupilRegression instance
             % Can optionally accept a configuration object to initialize parameters
-            %
-            % Parameters:
-            %   config - (optional) PupilRegressionConfig object with analysis parameters
             %
             % Returns:
             %   obj - PupilRegression object ready for analysis
 
             obj = obj@pupilReg_Vars();
-
-            % if nargin > 0 && isa(config, 'PupilRegressionConfig')
-            %     obj.copyFromConfig(config);
-            % end
-
             obj.betas_struct    = struct();
             obj.model_type      = 'OLS';
             obj.n_sp            = 20;
@@ -56,20 +48,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
         end
 
         %% ----------------------------------------------------------------
-        %  COPY CONFIG
-        %% ----------------------------------------------------------------
-        % function copyFromConfig(obj, config)
-        %     props = properties(config);
-        %     for i = 1:length(props)
-        %         if isprop(obj, props{i})
-        %             obj.(props{i}) = config.(props{i});
-        %         end
-        %     end
-        % end
-
-        %% ----------------------------------------------------------------
         %  HETEROSKEDASTIC CONFIGURATION SETTER
         %% ----------------------------------------------------------------
+        % todo: needs proper documentation
         function setHeteroskedasticConfig(obj, minBound, maxBound, lb, ub, n_sp)
             obj.model_type      = 'heteroskedastic';
             obj.minBound        = minBound;
