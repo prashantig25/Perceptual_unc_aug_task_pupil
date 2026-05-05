@@ -637,6 +637,13 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 fprintf('Saved coefficient names');
             end
 
+            % Save coefficient names once
+            if subj_idx == 1 && c == 1
+                coeff_names = lm.CoefficientNames;
+                % safe_saveall(fullfile(obj.save_dir, [obj.betas_save, '_coeffNames.mat']), coeff_names);
+                obj.betas_struct.coeff_names = coeff_names;
+            end
+
             % Store beta coefficients in results structure
             if obj.binned_accuracy == 1
                 obj.betas_struct.with_intercept(r+1, :, subj_idx, c) = betas;
