@@ -1,16 +1,7 @@
-% figureSM6 plots regression diagnostics of the behavioral model.
+% figureSM2 plots results from all regressors of the binned pupil analysis.
 
 clc
 clearvars
-
-line_width = 0.5; % line width for axes
-font_size = 7; % font size
-font_name = 'Arial'; % font name
-linewidth_axes = 0.5; % line width for plot lines
-fontsize_label = 12; % fontsize for subplot labels
-dot_size = 10;
-[~,~,~,~,~,~,darkblue_muted,~,~,~,~,~,~,barface_green,...
-    ~,~,~,fits_colors,~] = colors_rgb(); % colors
 
 % USER-BASED PATH
 currentDir = cd; % current directory
@@ -23,112 +14,150 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-% Construct the file paths using fullfile
-rsquared_full_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'partialR2_abs.mat');
-rsquared_signedpath = fullfile(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'partialR2_signed.mat');
-posterior_up_subjs_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'post_absUP_predict.mat');
-data_subjs_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil_no_zerope.xlsx');
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt.mat")); % add PE bin curves
+coeff_names = betas_struct.coeff_names; % importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff2bins_linearInt.mat")); % add PE bin curves
 
-% Load the data
-rsquared_full = importdata(rsquared_full_path); % r-squared values
-rsquared_signed = importdata(rsquared_signedpath); % r-squared values
-posterior_up_subjs = importdata(posterior_up_subjs_path); % posterior updates
-data_subjs = readtable(data_subjs_path); % single-trial updates, prediction errors
+[~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
+    ~,~,~,~,study2_blue] = colors_rgb(); % colors
+x = linspace(-300,2700,300); % x-axis 
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
-%% INITIALISE TILE LAYOUT
+font_name = 'Arial'; % font name
+font_size = 7; % font size
+fontsize_label = 12; % font size for subplot labels
+line_style = '-'; % line style
 
-figure
-set(gcf,'Position',[100 100 400 200])
-t = tiledlayout(1,2);
-t.TileSpacing = 'compact';
-t.Padding = 'compact';
-ax1 = nexttile(1,[1,1]);
+%% TILED LAYOUT
 
-%% PLOT R-SQUARED VALUES
-
-% CHANGE TILE POSITION
-ax2 = nexttile(2,[1,1]);
-position_change = [0.17, 0, -0.17, 0]; % change in position
-new_pos = change_position(ax2,position_change); % new position
-ax2_new = axes('Units', 'Normalized', 'Position', new_pos); % updated position
-box(ax2_new, 'off'); % box off
-delete(ax2); % delete old axis
-
-% PLOT
-title_name = {''}; 
-bar_plots_pval([rsquared_full;rsquared_signed],[mean(rsquared_full),mean(rsquared_signed)].',[std(rsquared_full)./sqrt(num_subjs),std(rsquared_signed)./sqrt(num_subjs)].',num_subjs, ...
-    2,1,{''},[1,2],{'Absolute','Signed'},title_name,{'Model'},{''},0,1,dot_size,1,font_size,line_width,font_name,0,darkblue_muted) 
+figure(Position=[200,200,450,150])
 hold on
+tiledlayout(1,4);
+ax1 = nexttile(1,[1,1]);
+ax2 = nexttile(2,[1,1]);
+ax3 = nexttile(3,[1,1]);
+ax4 = nexttile(4,[1,1]);
+axes_old = [ax1,ax2,ax3,ax4];
+ax1_new = ax1;
+ax2_new = ax2;
+ax3_new = ax3;
+ax4_new = ax4;
+axes_new = [ax1_new,ax2_new,ax3_new,ax4_new];
 
-% PLOT PROPERTIES
-xlabel('')
-% ylim([-0.3,0])
-set(gca,'Color','none')
-ylabel('Mean partial-\itR^2\rm values','Interpreter','tex')
-title('Model fit','FontWeight','normal')
-%% PLOT POSTERIOR DISTRIBUTION
+%% PLOT COEFFICIENTS
 
-% GET EMPIRICAL AND POSTERIOR UPDATES
-y = abs(data_subjs.up(data_subjs.pe ~= 0)); % empirical updates
-y_hat = posterior_up_subjs; % regression model estimated updates
-nbins = 75; % number of bins in a distribution
+ylabel_strings = {'UP-modulated pupil','RT-modulated pupil','x-gaze-modulated pupil','y-gaze-modulated pupil'};
 
-% CHANGE POSITION
-position_change = [0.03, 0, 0.15, 0];
-new_pos = change_position(ax1,position_change);
-ax1_new = axes('Units', 'Normalized', 'Position', new_pos);
-box(ax1_new, 'off');
-delete(ax1);
+up_idx = find(strcmp(coeff_names,'zsc_up'));
+rt_idx = find(strcmp(coeff_names,'rt'));
+xgaze_idx = find(strcmp(coeff_names,'xgaze'));
+ygaze_idx = find(strcmp(coeff_names,'ygaze'));
 
-y_hat = [];
-for n = 1:num_subjs
-    y_hat = [y_hat;cell2mat(posterior_up_subjs(n,1))];
+ncoeffs = [up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
+xpos_change = [-0.07,-0.035,0,0.04]; % change in position of tile
+ylim_lower = [-0.05,-0.08,-0.2,-0.1]; % y-axis lower limit
+ylim_upper = [0.1,0.05,0.12,0.1]; % y-axisx upper limit
+
+for a = 1:length(ncoeffs)
+
+    % POSITION CHANGE
+    new_pos = change_position(axes_old(a),[xpos_change(a),0,0.02,0]);
+    axes_new(a) = axes('Units', 'Normalized', 'Position', new_pos); % update
+    box(axes_new(a), 'off'); % remove box
+    delete(axes_old(a)); % delete old axis
+
+    cats = [1,2]; % number of categories
+    color_cell = {high_PU; low_PU}; % colors for low and high perceptual uncertainty data
+    col = 300; % number of time points
+
+    % PLOT FOR EACH OF THE BIN CATEGORIES
+    for j = cats
+        data_plot = zeros(num_subjs,col);
+        for s = 1:num_subjs
+            for c = 1:col
+                data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs(a),s,c);
+            end
+        end
+        hold on
+        color = color_cell;
+        ySmoothed = mean(data_plot);
+        plot(x,ySmoothed,"Color",color{j,:},'LineWidth',2)
+        hold on
+    end
+
+    % PLOT ERROR BARS FOR EACH BIN 
+    for j = cats
+        data_plot = zeros(num_subjs,col);
+        for s = 1:num_subjs
+            for c = 1:col
+                data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs(a),s,c);
+            end
+        end
+        ySmoothed = mean(data_plot);
+        color = cell2mat(color_cell);
+        shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
+        hold on
+    end
+
+    % PLOT PERMUTATION TEST RESULTS
+    disp_perm = 1;
+    if disp_perm == 1
+        ylim_axes = [ylim_lower(a),ylim_upper(a)];
+        [pval_pos] = create_pvalpos(ylim_axes); % get position for p-value
+        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 35 * ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
+            [119, 119, 119]./255, 'markersize', 4);
+    end
+
+    % Compute dynamic p-value string for this coefficient
+    if any(perm.mask(ncoeffs(a),:) == 1)
+        perm_prob_a = perm.prob(ncoeffs(a),:);
+        perm_mask_a = perm.mask(ncoeffs(a),:);
+        pval_a = min(perm_prob_a(perm_mask_a == 1));
+        if pval_a < 0.001
+            pval_str_a = "\itp\rm < 0.001";
+        else
+            pval_str_a = sprintf("\\itp\\rm = %.3f", pval_a);
+        end
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 35.5, pval_str_a, "FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+    end
+    
+    % ADJUST FIGURE PROPERTIES
+    adjust_figprops(axes_new(a),'Arial',7,0.5)
+    xlim([-300,2700])
+    % ylim([ylim_lower(a),ylim_upper(a)])
+    xline(0,'--')
+    yline(0,'--')
+    xlabel('Time since feedback (ms)')
+    ylabel(ylabel_strings(:,a))
 end
 
-% PLOT
-h1 = histfit(y_hat,nbins);
-hold on
-h = histfit(y,nbins);
-
-h1(1).FaceAlpha = 1; % face alpha for distributions
-h(1).FaceAlpha = 0.7;
-
-h(2).Color = fits_colors; % colors for distributions
-h1(2).Color = [37, 50, 55]/255;
-
-h(1).EdgeColor = fits_colors; % edge color for bars
-h1(1).EdgeColor = [37, 50, 55]/255;
-
-h(1).FaceColor = fits_colors; % face color for bars
-h1(1).FaceColor = [37, 50, 55]/255;
-
-% PLOT PROPERTIES
-set(ax1_new,'Color','none','FontName',font_name,'FontSize',font_size)
-set(ax1_new,'LineWidth',linewidth_axes)
-l = legend('Model predictions','','Absolute empirical updates','','EdgeColor','none','Color','none');
+l = legend('High state uncertainty','Low state uncertainty','Location','best','EdgeColor', ...
+    'none','AutoUpdate','off','FontSize',7,'FontName','Arial','Color','none');
 l.ItemTokenSize = [7 7];
-xlabel('Update')
-ylabel('Frequency (x 10^3)','Interpreter','tex')
-yticklabels({'0','1','2','3','4','5'})
-title('Posterior-predicted and empirical distribution','FontWeight','normal')
-set(gca,'Color','none')
-box off
+
 %% ADD SUBPLOT LABELS
 
-ax1_pos = ax2_new.Position;
-adjust_x = [- 0.06,-0.075]; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.02; % adjusted y-position for subplot label
+ax1_pos = axes_new(a).Position;
+adjust_x = -0.04; % adjusted x-position for subplot label
+adjust_y = ax1_pos(4)+0.08; % adjusted y-position for subplot label
+[label_x,label_y] = change_plotlabel(axes_new(1),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
 
-all_axes = [ax1_new,ax2_new];
-subplot_labels = {'a','b'};
-for i = 1:2
-    [label_x,label_y] = change_plotlabel(all_axes(i),adjust_x(i),adjust_y);
-    annotation("textbox",[label_x label_y .05 .05],'String', ...
-        subplot_labels{i},'FontSize',fontsize_label,'LineStyle','none','HorizontalAlignment','center')
-end
+[label_x,label_y] = change_plotlabel(axes_new(2),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'b','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
 
-%%
+[label_x,label_y] = change_plotlabel(axes_new(3),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'c','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+[label_x,label_y] = change_plotlabel(axes_new(4),adjust_x,adjust_y);
+annotation("textbox",[label_x label_y .05 .05],'String', ...
+    'd','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
+
+%% SAVE AS PNG
+
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'reg_diagnostics1.png', '-dpng', '-r600') 
+print(fig, 'binnedreg_full2_linearInt1.png', '-dpng', '-r600')

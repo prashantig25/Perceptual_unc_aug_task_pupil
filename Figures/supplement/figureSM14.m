@@ -2,7 +2,7 @@
 
 clc
 clearvars
-
+% USER-BASED PATH
 currentDir = cd; % current directory
 reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
@@ -13,19 +13,10 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_mathot_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
-coeff_names = betas_struct.coeff_names; %importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_regressedRT_linearInt_coeffNames.mat")); % add PE bin curves
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
-
-pe_idx = find(strcmp(coeff_names,'pe'));
-xgaze_idx = find(strcmp(coeff_names,'xgaze'));
-ygaze_idx = find(strcmp(coeff_names,'ygaze'));
-up_idx = find(strcmp(coeff_names,'zsc_up'));
-condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
-rt_idx = find(strcmp(coeff_names,'rt'));
-peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
-
+data_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
+betas_struct = importdata(fullfile(data_dir,"additiveMdl_linearInt.mat")); 
+coeff_names = betas_struct.coeff_names; 
+perm = importdata(fullfile(data_dir,"perm_additiveMdl_linearInt.mat")); 
 x = linspace(-300,2700,300); % x-axis
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
@@ -37,7 +28,7 @@ line_style = '-'; % line style
 
 %% TILED LAYOUT
 
-figure(Position=[200,200,450,300])
+figure(Position=[200,200,400,300])
 hold on
 tiledlayout(2,4);
 ax1 = nexttile(1,[1,1]);
@@ -46,26 +37,29 @@ ax3 = nexttile(3,[1,1]);
 ax4 = nexttile(4,[1,1]);
 ax5 = nexttile(5,[1,1]);
 ax6 = nexttile(6,[1,1]);
-ax7 = nexttile(7,[1,1]);
 ax1_new = ax1;
 ax2_new = ax2;
 ax3_new = ax3;
 ax4_new = ax4;
 ax5_new = ax5;
 ax6_new = ax6;
-ax7_new = ax7;
-axes_new = [ax1_new,ax2_new,ax3_new,ax4_new,ax5_new,ax6_new,ax7_new];
-axes_old = [ax1,ax2,ax3,ax4,ax5,ax6,ax7];
+axes_new = [ax1_new,ax2_new,ax3_new,ax4_new,ax5_new,ax6_new];
+axes_old = [ax1,ax2,ax3,ax4,ax5,ax6];
 
 %% PLOT COEFFICIENT CURVES
 
-ylabel_strings = [{"Uncertainty-modulated";"pupil"},{"PE-modulated";"pupil"},{"Uncertainty-weighted PE";"pupil"},{"UP-modulated";"pupil"},{"RT-modulated";"pupil"},{"x-gaze-modulated";"pupil"},{"y-gaze-modulated";"pupil"}];
-ncoeffs = [condiff_idx,pe_idx,peCondiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
-
-xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02]; % position change for axes
-pval_position = [NaN,0.025,0.0125,0.04,0.12,0.1,0.01] * 100; % position to plot p-values
-ylim_lower = [-0.02,-0.04,-0.02,-0.025,-0.17,-0.1,-0.1]; % lower limit for y-axis
-ylim_upper = [0.01,0.07,0.025,0.05,0.15,0.15,0.05,-0.1]; % upper limit for y-axis
+ylabel_strings = [{"Uncertainty-modulated";"pupil"},{"PE-modulated";"pupil"},{"x-gaze-modulated";"pupil"},{"y-gaze-modulated";"pupil"},{"UP-modulated";"pupil"},{"RT-modulated";"pupil"}];
+pe_idx = find(strcmp(coeff_names,'pe'));
+condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
+ygaze_idx = find(strcmp(coeff_names,'ygaze'));
+xgaze_idx = find(strcmp(coeff_names,'xgaze'));
+up_idx = find(strcmp(coeff_names,'zsc_up'));
+rt_idx = find(strcmp(coeff_names,'rt'));
+ncoeffs = [condiff_idx,pe_idx,xgaze_idx,ygaze_idx,up_idx,rt_idx]; % order of coefficients
+xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02]; % position change for axes
+pval_position = [NaN,-0.02,-0.01,0.01,-0.12,-0.01]; % position to plot p-values
+ylim_lower = [-0.02,-0.04,-0.02,-0.1,-0.17,-0.025]; % lower limit for y-axis
+ylim_upper = [0.01,0.07,0.05,0.05,0.15,0.15,0.025]; % upper limit for y-axis
 
 for a = 1:length(ncoeffs)
 
@@ -99,16 +93,16 @@ for a = 1:length(ncoeffs)
     if disp_perm == 1
         ylim_axes = [ylim_lower(a),ylim_upper(a)];
         [pval_pos] = create_pvalpos(ylim_axes);
-        plot(x(find(perm.prob(ncoeffs(a),:) < 0.05)), (pval_pos)*ones(1, length(find(perm.prob(ncoeffs(a),:) < 0.05))), '.', 'color', ...
+        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), (pval_position(a))*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
             [119, 119, 119]./255, 'markersize', 4);
-        p_val = min(unique(perm.prob(ncoeffs(a),perm.prob(ncoeffs(a),:) < 0.05)));
+        p_val = min(unique(perm.prob(ncoeffs(a),perm.mask(ncoeffs(a),:) == 1)));
     end
     if p_val < 0.001
-        text(mean(x(perm.prob(ncoeffs(a),:) < 0.05)),pval_position(a) + pval_pos,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.01
-            text(mean(x(perm.prob(ncoeffs(a),:) < 0.05)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.05 & p_val > 0.01
-            text(mean(x(perm.prob(ncoeffs(a),:) < 0.05)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     end
 
     % ADJUST FIGURE PROPERTIES
@@ -125,7 +119,7 @@ end
 
 ax1_pos = axes_new(a).Position;
 adjust_x = -0.07; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.03; % adjusted y-position for subplot label
+adjust_y = ax1_pos(4)+0.05; % adjusted y-position for subplot label
 [label_x,label_y] = change_plotlabel(axes_new(1),adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
@@ -150,12 +144,9 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'f','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
 
-[label_x,label_y] = change_plotlabel(axes_new(7),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'g','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
 
 %% SAVE AS PNG
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'mdl_NBC_linearInt1.png', '-dpng', '-r600') 
+print(fig, 'coeffs_AdditiveModel1.png', '-dpng', '-r600') 

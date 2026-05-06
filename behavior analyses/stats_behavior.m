@@ -104,8 +104,8 @@ t_vals = NaN(1,1);
 df_vals = NaN(1,1);
 cohen_d = NaN(1,1);
 
-% T-test
-[h_vals(1,:), p_vals(1,:), ~, stats_mixperc] = ttest2(mix_avg, perc_avg); % impact of reward uncertainty
+% t-test
+[h_vals(1,:), p_vals(1,:), ~, stats_mixperc] = ttest(mix_avg, perc_avg); % impact of reward uncertainty
 cond_names = ["mix_perc"];
 
 t_vals(1,:) = stats_mixperc.tstat;

@@ -118,7 +118,7 @@ reg_het2.runAnalysis();
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'), reg_het2.betas_struct);
 safe_saveall(fullfile(het_save_dir, 'negLL_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'),          reg_het2.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'),          reg_het1.perm_results);
+safe_saveall(fullfile(het_save_dir, 'perm_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'),          reg_het2.perm_results);
 
 fprintf('Pipeline 2 saved.\n');
 
