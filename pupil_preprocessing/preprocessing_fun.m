@@ -284,7 +284,7 @@ for s = 1:num_subs
             y0 = [s1,s2,n1,n2,tmax1,tmax2]; % starting point for optimization
             lb = [params.s1.Min, params.s2.Min, params.n1.Min, params.n2.Min, params.tmax1.Min, params.tmax2.Min];
             ub = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, params.tmax1.Max, params.tmax2.Max];
-            options = optimoptions('fmincon','Display','iter', 'Algorithm', 'interior-point');
+            options = optimoptions('fmincon','Display','none', 'Algorithm', 'interior-point');
 
             % PERFORM THE OPTIMIZATION
             rng(42); % set seed for reproducability for fmincon

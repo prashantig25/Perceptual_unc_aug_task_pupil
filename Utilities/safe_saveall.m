@@ -67,6 +67,7 @@ if isfile(filename)
 
             if ~col_check
                 fprintf('MISMATCH at col %d (%s)\n', col, newData.Properties.VariableNames{col});
+                fprintf('Max diff: %d', max(absDiff))
                 if ~numericCols(col)
                     fprintf('  newData class: %s\n', class(colNew));
                     fprintf('  oldData class: %s\n', class(colOld));
