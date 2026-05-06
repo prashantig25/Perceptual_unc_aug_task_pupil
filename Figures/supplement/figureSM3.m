@@ -40,21 +40,18 @@ for n = 1:numSubjs
     belief_state = NaN(height(dataSubj),1);
     
     for h = 1:height(dataSubj)
-        if dataSubj.state(h) == 1
-            belief_state(h,1) = normcdf(dataSubj.condiff_relative(h), 0, sigma);
-        else
-            belief_state(h,1) = 1-normcdf(dataSubj.condiff_relative(h), 0, sigma);
-        end
-        belief_state(h,1) = belief_state(h,1)-(1-belief_state(h,1));
-        % belief_state(h,1) = belief_state(h,1)-0.5;
+        
+        % Using agent equations
+        obj.u = normcdf(0, dataSubj.condiff_relative(h), sigma);
+        obj.v = normcdf(-0.1, dataSubj.condiff_relative(h), sigma);
+        obj.w = normcdf(0.1, dataSubj.condiff_relative(h), sigma);
 
-        obj.u = normcdf(0, o_t, obj.sigma);
-        obj.v = normcdf(-obj.kappa_max, o_t, obj.sigma);
-        obj.w = normcdf(obj.kappa_max, o_t, obj.sigma);
+        % Compute belief states
+        pi_0 = (obj.u - obj.v) / (obj.w - obj.v);
+        pi_1 = (obj.w - obj.u) / (obj.w - obj.v);
 
-        % COMPUTE BELIEF STATES
-        obj.pi_0 = (obj.u - obj.v) / (obj.w - obj.v);
-        obj.pi_1 = (obj.w - obj.u) / (obj.w - obj.v);
+        % Get belief state difference
+        belief_state(h,1) = abs(pi_1 - pi_0);
     end
     
     for b = 1:nbins 

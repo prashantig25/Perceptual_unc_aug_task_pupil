@@ -437,8 +437,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 idx = preds.bin_columns == r;
             elseif obj.binned_accuracy == 1
                 idx = preds.correct == r;
-            else
-                idx = true(height(preds), 1);
+            % else
+            %     idx = true(height(preds), 1);
             end
 
             pupil_bins  = zsc_pupil(idx, :);
