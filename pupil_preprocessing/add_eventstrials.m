@@ -24,7 +24,8 @@ num_trials_sess = 0; % number of trials for participants with multiple sessions
 
 parfor s = 1:num_subs
     for ss = 1:num_sess(s)
-
+        
+        % todo: use descriptive object data loading function!
         % READ ASC FILES
         % ASC FOR EVENTS, BLINKS, SACCADES
         if strcmp(subj_ids(s),'4672') == 1 % only for subj 4672 

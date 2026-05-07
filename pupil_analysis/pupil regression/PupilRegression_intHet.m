@@ -204,7 +204,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     num_vars = 1:obj.num_vars+1;
                     var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
                     var2 = squeeze(obj.betas_struct.with_intercept(2, :, :, :)); % [num_vars x num_subjs x col]
-                    obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1, var2);
+                    % obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1, var2);
+                    obj.perm_results = obj.permtestFcn(num_vars, obj.num_subs, obj.col, var1, var2);
+
                 else
                     obj.perm_results = [];
                 end
@@ -217,7 +219,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 num_vars = 1:obj.num_vars+1;
                 obj.updateProgress('Running permutation test…');
                 var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
-                obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
+                % obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
+                obj.perm_results = obj.permtestFcn(num_vars, obj.num_subs, obj.col, var1);
+
             end
             
             % Close progress bar

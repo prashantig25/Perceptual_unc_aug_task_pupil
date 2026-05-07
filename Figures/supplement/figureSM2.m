@@ -1,10 +1,10 @@
+% Figure SM2: Reaction-time regression
+
 clc
 clearvars
 
-% =================== 1. INITIAL SETUP AND BASELINE MODEL FIT ========================
-
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil';
+reqPath    = 'Perceptual_unc_aug_task_pupil-main';
 pathParts  = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -16,75 +16,70 @@ preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 
 preds_all  = readtable(preds_file);
 data = readtable(fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil_no_zerope.xlsx'));
 uniqueID = unique(data.id);
-data.ID = data.id;
-
-% Pre-calculate mu_congruence
-for h = 1:height(data)
-    if data.congruence(h) == 0
-        data.mu_congruence(h) = 1-data.mu(h);
-    else
-        data.mu_congruence(h) = data.mu(h);
-    end
-end
 numSubjs = length(uniqueID);
-data.condiff_relative = (data.contrast_left - data.contrast_right) ./ 2;
 
 % Load auxiliary data
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 num_blocks = 8;
 
-%% --- Fit Model: RT (current) ~ 1 + condiffZsc (current) + condition (current) + PE (previous trial, within block) ---
+%% Fit Model: RT (current) ~ 1 + condiffZsc (current) + condition (current) + PE (previous trial, within block)
 
+% Initialize coefficients
 betas_RT = NaN(length(subj_ids), 3);
 
+% Cycle over subjects
 for s = 1:length(subj_ids)
 
+    % Extract data
     preds = preds_all(preds_all.id == str2double(subj_ids{s}), :);
-    for h = 1:height(preds)
-        if preds.congruence(h) == 0
-            preds.mu_congruence(h) = 1-preds.mu(h);
-        else
-            preds.mu_congruence(h) = preds.mu(h);
-        end
-    end
 
-    subjData     = preds;
+    % Extract subject data
+    subjData = preds;
+
+    % Initialize variable for combined dat
     subjData_all = [];
 
+    % Cycle over blocks
     for b = 1:num_blocks
+
+        % Extract block data
         blockData = subjData(subjData.blocks == b, :);
 
         % Delete trial 1 within this block
         blockData = blockData(blockData.trial ~= 1, :);
 
-        if height(blockData) < 2; continue; end
+        % Todo: comment on this
+        if height(blockData) < 2
+            continue
+        end
 
         % Shift PE within this block only — no cross-block associations
-        pe_prev          = [NaN; blockData.pe(1:end-1)];
+        pe_prev = [NaN; blockData.pe(1:end-1)];
         blockData.pe_prev = pe_prev;
 
         % Remove first row (NaN pe_prev)
         blockData = blockData(~isnan(blockData.pe_prev), :);
 
+        % Combine all data
         subjData_all = [subjData_all; blockData];
     end
 
-    if isempty(subjData_all); continue; end
-
+    % Prepare data for regression model
     subjData_all.condiffZsc = nanzscore(subjData_all.con_diff);
-    subjData_all.muZsc      = nanzscore(subjData_all.mu_congruence);
-    subjData_all.logRT      = log(subjData_all.rt);
+    subjData_all.logRT = log(subjData_all.rt);
     subjData_all.pe_prevZsc = nanzscore(subjData_all.pe_prev);
 
+    % Fit model
     mdlRT = fitlm(subjData_all, 'logRT ~ 1 + condiffZsc + condition + pe_prevZsc', ...
         'CategoricalVars', 'condition');
 
+    % Store coefficients
     betas_RT(s,:) = mdlRT.Coefficients.Estimate(2:end);
 
 end
 
-% =================== 2. STATISTICAL ANALYSIS AND PLOTTING ========================
+% STATISTICAL ANALYSIS AND PLOTTING
 
 % 1. Calculate Mean and SEM
 mean_betas = mean(betas_RT, 1);
@@ -100,9 +95,9 @@ for i = 1:size(betas_RT, 2)
 end
 
 % 3. Prepare data for bar_plots_pval
-y        = [betas_RT(:,1); betas_RT(:,2); betas_RT(:,3)];
+y = [betas_RT(:,1); betas_RT(:,2); betas_RT(:,3)];
 mean_all = mean_betas';
-SEM_all  = SEM_betas';
+SEM_all = SEM_betas';
 
 % Significance labels
 bar_labels = cell(1, 3);
@@ -117,24 +112,16 @@ end
 % Max y positions for significance stars
 max_vals = zeros(1, 3);
 for i = 1:3
-    max_beta    = max(betas_RT(:, i));
+    max_beta = max(betas_RT(:, i));
     max_vals(i) = max(mean_betas(i) + SEM_betas(i), max_beta) + 0.01;
 end
 max_vals = repelem(max(max_vals),3);
-
-% Predictor labels
-xticklabs = {
-    ['Perceptual'], ...
-    ['Uncertainty'], ...
-    ['Previous trial |PE|']
-};
 
 % Colors
 [~,high_PU,mid_PU,low_PU,color_screen,fb_green,darkblue_muted,mix,perc,rew,~,~,binned_dots,~,...
     ~,~,~,~,~] = colors_rgb();
 
 % 4. Bar Plot
-
 xticklabs = {'', '', ''};
 figure('Position',[100,100,250,250])
 h = bar_plots_pval(y, mean_all, SEM_all, numSubjs, 3, 1, {''}, ...
@@ -153,7 +140,7 @@ multiline_labs = {
     sprintf('Perceptual\ncondition'), ...
     sprintf('Contrast\ndifference'), ...
     sprintf('Absolute PE\n(previous trial)')
-};
+    };
 
 % set(gcf, 'XTickLabels', {});   % clear any residual labels
 yl = ylim(gca);
@@ -166,7 +153,7 @@ for i = 1:3
         'FontName', 'Arial', ...
         'FontSize', 7);
 end
-% 
+
 % Save statistics
 termString = {"condition"; "condiff"; "PE_prevTrial"};
 T = table(termString, round(p_values,3).', 'VariableNames', {'term', 'pValuesRT'});

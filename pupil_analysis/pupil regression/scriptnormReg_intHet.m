@@ -1,8 +1,6 @@
 clc
 clearvars
 
-% TODO: find out where .mat file without name is saved...
-
 %% =======================================================================
 %                            SETUP COMMON PARAMETERS
 % =======================================================================
