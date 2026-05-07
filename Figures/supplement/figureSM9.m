@@ -1,4 +1,4 @@
-% figureSM8 plots betas from pupil model after regressing out RTs.
+% Figure S9: Plots betas from pupil model after regressing out RTs.
 
 clc
 clearvars
@@ -15,7 +15,7 @@ else
 end
 
 betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_regressedRT_linearInt.mat")); % add PE bin curves
-coeff_names = betas_struct.coeff_names; %importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_regressedRT_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas_struct.coeff_names;
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_regressedRT_linearInt.mat")); % add PE bin curves
 
 pe_idx = find(strcmp(coeff_names,'pe'));
@@ -32,7 +32,6 @@ num_subjs = length(subj_ids); % number of subjects
 neutral = [7, 53, 94]/255;
 font_name = 'Arial'; % font name
 font_size = 7; % font size
-fontsize_label = 12; % font size for subplot labels
 line_style = '-'; % line style
 
 %% TILED LAYOUT
@@ -87,12 +86,11 @@ for a = 1:length(ncoeffs)
     end
     hold on
     color = color_cell;
-    ySmoothed = mean(data_plot);
-    plot(x,ySmoothed,"Color",color{1,:},'LineWidth',2)
+    ySignal = mean(data_plot);
+    plot(x,ySignal,"Color",color{1,:},'LineWidth',2)
     hold on
     color = cell2mat(color_cell);
-    shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
-    hold on
+    shadedErrorBar(x,ySignal,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
 
     % PLOT PERMUTATION TEST
     disp_perm = 1;
@@ -114,7 +112,6 @@ for a = 1:length(ncoeffs)
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
     xlim([-300,2700])
-    % ylim([ylim_lower(a),ylim_upper(a)])
     xline(0,'--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')

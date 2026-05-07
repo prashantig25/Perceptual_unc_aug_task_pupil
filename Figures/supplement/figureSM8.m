@@ -1,4 +1,4 @@
-% figureSM2 plots results from all regressors of the pupil analysis.
+% Figure S8: Plot results from all regressors of the pupil analysis.
 
 clc
 clearvars
