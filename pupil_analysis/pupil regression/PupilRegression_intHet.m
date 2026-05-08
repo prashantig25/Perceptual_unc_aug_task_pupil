@@ -479,7 +479,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
 
             [betas, ~, ~, ~, lm] = linear_fit(tbl, obj.model_def, ...
-                obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0, 0, 0, 0);
+                obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0);
 
             % Save coefficient names once
             if subj_idx == 1 && c == 1
