@@ -81,11 +81,11 @@ for a = 1:length(ncoeffs)
     end
     hold on
     color = color_cell;
-    ySmoothed = mean(data_plot);
-    plot(x,ySmoothed,"Color",color{1,:},'LineWidth',2)
+    ySignal = mean(data_plot);
+    plot(x,ySignal,"Color",color{1,:},'LineWidth',2)
     hold on
     color = cell2mat(color_cell);
-    shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
+    shadedErrorBar(x,ySignal,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
     hold on
 
     % PLOT PERMUTATION TEST
@@ -108,7 +108,6 @@ for a = 1:length(ncoeffs)
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
     xlim([-300,2700])
-    % ylim([ylim_lower(a),ylim_upper(a)])
     xline(0,'--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')
