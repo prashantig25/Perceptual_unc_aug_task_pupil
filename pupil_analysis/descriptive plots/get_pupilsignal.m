@@ -76,6 +76,17 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
 save_sliderOnset = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset');
 
+dirs = {
+    'save_dir',  save_dir;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
+mkdir(save_dir);
+mkdir(save_sliderOnset);
+main = 1; % running analyses based on the main pipeline
+
 % Create directories if they don't exist yet
 if ~exist(save_dir, 'dir')
     mkdir(save_dir);
@@ -109,6 +120,13 @@ baseline = "event-specific";
 % Save directories
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
+mkdir(save_dir);
 
 % Create directories if they don't exist yet
 if ~exist(save_dir, 'dir')
@@ -135,6 +153,12 @@ baseline = "no correction";
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb linearInt');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+mkdir(save_dir);
 
 % Create directory if it don't exist yet
 if ~exist(save_dir, 'dir')
@@ -162,6 +186,12 @@ baseline = "event-specific";
 % Save path
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -187,6 +217,12 @@ baseline = "no correction";
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch non-baseline corrected linear int');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -213,6 +249,12 @@ baseline = "trial-specific";
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -238,6 +280,12 @@ baseline = "no correction";
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp non-baseline corrected linear int');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -274,6 +322,13 @@ baseline = "event-specific";
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 cubic spline new');
+dirs = {
+    'save_dir',  save_dir;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'cubic spline', 'CS'};
+checkPathKeywords(dirs, keywords);
+mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -297,6 +352,12 @@ baseline = "no correction";
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb cubic spline new');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'cubic spline', 'CS'};
+checkPathKeywords(dirs, keywords);
+mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -318,7 +379,7 @@ end
 % Update preprocessing directory
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
-    filesep, 'preprocessed trials and events added saccade correction and urai params PG');
+    filesep, 'preprocessed trials and events added deconv');
 
 % 3.1 FEEDBACK-LOCKED PUPIL SIGNAL - EVENT-SPECIFIC BASELINE
 % -------------------------------------------------------------------------
@@ -331,7 +392,14 @@ main = 0;
 
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb deconv');
+dirs = {
+    'save_dir',  save_dir;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'deconv', 'deconvolution'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
@@ -355,7 +423,13 @@ baseline = "no correction";
 
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected saccade correction and urai params PG');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected deconv');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'deconv', 'deconvolution'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir);
 
 % Create directory if it doesn't exist yet

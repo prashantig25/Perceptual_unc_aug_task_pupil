@@ -15,8 +15,6 @@ pe_additiveMdl,0.001
 pe_het_linearInt,0.001
 peCondiff_het_linearInt,0.016
 pe_het_cubicSpline,0.001
-peCondiff_het_cubicSpline,0.019
-pe_het_cubicSpline,0.001
 peCondiff_het_cubicSpline,0.021
 pe_het_deconvolution,0.001
 peCondiff_het_deconvolution,0.03
