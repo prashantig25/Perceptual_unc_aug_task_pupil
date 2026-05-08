@@ -34,7 +34,7 @@ function checkPathKeywords(dirs, keywords)
         end
 
         if isempty(matched)
-            matchStr = 'NONE';
+            matchStr = 'ERROR';
         else
             matchStr = strjoin(matched, ', ');
         end
