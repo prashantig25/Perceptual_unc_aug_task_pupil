@@ -1,4 +1,4 @@
-% fullTrial saves pupil signal from different events for the entire trial.
+% fullTrial saves pupil signal from different events for the entire trial illustration.
 
 % todo: currently no file found
 clc
@@ -25,12 +25,10 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive'); 
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive');
 fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial linear int'); % directory to get preprocessed data
 patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int'); % directory to get preprocessed data
 resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int'); % directory to get preprocessed data
-mkdir(save_dir);
-
 if ~exist(save_dir, 'dir')
     mkdir(save_dir);
 end
@@ -39,12 +37,16 @@ end
 for i = 1:num_subjs
 
     % IMPORT EVENT-RELATED DATA
+
+    % Patch phase
     filename = strcat(patch_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); patch = pupil(:,1:col_patch);
 
+    % Response phase
     filename = strcat(resp_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); resp = pupil;
 
+    % Feedback phase
     filename = strcat(fb_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); fb = pupil(:,1:col_fb);
 
