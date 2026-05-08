@@ -1,4 +1,4 @@
-% figureSM6 plots regression diagnostics of the behavioral model.
+% Figure S4: Plot regression diagnostics of the behavioral model.
 
 clc
 clearvars
@@ -23,6 +23,7 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
+
 % Construct the file paths using fullfile
 rsquared_full_path = fullfile(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'partialR2_abs.mat');
 rsquared_signedpath = fullfile(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'partialR2_signed.mat');
@@ -36,6 +37,7 @@ posterior_up_subjs = importdata(posterior_up_subjs_path); % posterior updates
 data_subjs = readtable(data_subjs_path); % single-trial updates, prediction errors
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
+
 %% INITIALISE TILE LAYOUT
 
 figure
@@ -63,15 +65,14 @@ hold on
 
 % PLOT PROPERTIES
 xlabel('')
-% ylim([-0.3,0])
 set(gca,'Color','none')
-ylabel('Mean partial-\itR^2\rm values','Interpreter','tex')
+ylabel('Partial-\itR^2','Interpreter','tex')
 title('Model fit','FontWeight','normal')
+
 %% PLOT POSTERIOR DISTRIBUTION
 
 % GET EMPIRICAL AND POSTERIOR UPDATES
 y = abs(data_subjs.up(data_subjs.pe ~= 0)); % empirical updates
-y_hat = posterior_up_subjs; % regression model estimated updates
 nbins = 75; % number of bins in a distribution
 
 % CHANGE POSITION
@@ -94,9 +95,6 @@ h = histogram(y,nbins);
 h1(1).FaceAlpha = 1; % face alpha for distributions
 h(1).FaceAlpha = 0.7;
 
-% h(2).Color = fits_colors; % colors for distributions
-% h1(2).Color = [37, 50, 55]/255;
-
 h(1).EdgeColor = fits_colors; % edge color for bars
 h1(1).EdgeColor = [37, 50, 55]/255;
 
@@ -109,15 +107,23 @@ set(ax1_new,'LineWidth',linewidth_axes)
 l = legend('Model predictions','Absolute empirical updates','','EdgeColor','none','Color','none');
 l.ItemTokenSize = [7 7];
 xlabel('Update')
-ylabel('Frequency (x 10^3)','Interpreter','tex')
-yticklabels({'0','1','2','3','4','5'})
+
+ax1_new = gca;
+ticks      = ax1_new.YTick;        % tick positions
+tickLabels = ax1_new.YTickLabel;   % tick labels as cell array
+tickLables = str2double(tickLabels)./100;
+C = num2cell(tickLables.');   % produces an 11x1 cell array
+yticklabels(C)
+ylabel('Frequency (x 10^2)','Interpreter','tex')
+
 title('Posterior-predicted and empirical distribution','FontWeight','normal')
 set(gca,'Color','none')
 box off
+
 %% ADD SUBPLOT LABELS
 
 ax1_pos = ax2_new.Position;
-adjust_x = [- 0.06,-0.075]; % adjusted x-position for subplot label
+adjust_x = [- 0.07,-0.075]; % adjusted x-position for subplot label
 adjust_y = ax1_pos(4)+0.02; % adjusted y-position for subplot label
 
 all_axes = [ax1_new,ax2_new];
@@ -128,7 +134,7 @@ for i = 1:2
         subplot_labels{i},'FontSize',fontsize_label,'LineStyle','none','HorizontalAlignment','center')
 end
 
-%%
+%% Save
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
 print(fig, 'reg_diagnostics1.png', '-dpng', '-r600') 
