@@ -52,6 +52,14 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines'
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial linear int');
 save_sliderOnset = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'slider onset');
+
+dirs = {
+    'save_dir',  save_dir;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir);
 mkdir(save_sliderOnset);
 main = 1; % running analyses based on the main pipeline
@@ -72,6 +80,12 @@ base_trialspecific = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -89,6 +103,11 @@ base = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb linearInt');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -111,6 +130,11 @@ main = 1;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -133,6 +157,11 @@ main = 1;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch non-baseline corrected linear int');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -155,6 +184,11 @@ base = 1;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -177,6 +211,11 @@ base = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp non-baseline corrected linear int');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -204,6 +243,12 @@ base_trialspecific = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 cubic spline new');
+dirs = {
+    'save_dir',  save_dir;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'cubic spline', 'CS'};
+checkPathKeywords(dirs, keywords);
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -221,6 +266,11 @@ base = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'non-baseline corrected fb cubic spline new');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'cubic spline', 'CS'};
+checkPathKeywords(dirs, keywords);
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -248,12 +298,19 @@ main = 0;
 % ONLY DIFFERENCE: Use alternate preprocessing directory
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
-    filesep, 'preprocessed trials and events added saccade correction and urai params PG');
+    filesep, 'preprocessed trials and events added deconv');
 
 %% 7. FB-LOCKED PUPIL SIGNAL - EVENT SPECIFIC BASELINE (DECONVOLUTION PIPELINE)
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb deconv');
+dirs = {
+    'save_dir',  save_dir;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'deconv', 'deconvolution'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir);
 
 parfor s = 1:num_subs
@@ -270,7 +327,13 @@ end
 base = 0;
 
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected saccade correction and urai params PG');
+    filesep, 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected deconv');
+dirs = {
+    'save_dir',  save_dir;
+};
+keywords = {'deconv', 'deconvolution'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir);
 
 parfor s = 1:num_subs
