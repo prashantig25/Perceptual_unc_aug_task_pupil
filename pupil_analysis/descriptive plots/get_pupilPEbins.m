@@ -56,15 +56,9 @@ for i = 1:num_subs
     behvData = PupilDescriptive.loadBehavioralData(i);
 
     % MISSED TRIALS
-    % missed_trials = []; % initialize array for index of missed trials
-    % for b = 1:height(behv_data)
-    %     if isnan(behv_data.rt(b,:)) % || isnan(behv_data.slider(b,:)) % check if participant has not responded
-    %         missed_trials = [missed_trials;b];
-    %     end
-    % end
-    missed_trials = find(isnan(behv_data.rt));
-    behv_data(missed_trials,:) = [];
-    missedSlider = isnan(behv_data.slider);
+    missed_trials = find(isnan(behvData.rt));
+    behvData(missed_trials,:) = [];
+    missedSlider = isnan(behvData.slider);
 
     % GET PE DATA
     preds = preds_all(preds_all.id == str2num(subj_ids{i}),:);
@@ -122,5 +116,5 @@ safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_linearInt.mat"),condiffbin)
 % Quick visual check of the mean curves 
 figure()
 hold on
-plot(mean(var1))
-plot(mean(var2))
+plot(mean(squeeze(var1)))
+plot(mean(squeeze(var2)))
