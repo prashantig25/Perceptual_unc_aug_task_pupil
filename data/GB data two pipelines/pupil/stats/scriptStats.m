@@ -49,7 +49,7 @@ results = [results; table({'peCondiff_main'}, round(min(perm.prob(peCondiff_idx,
 
 %% figure 5 MS - learning residual analysis
 
-data_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
+data_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
 perm = importdata(fullfile(data_dir,"perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
 betas_pupil = importdata(fullfile(data_dir,"betas_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % import coeff names
 coeffs_name = betas_pupil.coeff_names;
