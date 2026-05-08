@@ -45,7 +45,7 @@ classdef PupilDescriptive
             %
             % OUPUT:
             %   pupil: Pupil signal
-            %   sliderOnset: XXXX
+            %   sliderOnset: Slider onset
 
             % Load behavioral data
             behvData = obj.loadBehavioralData(subjNum);
