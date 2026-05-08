@@ -119,9 +119,9 @@ reg_het2.use_sp              = 1;
 
 reg_het2.runAnalysis();
 
-safe_saveall(fullfile(het_save_dir, 'param_estimates_het_CS_ForPregenSP.mat'), reg_het2.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_het_CS_ForPregenSP.mat'),          reg_het2.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_het_CS_ForPregenSP.mat'),          reg_het2.perm_results);
+safe_saveall(fullfile(het_save_dir, 'hetModel_CS_newSP.mat'), reg_het2.betas_struct);
+safe_saveall(fullfile(het_save_dir, 'negLL_hetModel_CS_newSP.mat'),          reg_het2.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_hetModel_CS_newSP.mat'),          reg_het2.perm_results);
 
 fprintf('Pipeline 2 saved.\n');
 
@@ -160,9 +160,9 @@ reg_het3.use_sp              = 0;
 
 reg_het3.runAnalysis();
 
-safe_saveall(fullfile(het_save_dir, 'param_estimates_het_deconv_ForPregenSP.mat'), reg_het3.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_het_deconv_ForPregenSP.mat'),          reg_het3.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_het_deconv_ForPregenSP.mat'),          reg_het3.perm_results);
+safe_saveall(fullfile(het_save_dir, 'hetModel_deconv_newSP.mat'), reg_het3.betas_struct);
+safe_saveall(fullfile(het_save_dir, 'negLL_hetModel_deconv_newSP.mat'),          reg_het3.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_hetModel_deconv_newSP.mat'),          reg_het3.perm_results);
 
 fprintf('Pipeline 3 saved.\n');
 

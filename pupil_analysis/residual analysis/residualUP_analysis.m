@@ -101,8 +101,8 @@ for n = 1:num_subjs
     end
 end
 
-% SAVE COEFF NAMES
-safe_saveall(strcat(save_dir, filesep, "coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat"), coeffs_name);
+% SAVE COEFFS
+betas_pupil.coeff_names = coeffs_name;
 
 % SAVE BETAS
 safe_saveall(strcat(save_dir,filesep,"betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"), betas_pupil);
