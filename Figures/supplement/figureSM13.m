@@ -57,9 +57,9 @@ ols_coeff_names = betas_linearInt.coeff_names;
 pe_condiff_idx  = find(strcmp(ols_coeff_names, 'zsc_condiff:pe'));
 
 fprintf('Loading heteroskedasticity specifications...\n');
-betas_linear_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'));
-betas_cubic_het  = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'));
-betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat'));
+betas_linear_het = importdata(fullfile(alt_dir, 'hetModel_linearInt_newSP.mat'));
+betas_cubic_het  = importdata(fullfile(alt_dir, 'hetModel_CS_newSP.mat'));
+betas_deconv_het = importdata(fullfile(alt_dir, 'hetModel_deconv_newSP.mat'));
 
 % Heteroskedastic permutation test
 perm_linear_het = importdata(fullfile(alt_dir,"perm_hetModel_linearInt_newSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);

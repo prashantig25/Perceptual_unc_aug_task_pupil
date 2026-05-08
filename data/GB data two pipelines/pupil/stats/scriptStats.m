@@ -14,6 +14,9 @@ end
 % Initialize results table
 results = table({}, [], 'VariableNames', {'term', 'pval'});
 
+% Save dir
+save_dir = fullfile(desiredPath,'data', 'GB data two pipelines', 'pupil', 'stats');
+
 %% figure 3 MS - descriptive analysis
 
 condiffbin = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "descriptive", filesep, "fb_PE2bins_linearInt.mat"));
@@ -119,5 +122,5 @@ results = [results; table({'peCondiff_het_deconvolution'}, round(min(perm.prob(p
 
 %% SAVE ALL
 
-safe_saveall("allStats.csv",results)
+safe_saveall(fullfile(save_dir,filesep,"allStats.csv"),results)
 
