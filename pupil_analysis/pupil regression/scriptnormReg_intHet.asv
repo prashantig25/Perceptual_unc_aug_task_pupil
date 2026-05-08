@@ -24,7 +24,7 @@ xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pup
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
 
 preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
-preds_all = readtable(preds_file);
+preds_all  = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 %% ANALYSIS 1: MAIN MODEL (Figure 4)
@@ -70,9 +70,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', '', '');
 
 reg.runAnalysis();
-tol = 1e-9; %1e-12;
-%tol = 1e-12;
-reg.saveResults(tol);
+reg.saveResults();
 
 %%
 %%%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%%%%%%%%
@@ -121,7 +119,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_cubicSplineNew', 'perm_pe_condiff_cubicSplineNew', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS: ADDITIVE MODEL
 %%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%%%%%%%%
@@ -167,7 +165,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('additiveMdl_linearInt', 'perm_additiveMdl_linearInt', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %%
 %%%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%%%%%%%%
@@ -197,6 +195,7 @@ vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
 coeff_names = tmpMdl.CoefficientNames;
+safe_saveall(fullfile(save_dir, ['coeffNames_additiveMdl_CSnew', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -216,7 +215,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('additiveMdl_CSnew', 'perm_additiveMdl_CSnew', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS 2: BINNED REGRESSION APPROACH (Figure 3c)
 %%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%
@@ -264,7 +263,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff2bins_linearInt', 'perm_pe_condiff2bins_linearInt', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %%
 %%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%
@@ -314,7 +313,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff2bins_cubicSplineNew', 'perm_pe_condiff2bins_cubicSplineNew', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS 3: REGRESSED RT MODEL (Figure S12)
 %%%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%%
@@ -361,7 +360,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_regressedRT_linearInt', 'perm_pe_condiff_regressedRT_linearInt', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %%
 %%%%%%%% WITH CUBIC SPLINE INTERPOLATION %%%%%%%%%%
@@ -410,7 +409,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_regressedRT_cubicSplineNew', 'perm_pe_condiff_regressedRT_cubicSplineNew', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS 5: PATCH-LOCKED PUPIL DILATION (Figure S8)
 
@@ -457,7 +456,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('patch_condiff_linearInt', 'perm_patch_linearInt', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS 6: MAIN MODEL BUT ON NON-BASELINE CORRECTED SIGNAL + MATHOT et al., 2022 PIPELINE
 
@@ -469,7 +468,7 @@ reg.setSubjects(subj_ids, num_sess);
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb linearInt');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
-save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+save_dir  = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 dirs = {
     'pupil_dir',  pupil_dir;
@@ -503,7 +502,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_linearInt', 'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %%
 %%%%%%%%% CUBIC SPLINE INTERPOLATION %%%%%%%%
@@ -516,7 +515,7 @@ reg.setSubjects(subj_ids, num_sess);
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb cubic spline new');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
-save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+save_dir  = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 
 dirs = {
@@ -552,7 +551,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'pe_condiff_residuals_mathot_nonBaselineCorrected_cubicSplineNew', 'pe_condiff_predicted_mathot_nonBaselineCorrected_cubicSplineNew');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS 10: Figure S11
 
@@ -601,7 +600,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG', 'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS 10: Figure S11 but w/o baseline correction
 
@@ -650,7 +649,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG', 'perm_pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS 3: REGRESSED RT MODEL BUT WITH DECONVOLUTION
 
@@ -699,7 +698,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG', 'perm_pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 %% ANALYSIS: BINNED REGRESSION APPROACH (Figure 3c) BUT WITH DECONVOLUTION-BASED
 
@@ -712,18 +711,11 @@ pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', file
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
+% save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'new pipeline gaze');
+
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
-
-dirs = {
-    'pupil_dir',  pupil_dir;
-    'xgaze_dir',  xgaze_dir;
-    'ygaze_dir',  ygaze_dir;
-};
-keywords = {'deconv', 'saccade'};
-checkPathKeywords(dirs, keywords);
-
-reg.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, save_dir);
+reg.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
 
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt';
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
@@ -749,7 +741,7 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff2bins_deconv_saccCorr_uraiParamsPG', 'perm_pe_condiff2bins_deconv_saccCorr_uraiParamsPG', '', '');
 
 reg.runAnalysis();
-reg.saveResults(tol);
+reg.saveResults();
 
 fprintf('\n=== All analyses completed successfully ===\n');
 

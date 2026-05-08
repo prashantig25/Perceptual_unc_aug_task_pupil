@@ -107,8 +107,15 @@ set(ax1_new,'LineWidth',linewidth_axes)
 l = legend('Model predictions','Absolute empirical updates','','EdgeColor','none','Color','none');
 l.ItemTokenSize = [7 7];
 xlabel('Update')
-ylabel('Frequency (x 10^3)','Interpreter','tex')
-yticklabels({'0','1','2','3','4','5'})
+
+ax1_new = gca;
+ticks      = ax1_new.YTick;        % tick positions
+tickLabels = ax1_new.YTickLabel;   % tick labels as cell array
+tickLables = str2double(tickLabels)./100;
+C = num2cell(tickLables.');   % produces an 11x1 cell array
+yticklabels(C)
+ylabel('Frequency (x 10^2)','Interpreter','tex')
+
 title('Posterior-predicted and empirical distribution','FontWeight','normal')
 set(gca,'Color','none')
 box off
@@ -116,7 +123,7 @@ box off
 %% ADD SUBPLOT LABELS
 
 ax1_pos = ax2_new.Position;
-adjust_x = [- 0.06,-0.075]; % adjusted x-position for subplot label
+adjust_x = [- 0.07,-0.075]; % adjusted x-position for subplot label
 adjust_y = ax1_pos(4)+0.02; % adjusted y-position for subplot label
 
 all_axes = [ax1_new,ax2_new];

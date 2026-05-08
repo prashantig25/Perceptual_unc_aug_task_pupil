@@ -62,9 +62,9 @@ betas_cubic_het  = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE
 betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat'));
 
 % Heteroskedastic permutation test
-perm_linear_het = importdata(fullfile(alt_dir,"perm_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
-perm_cubic_het = importdata(fullfile(alt_dir,"perm_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
-perm_deconv_het = importdata(fullfile(alt_dir,"perm_param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_linear_het = importdata(fullfile(alt_dir,"perm_hetModel_linearInt_newSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_cubic_het = importdata(fullfile(alt_dir,"perm_hetModel_CS_newSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_deconv_het = importdata(fullfile(alt_dir,"perm_hetModel_deconv_newSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
 
 %% EXTRACT COEFFICIENTS
 
@@ -278,7 +278,7 @@ disp(medianPvalues)
 medianMultiverse = table(round(medianPvalues, 3), ...
     'VariableNames', {'median'});
 stats_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'stats');
-safe_saveall(fullfile(stats_dir, 'medianMultiversePval.csv'), medianMultiverse);
+safe_saveall(fullfile(stats_dir, 'medianMultiversePval_peCondiff.csv'), medianMultiverse);
 
 yline(0.025, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1, 'HandleVisibility', 'off');
 yline(0.05, '--', 'Color', [0.5 0.5 0.5], 'LineWidth', 1, 'HandleVisibility', 'off');

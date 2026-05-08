@@ -37,14 +37,14 @@ betas_linearInt        = importdata(fullfile(main_dir, 'pe_condiff_linearInt.mat
 perm_linearInt         = importdata(fullfile(main_dir, 'perm_pe_condiff_linearInt.mat'));
 betas_cubicSpline      = importdata(fullfile(main_dir, 'pe_condiff_cubicSplineNew.mat'));
 perm_cubicSpline       = importdata(fullfile(main_dir, 'perm_pe_condiff_cubicSplineNew.mat'));
-betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat.mat'));
-perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat.mat'));
+betas_deconv           = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG.mat'));
+perm_deconv            = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG.mat'));
 betas_linearInt_RT     = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_linearInt.mat'));
 perm_linearInt_RT      = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_linearInt.mat'));
 betas_cubicSpline_RT   = importdata(fullfile(main_dir, 'pe_condiff_regressedRT_cubicSplineNew.mat'));
 perm_cubicSpline_RT    = importdata(fullfile(main_dir, 'perm_pe_condiff_regressedRT_cubicSplineNew.mat'));
-betas_deconv_RT        = importdata(fullfile(alt_dir,  'pe_condiff_regressedRT_deconvolution.mat'));
-perm_deconv_RT         = importdata(fullfile(alt_dir,  'perm_pe_condiff_regressedRT_deconvolution.mat'));
+betas_deconv_RT        = importdata(fullfile(alt_dir,  'pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG.mat'));
+perm_deconv_RT         = importdata(fullfile(alt_dir,  'perm_pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG.mat'));
 betas_linearInt_noBL   = importdata(fullfile(alt_dir,  'pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
 perm_linearInt_noBL    = importdata(fullfile(alt_dir,  'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat'));
 betas_cubicSpline_noBL = importdata(fullfile(alt_dir,  'pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew.mat'));
@@ -53,18 +53,18 @@ betas_deconv_noBL      = importdata(fullfile(alt_dir,  'pe_condiff_deconvolution
 perm_deconv_noBL       = importdata(fullfile(alt_dir,  'perm_pe_condiff_deconvolution_nonBaselineCorrected.mat'));
 
 fprintf('Loading heteroskedasticity specifications...\n');
-betas_linear_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat'));
-betas_cubic_het  = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat'));
-betas_deconv_het = importdata(fullfile(alt_dir, 'param_estimates_hetero_noZeroPE_deconvolution_20SPAbs3Width_pregenSP_fbSeed42.mat'));
+betas_linear_het = importdata(fullfile(alt_dir, 'hetModel_linearInt_newSP.mat'));
+betas_cubic_het  = importdata(fullfile(alt_dir, 'hetModel_CS_newSP.mat'));
+betas_deconv_het = importdata(fullfile(alt_dir, 'hetModel_deconv_newSP.mat'));
 
 % Load OLS coefficient names and find pe:zsc_condiff index dynamically
 ols_coeff_names = betas_linearInt.coeff_names;
 pe_condiff_idx  = find(strcmp(ols_coeff_names, 'pe'));
 
 % Heteroskedastic permutation test
-perm_linear_het = importdata(fullfile(alt_dir,"perm_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
-perm_cubic_het = importdata(fullfile(alt_dir,"perm_hetero_noZeroPE_CS_20SPAbs3Width_pregenSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
-perm_deconv_het = importdata(fullfile(alt_dir,"perm_param_estimates_hetero_noZeroPE_deconvolution_saccCorr_uraiParams_PG.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_linear_het = importdata(fullfile(alt_dir,"perm_hetModel_linearInt_newSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_cubic_het = importdata(fullfile(alt_dir,"perm_hetModel_CS_newSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
+perm_deconv_het = importdata(fullfile(alt_dir,"perm_hetModel_deconv_newSP.mat")); % get_permtest(1:size(betas_linear_het.with_intercept,2), num_subjs, col, betas_linear_het.with_intercept, [], 0, 1);
 
 %% EXTRACT COEFFICIENTS
 

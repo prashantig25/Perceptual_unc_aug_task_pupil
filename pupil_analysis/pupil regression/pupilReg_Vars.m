@@ -83,7 +83,7 @@ classdef pupilReg_Vars < handle
             obj.num_sess = num_sess;
         end
         
-        function setPaths(obj, behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir)
+        function setPaths(obj, behv_dir, pupil_dir, xgaze_dir, ygaze_dir, save_dir)
             % Set all directory paths for input data and output files
             %
             % Parameters:
@@ -91,14 +91,12 @@ classdef pupilReg_Vars < handle
             %   pupil_dir - path to pupil preprocessed data directory  
             %   xgaze_dir - path to x-gaze preprocessed data directory
             %   ygaze_dir - path to y-gaze preprocessed data directory
-            %   base_dir - path to baseline preprocessed data directory
             %   save_dir - path to output directory for saving results
             
             obj.behv_dir = behv_dir;
             obj.pupil_dir = pupil_dir;
             obj.xgaze_dir = xgaze_dir;
             obj.ygaze_dir = ygaze_dir;
-            obj.base_dir = base_dir;
             obj.save_dir = save_dir;
         end
         

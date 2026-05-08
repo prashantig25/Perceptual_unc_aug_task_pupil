@@ -9,14 +9,16 @@ classdef PupilRegression_intHet < pupilReg_Vars
         starting_points % [n_subj x col x n_sp x num_params], pre-generated
 
         % Heteroskedastic model properties
-        model_type % 'OLS' (default) or 'heteroskedastic'
-        n_sp % number of random starting points for fmincon
-        minBound % lower edge for uniform random start sampling
-        maxBound % upper edge for uniform random start sampling
-        lb % hard lower bounds for fmincon
-        ub % hard upper bounds for fmincon
-        fmincon_options % optimoptions object for fmincon
-        negLL_values % negative log-likelihood values (heteroskedastic model only)
+        model_type
+        n_sp
+        use_sp
+        p0
+        minBound
+        maxBound
+        lb
+        ub
+        fmincon_options
+        negLL_values
 
         % Progress bar
         wb % waitbar handle
@@ -42,9 +44,11 @@ classdef PupilRegression_intHet < pupilReg_Vars
             obj.betas_struct    = struct();
             obj.model_type      = 'OLS';
             obj.n_sp            = 20;
+            obj.use_sp          = 0; 
             obj.wb              = [];
             obj.total_steps     = 0;
             obj.completed_steps = 0;
+            obj.p0 = [0, 0, 0, 0.1, 0.1, 0, 0, 0, 0, 0];
         end
 
         %% ----------------------------------------------------------------
@@ -605,13 +609,13 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 'VariableNames', {'pupil','xgaze','ygaze','zsc_condiff','signed_pe', ...
                 'pe','zsc_up','rt','condition','ecoperf','reward','pe_condiff'});
 
-            if obj.baseline_mdl == 1
-                tbl.baseline = zsc_base(validIdx);
-            end
+            % if obj.baseline_mdl == 1
+            %     tbl.baseline = zsc_base(validIdx);
+            % end
 
             % Fit linear regression model
             [betas, ~, ~, ~, lm] = obj.externalFitFcn(tbl, obj.model_def, ...
-                obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0, 0);
+                obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0);
 
             % Save coefficient names once
             if subj_idx == 1 && c == 1
@@ -639,6 +643,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             ub         = obj.ub;
             foptions   = obj.fmincon_options;
             num_params = obj.num_vars + 1;
+            use_sp     = obj.use_sp;
+            bestParams = obj.p0;
 
             % Pre-compute z-scored predictors
             x1_z = zscore(abs(preds_bins.pe));
@@ -687,15 +693,22 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); % todo: check this!! %#ok<PFBNS>
 
                 bestNegLL  = inf;
-                bestParams = nan(1, num_params);
+                bestParams = obj.p0;
 
-                for i = 1:n_sp
-                    p0 = squeeze(starts_subj(c, i, :))';
-                    [p_est, nLL_val] = fmincon(negLLfun, p0, [], [], [], [], lb, ub, [], foptions);
-                    if nLL_val < bestNegLL
-                        bestNegLL  = nLL_val;
-                        bestParams = p_est;
+                if use_sp == 1
+                    for i = 1:n_sp
+                        p0 = squeeze(starts_subj(c, i, :))';
+                        [p_est, nLL_val] = fmincon(negLLfun, p0, [], [], [], [], lb, ub, [], foptions);
+                        if nLL_val < bestNegLL
+                            bestNegLL  = nLL_val;
+                            bestParams = p_est;
+                        end
                     end
+                else
+                    [p_est, nLL_val] = fmincon(negLLfun, bestParams, [], [], [], [], lb, ub, [], foptions);
+                    bestNegLL  = nLL_val;
+                    bestParams = p_est;
+                    p0 = bestParams;
                 end
 
                 % k            = num_params;

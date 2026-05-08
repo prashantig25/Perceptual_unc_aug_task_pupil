@@ -2,7 +2,7 @@ term,pval
 peBinned_condiff,0.016
 peBinned,0.001
 peBinned_condiff_cubicSpline,0.06
-peBinned_condiff_deconv,0.006
+peBinned_condiff_deconv,0.014
 pe_main,0.001
 peCondiff_main,0.01
 post_up,0.001
@@ -15,6 +15,8 @@ pe_additiveMdl,0.001
 pe_het_linearInt,0.001
 peCondiff_het_linearInt,0.016
 pe_het_cubicSpline,0.001
+peCondiff_het_cubicSpline,0.019
+pe_het_cubicSpline,0.001
 peCondiff_het_cubicSpline,0.021
 pe_het_deconvolution,0.001
-peCondiff_het_deconvolution,0.024
+peCondiff_het_deconvolution,0.03
