@@ -195,6 +195,7 @@ vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');
 dummyData = array2table(zeros(1, numel(vars)), 'VariableNames', vars);
 tmpMdl    = fitlm(dummyData, model_def);
 coeff_names = tmpMdl.CoefficientNames;
+safe_saveall(fullfile(save_dir, ['coeffNames_additiveMdl_CSnew', '.mat']), coeff_names);
 num_vars  = tmpMdl.NumCoefficients - 1;
 pred_vars = {'pe','signed_pe','zsc_up','rt','xgaze','ygaze','zsc_condiff','baseline','reward','ecoperf'};
 cat_vars  = {'condition','reward','ecoperf'};
@@ -710,18 +711,11 @@ pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', file
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
+% save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'new pipeline gaze');
+
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
-
-dirs = {
-    'pupil_dir',  pupil_dir;
-    'xgaze_dir',  xgaze_dir;
-    'ygaze_dir',  ygaze_dir;
-};
-keywords = {'deconv', 'saccade'};
-checkPathKeywords(dirs, keywords);
-
-reg.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, save_dir);
+reg.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
 
 model_def = 'pupil ~ xgaze + ygaze + pe + zsc_up + rt';
 vars      = unique(regexp(model_def, '\w+', 'match'), 'stable');

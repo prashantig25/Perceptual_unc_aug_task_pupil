@@ -474,9 +474,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 'VariableNames', {'pupil','xgaze','ygaze','zsc_condiff','signed_pe', ...
                 'pe','zsc_up','rt','condition','ecoperf','reward','pe_condiff'});
 
-            if obj.baseline_mdl == 1
-                tbl.baseline = zsc_base(validIdx);
-            end
+            % if obj.baseline_mdl == 1
+            %     tbl.baseline = zsc_base(validIdx);
+            % end
 
             [betas, ~, ~, ~, lm] = linear_fit(tbl, obj.model_def, ...
                 obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0);
