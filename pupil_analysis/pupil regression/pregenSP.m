@@ -75,13 +75,13 @@ reg_het1.binned_accuracy   = 0;
 reg_het1.two_tailed        = 0;
 reg_het1.bins_array        = 1;
 reg_het1.residuals_predicted = 0;
-reg_het1.use_sp              = 1;
+reg_het1.use_sp              = 0;
 
 reg_het1.runAnalysis();
 
-safe_saveall(fullfile(het_save_dir, 'hetModel_linearInt_newSP.mat'), reg_het1.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_hetModel_linearInt_newSP.mat'),          reg_het1.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_hetModel_linearInt_newSP.mat'),          reg_het1.perm_results);
+safe_saveall(fullfile(het_save_dir, 'param_estimates_het_linearInt_ForPregenSP.mat'), reg_het1.betas_struct);
+safe_saveall(fullfile(het_save_dir, 'negLL_het_linearInt_ForPregenSP.mat'),          reg_het1.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_het_linearInt_ForPregenSP.mat'),          reg_het1.perm_results);
 
 fprintf('Pipeline 1 saved.\n');
 
@@ -115,7 +115,7 @@ reg_het2.binned_accuracy   = 0;
 reg_het2.two_tailed        = 0;
 reg_het2.bins_array        = 1;
 reg_het2.residuals_predicted = 0;
-reg_het2.use_sp              = 1;
+reg_het2.use_sp              = 0;
 
 reg_het2.runAnalysis();
 
@@ -169,3 +169,136 @@ fprintf('Pipeline 3 saved.\n');
 fprintf('\n====================================================\n');
 fprintf('  ALL PIPELINES COMPLETE\n');
 fprintf('====================================================\n');
+
+%% Configuration to pregen bounds
+width = 3;              % Scaling factor for bounds (±width × max_abs_value)
+ncoeffs = 1:10;        % Coefficient indices to process
+
+%% Process Linear Interpolation Model
+fprintf('Processing Linear Interpolation parameters...\n');
+betas_struct = importdata("param_estimates_het_linearInt_ForPregenSP.mat");
+[minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
+
+% Save results
+safe_saveall("minHetParams_linearIntabs.mat", minCoeff);
+safe_saveall("maxHetParams_linearIntabs.mat", maxCoeff);
+
+%% Process Cubic Spline Model
+fprintf('Processing Cubic Spline parameters...\n');
+betas_struct = importdata("param_estimates_het_CS_ForPregenSP.mat");
+[minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
+
+% Save results
+safe_saveall("minHetParams_CSabs.mat", minCoeff);
+safe_saveall("maxHetParams_CSabs.mat", maxCoeff);
+
+%% Process Deconvolution Model
+fprintf('Processing Deconvolution parameters...\n');
+betas_struct = importdata("param_estimates_het_deconv_ForPregenSP.mat");
+[minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
+
+% Save results
+safe_saveall("minHetParams_deconvolutionabs.mat", minCoeff);
+safe_saveall("maxHetParams_deconvolutionabs.mat", maxCoeff);
+
+fprintf('All bounds calculated and saved successfully.\n');
+
+%% pregen SP using bounds ...
+
+nSubjs = length(subj_ids);
+nCoeffs = 10;
+nSp = 20;
+col = 300;
+
+rng(123)
+
+%% SP for linear interpolation ...
+
+minBound = importdata("minHetParams_linearIntabs.mat");
+maxBound = importdata("maxHetParams_linearIntabs.mat");
+
+startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
+
+for n = 1:nSubjs
+    for c = 1:nCoeffs
+        for sp = 1:nSp
+            for cl = 1:col
+                startingPoints(n,cl,sp,c) = unifrnd(minBound(c), maxBound(c));
+            end
+        end
+    end
+end
+
+safe_saveall("startingPoints_linearInt.mat",startingPoints)
+
+%% SP for cubic-spline int ...
+
+minBound = importdata("minHetParams_CSabs.mat");
+maxBound = importdata("maxHetParams_CSabs.mat");
+
+startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
+
+for n = 1:nSubjs
+    for c = 1:num_params_hetero
+        for sp = 1:nSp
+            for cl = 1:col
+                startingPoints(n,cl,sp,c) = unifrnd(minBound(c), maxBound(c));
+            end
+        end
+    end
+end
+
+safe_saveall("startingPoints_CS.mat",startingPoints)
+
+%% SP for deconvolution-based preprocessing
+
+minBound = importdata("minHetParams_deconvolutionabs.mat");
+maxBound = importdata("maxHetParams_deconvolutionabs.mat");
+
+startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
+
+for n = 1:nSubjs
+    for c = 1:nCoeffs
+        for sp = 1:nSp
+            for cl = 1:col
+                startingPoints(n,cl,sp,c) = unifrnd(minBound(c), maxBound(c));
+            end
+        end
+    end
+end
+
+safe_saveall("startingPoints_deconv.mat",startingPoints)
+
+
+%% Helper Function: Calculate Symmetric Bounds
+function [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width)
+    % CALCULATESYMMETRICBOUNDS Compute symmetric min/max bounds for coefficients
+    %
+    % Inputs:
+    %   betas_struct - Parameter estimates array (subjects × coeffs × bins)
+    %   ncoeffs      - Vector of coefficient indices to process
+    %   width        - Scaling factor for bounds
+    %
+    % Outputs:
+    %   minCoeff     - Minimum bounds for each coefficient
+    %   maxCoeff     - Maximum bounds for each coefficient
+    
+    % Preallocate output arrays
+    minCoeff = NaN(length(ncoeffs), 1);
+    maxCoeff = NaN(length(ncoeffs), 1);
+    
+    % Loop through each coefficient
+    for a = 1:length(ncoeffs)
+        coeff_idx = ncoeffs(a);
+        
+        % Extract data for current coefficient across all subjects and bins
+        data_plot = squeeze(betas_struct.with_intercept(:, coeff_idx, :, :));
+        
+        % Find the maximum absolute value across all entries
+        max_abs_val = max(abs(data_plot(:)));
+        
+        % Create symmetric bounds: ±width × max_abs_value
+        minCoeff(a) = round(-width * max_abs_val);
+        maxCoeff(a) = round(width * max_abs_val);
+    end
+end
