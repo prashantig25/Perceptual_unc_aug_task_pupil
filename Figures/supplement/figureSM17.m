@@ -1,4 +1,4 @@
-% figureSM9 plots results of the model-based analyses of patch-locked pupil
+% Figure S17: Plots results of the model-based analyses of patch-locked pupil
 % response.
 
 clc
@@ -78,11 +78,11 @@ for a = 1:length(ncoeffs)
     end
     hold on
     color = color_cell;
-    ySmoothed = mean(data_plot);
-    plot(x,ySmoothed,"Color",color{1,:},'LineWidth',2)
+    ySignal = mean(data_plot);
+    plot(x,ySignal,"Color",color{1,:},'LineWidth',2)
     hold on
     color = cell2mat(color_cell);
-    shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
+    shadedErrorBar(x,ySignal,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
     hold on
 
     % PLOT PERMUTATION TEST RESULTS
