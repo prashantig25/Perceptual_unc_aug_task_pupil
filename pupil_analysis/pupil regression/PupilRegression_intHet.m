@@ -587,7 +587,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
             starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
 
-            parfor c = 1:col
+            for c = 1:col
                 y     = zsc_pupil(:, c);
                 xgaze = xgaze_z(:, c);
                 ygaze = ygaze_z(:, c);
@@ -596,7 +596,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); %#ok<PFBNS>
 
                 bestNegLL  = inf;
-                bestParams = obj.p0;
+                % bestParams = obj.p0;
 
                 if use_sp == 1
                     for i = 1:n_sp

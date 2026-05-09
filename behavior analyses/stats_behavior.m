@@ -18,7 +18,7 @@ else
 end
 
 save_behavior    = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'stats', filesep, 'behavior');
-descriptive_path = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'descriptive');
+descriptive_path = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'descriptive (n = 47)');
 regression_path  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses');
 %% LOAD DATA
 
@@ -71,7 +71,7 @@ ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df','mean','sem'}); % Create a table to store the t-test results
 
 % Save the table as a CSV file
-safe_saveall(strcat(save_behavior,filesep,'allconditions_chance_ttest.csv'), ttestResults);
+safe_saveall(strcat(save_behavior,filesep,'allconditions_chance_ttest47.csv'), ttestResults);
 
 %% COHEN'S D FOR ECONOMIC PERFORMANCE ACROSS CONDITIONS
 
@@ -85,7 +85,7 @@ end
 % save output to .csv file for OVERLEAF
 cohenResults = table(cond_names, round(cohen_d,2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
-safe_saveall(strcat(save_behavior,filesep,'ecoperf_cohen.csv'),cohenResults);
+safe_saveall(strcat(save_behavior,filesep,'ecoperf_cohen47.csv'),cohenResults);
 %% T-TEST TO COMPARE SLIDER DATA ACROSS UNCERTAINTIES
 
 % initialise
@@ -115,7 +115,7 @@ cohen_d(1,1) = compute_cohend_ttest2(nanmean(perc_avg), nanmean(mix_avg), sd_poo
 ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
     round(t_vals,2), round(df_vals,2), round(cohen_d,2),...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df','cohen_d'}); % Create a table to store the t-test results
-safe_saveall(strcat(save_behavior,filesep,'mu_uncertainty_ttest.csv'),ttestResults);
+safe_saveall(strcat(save_behavior,filesep,'mu_uncertainty_ttest47.csv'),ttestResults);
 
 %% SAVE MEAN and SEM FOR SLIDER UPDATES ACROSS CONDITIONS
 
@@ -142,7 +142,7 @@ df_vals(2,:) = stats_perc.df;
 ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
     round(t_vals,2), round(df_vals,2), round(mean_mu,2), round(sem_mu,2),...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df', 'mean', 'sem'}); % Create a table to store the t-test results
-safe_saveall(strcat(save_behavior,filesep,'mu_meansem.csv'),ttestResults);
+safe_saveall(strcat(save_behavior,filesep,'mu_meansem47.csv'),ttestResults);
 
 %% COHEN'S D FOR SLIDER UPDATES ACROSS CONDITIONS
 
@@ -158,7 +158,7 @@ end
 % save output to .csv file for OVERLEAF
 cohenResults = table(cond_names, round(cohen_d,2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
-safe_saveall(strcat(save_behavior,filesep,'mu_cohen.csv'),cohenResults);
+safe_saveall(strcat(save_behavior,filesep,'mu_cohen47.csv'),cohenResults);
 
 %% T-TEST ON BETA COEFFICIENTS
 

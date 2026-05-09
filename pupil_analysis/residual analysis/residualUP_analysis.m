@@ -36,6 +36,13 @@ save_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'resi
 
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+
+dirs = {
+    'pupil_dir',  pupil_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir);
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING

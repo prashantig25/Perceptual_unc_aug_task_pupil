@@ -21,7 +21,7 @@ else
 end
 
 betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
-coeff_names = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+coeff_names = betas_pupil.coeff_names; % importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
 pupil_idx = find(strcmp(coeff_names,'pupil'));
 up_idx = find(strcmp(coeff_names,'post_up'));
 pePupil_idx = find(strcmp(coeff_names,'pe:pupil'));
@@ -34,6 +34,13 @@ pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines'
 save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual'); 
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'preprocessed');
 betas_field = betas_pupil.with_intercept;
+
+dirs = {
+    'pupil_dir',  pupil_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir)
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
