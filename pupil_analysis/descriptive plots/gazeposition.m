@@ -43,9 +43,22 @@ PupilDescriptive.base_duration = 9; % todo: put in defaults
 
 fprintf("\n1. Gaze based on linear interpolation\n")
 
+save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze linear int'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze linear int new'); 
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed linear int trials and events added');
 PupilDescriptive.preproc_dir = preproc_dir;
+
+dirs = {
+    'save_xgaze',  save_xgaze;
+    'save_ygaze',  save_ygaze;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
+mkdir(save_xgaze);
+mkdir(save_ygaze);
 
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze linear int');
 save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze linear int');
@@ -73,11 +86,20 @@ end
 
 fprintf("\n2. Gaze based on cubic spline interpolation\n")
 
-save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze CS new');
-save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze CS new');
+save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze CS new'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze CS'); 
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed cubic spline new trials and events added');
 PupilDescriptive.preproc_dir = preproc_dir;
+behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+
+dirs = {
+    'save_xgaze',  save_xgaze;
+    'save_ygaze',  save_ygaze;
+    'preproc_dir', preproc_dir;
+};
+keywords = {'CS', 'cubic spline'};
+checkPathKeywords(dirs, keywords);
 
 % Create directories if they don't exist yet
 if ~exist(save_xgaze, 'dir')
@@ -101,6 +123,24 @@ end
 %% GAZE BASED ON DECONVOLUTION
 
 fprintf("\n3. Gaze based on deconvolution\n")
+save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze deconv fixed seed'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze deconv'); 
+preproc_dir = strcat(desiredPath, filesep, 'data', filesep, ...
+    'GB data two pipelines', filesep, 'pupil', filesep, ...
+    'preprocessing', filesep, 'alternate pipeline', filesep, ...
+    'preprocessed trials and events added deconv');
+behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+
+dirs = {
+    'save_xgaze',  save_xgaze;
+    'save_ygaze',  save_ygaze;
+    'preproc_dir', preproc_dir;
+};
+keywords = {'deconv', 'deconvolution'};
+checkPathKeywords(dirs, keywords);
+
+mkdir(save_xgaze);
+mkdir(save_ygaze);
 
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze deconv fixed seed');
 save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze deconv fixed seed');

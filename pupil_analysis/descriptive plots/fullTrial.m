@@ -29,9 +29,15 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',
 fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial linear int'); % directory to get preprocessed data
 patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int'); % directory to get preprocessed data
 resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int'); % directory to get preprocessed data
-if ~exist(save_dir, 'dir')
-    mkdir(save_dir);
-end
+
+dirs = {
+    'patch_dir', patch_dir;
+    'fb_dir',    fb_dir;
+    'resp_dir',  resp_dir
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+mkdir(save_dir);
 
 % LOOP OVER SUBJECTS
 for i = 1:num_subjs
