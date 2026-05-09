@@ -73,6 +73,8 @@ ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
 
 % Save the table as a CSV file
 safe_saveall(strcat(save_behavior,filesep,'allconditions_chance_ttest47.csv'), ttestResults);
+disp("Economic-choice performance");
+display(ttestResults);
 
 %% COHEN'S D FOR ECONOMIC PERFORMANCE ACROSS CONDITIONS
 
@@ -80,13 +82,16 @@ num_condition = 2; % number of conditions
 cohen_d = NaN(num_condition,1); % initialise
 ecoperf = [ecoperf_mix_avg,ecoperf_perc_avg];
 for i = 1:num_condition
-    cohen_d(i,1) = compute_cohen_ttest(nanmean(ecoperf(:,i)),0,nanstd(ecoperf(:,i)));
+    cohen_d(i,1) = compute_cohen_ttest(nanmean(ecoperf(:,i)), chance_level,nanstd(ecoperf(:,i)));
 end
 
 % save output to .csv file for OVERLEAF
 cohenResults = table(cond_names, round(cohen_d,2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'ecoperf_cohen47.csv'),cohenResults);
+disp("Economic-choice performance Cohen's d");
+display(cohenResults);
+
 %% T-TEST TO COMPARE SLIDER DATA ACROSS UNCERTAINTIES
 
 % Initialise variables
@@ -115,6 +120,8 @@ ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
     round(t_vals,2), round(df_vals,2), round(cohen_d,2),...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df','cohen_d'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'mu_uncertainty_ttest47.csv'),ttestResults);
+disp("Slider condition comparison");
+display(ttestResults);
 
 %% SAVE MEAN and SEM FOR SLIDER UPDATES ACROSS CONDITIONS
 
@@ -142,6 +149,8 @@ ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
     round(t_vals,2), round(df_vals,2), round(mean_mu,2), round(sem_mu,2),...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df', 'mean', 'sem'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'mu_meansem47.csv'),ttestResults);
+disp("Slider conditions against chance");
+display(ttestResults);
 
 %% COHEN'S D FOR SLIDER UPDATES ACROSS CONDITIONS
 
@@ -151,13 +160,15 @@ mu = [mix_avg,perc_avg];
 cond_names = ["mix";"perc"];
 
 for i = 1:num_condition
-    cohen_d(i,1) = compute_cohen_ttest(nanmean(mu(:,i)),0,nanstd(mu(:,i)));
+    cohen_d(i,1) = compute_cohen_ttest(nanmean(mu(:,i)),chance_level,nanstd(mu(:,i)));
 end
 
 % save output to .csv file for OVERLEAF
 cohenResults = table(cond_names, round(cohen_d,2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'mu_cohen47.csv'),cohenResults);
+disp("Slider Cohen's d");
+display(cohenResults);
 
 %% T-TEST ON BETA COEFFICIENTS
 
