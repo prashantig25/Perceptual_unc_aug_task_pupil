@@ -127,15 +127,13 @@ classdef unit_tests < matlab.mock.TestCase
             pupil_dir = "my_path/pupil";
             xgaze_dir = "my_path/x_gaze";
             ygaze_dir = "my_path/y_gaze";
-            base_dir = "my_path/base_dir";
             save_dir = "my_path/save_dir";
-            analyzer.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, base_dir, save_dir);
+            analyzer.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, save_dir);
 
             testCase.verifyEqual(analyzer.behv_dir, behv_dir)
             testCase.verifyEqual(analyzer.pupil_dir, pupil_dir)
             testCase.verifyEqual(analyzer.xgaze_dir, xgaze_dir)
             testCase.verifyEqual(analyzer.ygaze_dir, ygaze_dir)
-            testCase.verifyEqual(analyzer.base_dir, base_dir)
             testCase.verifyEqual(analyzer.save_dir, save_dir)
         end
 
