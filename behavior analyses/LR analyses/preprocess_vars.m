@@ -2,7 +2,7 @@ classdef preprocess_vars < handle
 % PREPROCESS_VARS is a superclass that specifies variables for the preprocessing of
 % behavioural data, to compute regressors for model based analyses.
     properties
-        filename = 'pupilbehv_allNEW.xlsx';  % path of file with behavioural data
+        filename = 'data_agent0.06ForPreprocess.txt';  % path of file with behavioural data
         removed_cond = [3] % experimental condition number that is to be excluded during analysis
         num_subjs = 47; % number of participants
         data % table with behavioural data

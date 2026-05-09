@@ -21,7 +21,7 @@ end
 
 behv_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'raw data');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int new');
 
 preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
 preds_all  = readtable(preds_file);
@@ -82,7 +82,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 mkdir(save_dir);
 
@@ -131,7 +131,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int new');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 dirs = {
     'pupil_dir',  pupil_dir;
@@ -177,7 +177,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 
 dirs = {
@@ -226,7 +226,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int new');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 dirs = {
@@ -274,7 +274,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 
@@ -324,7 +324,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int new');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 dirs = {
@@ -371,7 +371,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 
@@ -419,7 +419,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'patch linear int');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int new');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 dirs = {
@@ -466,7 +466,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb linearInt');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int new');
 save_dir  = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 dirs = {
@@ -513,7 +513,7 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb cubic spline new');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS');
 save_dir  = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 
@@ -559,10 +559,10 @@ fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb deconv');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 
@@ -608,10 +608,10 @@ fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected saccade correction and urai params PG');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected deconv');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 
@@ -657,10 +657,10 @@ fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) ===\n');
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb deconv');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 
@@ -706,10 +706,10 @@ fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) ===\n'
 reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb saccade correction and urai params PG');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb deconv');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 

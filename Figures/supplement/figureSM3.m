@@ -21,7 +21,7 @@ end
 subplot(1,3,1)
 
 % Load and process human data
-data = importdata("preprocessed_agent.mat");
+data = readtable("preprocessed_lr_agent.xlsx");
 uniqueID = unique(data.ID);
 numSubjs = length(uniqueID);
 sigma = 0.06; %importdata("sigmaNoReward_simpleRL.mat");

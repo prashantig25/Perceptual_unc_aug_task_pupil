@@ -32,6 +32,12 @@ end
 
 save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive'); 
 pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
+dirs = {
+    'pupil_dir',  pupil_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 preds_all = readtable(strcat(desiredPath,filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 mkdir(save_dir);
@@ -123,3 +129,4 @@ condiffbin.pebin2_correct = subj_pupil_signal_pebin2correct;
 condiffbin.pebin2_incorrect = subj_pupil_signal_pebin2incorrect;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
 safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_linearInt.mat"),condiffbin)
+

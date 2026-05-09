@@ -35,9 +35,18 @@ behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',fi
 %% GAZE BASED LINEAR INT
 
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze linear int'); 
-save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze linear int'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze linear int new'); 
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed linear int trials and events added');
+
+dirs = {
+    'save_xgaze',  save_xgaze;
+    'save_ygaze',  save_ygaze;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_xgaze);
 mkdir(save_ygaze);
 
@@ -81,7 +90,7 @@ parfor s = 1:num_subs
 
         % GET EVENT-LOCKED GAZE POSITION
         xgaze_event = NaN(n,time_pupil); % initialise array to store pupil
-        ygaze_event = zeros(n,time_base); % initialise array to store baseline pupil
+        ygaze_event = NaN(n,time_pupil); % initialise array to store baseline pupil
         [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
             event_name,n,data,trial_list,pre_duration);      
         xgaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
@@ -96,10 +105,19 @@ end
 %% GAZE BASED ON CUBIC SPLINE INTERPOLATION
 
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze CS new'); 
-save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze CS new'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze CS'); 
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed cubic spline new trials and events added');
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+
+dirs = {
+    'save_xgaze',  save_xgaze;
+    'save_ygaze',  save_ygaze;
+    'preproc_dir', preproc_dir;
+};
+keywords = {'CS', 'cubic spline'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_xgaze);
 mkdir(save_ygaze);
 
@@ -143,7 +161,7 @@ parfor s = 1:num_subs
 
         % GET EVENT-LOCKED GAZE POSITION
         xgaze_event = NaN(n,time_pupil); % initialise array to store pupil
-        ygaze_event = zeros(n,time_base); % initialise array to store baseline pupil
+        ygaze_event = NaN(n,time_pupil); % initialise array to store baseline pupil
         [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
             event_name,n,data,trial_list,pre_duration);      
         xgaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
@@ -158,10 +176,21 @@ end
 %% GAZE BASED ON DECONVOLUTION
 
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze deconv fixed seed'); 
-save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze deconv fixed seed'); 
-preproc_dir = "/Users/prashantig/Brown Dropbox/Prashanti Ganesh/PhD/Semester 8/pupil_manuscript/Perceptual_unc_aug_task_pupil/data/" + ...
-    "GB data two pipelines/pupil/preprocessing/alternate pipeline/preprocessed trials and events added fixed seed";
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze deconv'); 
+preproc_dir = strcat(desiredPath, filesep, 'data', filesep, ...
+    'GB data two pipelines', filesep, 'pupil', filesep, ...
+    'preprocessing', filesep, 'alternate pipeline', filesep, ...
+    'preprocessed trials and events added deconv');
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+
+dirs = {
+    'save_xgaze',  save_xgaze;
+    'save_ygaze',  save_ygaze;
+    'preproc_dir', preproc_dir;
+};
+keywords = {'deconv', 'deconvolution'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_xgaze);
 mkdir(save_ygaze);
 
@@ -205,7 +234,7 @@ parfor s = 1:num_subs
 
         % GET EVENT-LOCKED GAZE POSITION
         xgaze_event = NaN(n,time_pupil); % initialise array to store pupil
-        ygaze_event = zeros(n,time_base); % initialise array to store baseline pupil
+        ygaze_event = NaN(n,time_pupil); % initialise array to store baseline pupil
         [xgaze_event,ygaze_event]= get_gazepos(time_pupil,xgaze_event,ygaze_event, ...
             event_name,n,data,trial_list,pre_duration);      
         xgaze_event(missedtrials == 0,:) = []; % remove pupil response of missed trials
