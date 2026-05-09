@@ -2,9 +2,8 @@
 % participant.
 
 % todo: 
-% check if we can delete all other cases than "feedback" in get_gazepos
-% check consistency with main branch due to previously inconsistent
-% initialization
+% check if we can delete all other cases than "feedback" in get_gazepos (still used after update?)
+% check consistency with main branch due to previously inconsistent initialization
 
 clc
 clearvars
