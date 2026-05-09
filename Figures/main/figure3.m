@@ -160,7 +160,7 @@ l.ItemTokenSize = [7 7];
 % PERMUTATION TEST P-VALUE
 disp_perm = 1;
 if disp_perm == 1
-    plot(x(find(condiffbin.stat==1)), -16*ones(1, length(find(condiffbin.stat==1))), '.', 'color', ...
+    plot(x(find(condiffbin.stat==1)), -40*ones(1, length(find(condiffbin.stat==1))), '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
 permPE_prob = condiffbin.prob(1,:);
@@ -172,7 +172,7 @@ else
     pval_str = sprintf("\\itp\\rm = %.3f", pval);
 end
 
-text(mean(x(condiffbin.stat == 1)),-15,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(condiffbin.stat == 1)),-39,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 %% PLOT BINNED REGRESSION RESULTS
 
 % POSITION CHANGE
@@ -233,10 +233,10 @@ end
 % DISPLAY PERMUTATION TEST RESULTS
 disp_perm = 1;
 if disp_perm == 1
-    plot(x(find(perm.mask(ncoeffs,:) == 1)), ones(1, length(find(perm.mask(ncoeffs,:) == 1))), '.', 'color', ...
+    plot(x(find(perm.mask(ncoeffs,:) == 1)), ones(1, length(find(perm.mask(ncoeffs,:) == 1))) + 1, '.', 'color', ...
         [119, 119, 119]./255, 'markersize', 4);
 end
-text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos + 1.5,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos + 2.5,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax5_new,'Arial',7,0.5)

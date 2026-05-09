@@ -11,8 +11,21 @@ font_size = 7;
 [~,~,~,~,color_screen,fb_green,darkblue_muted,mix,perc,rew,~,~,~,~,...
     ~,~,~,~,~] = colors_rgb(); % colors
 
-mix_ecoperf = importdata("mix_ecoperf.mat");
-perc_ecoperf = importdata("perc_ecoperf.mat");
+% Path setup
+currentDir = cd;
+reqPath = 'Perceptual_unc_aug_task_pupil';
+pathParts = strsplit(currentDir, filesep);
+if startsWith(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+
+descriptive_path = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'descriptive (n = 47)');
+
+mix_ecoperf = importdata(fullfile(descriptive_path,"mix_ecoperf.mat"));
+perc_ecoperf = importdata(fullfile(descriptive_path,"perc_ecoperf.mat"));
 
 %% INITIALIZE FIGURE
 

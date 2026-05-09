@@ -29,10 +29,10 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 data_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
-coeffs_name = importdata(fullfile(data_dir,"coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % import coeff names
+betas_pupil = importdata(fullfile(data_dir,"betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+coeffs_name = betas_pupil.coeff_names; % import coeff names
 pupil_idx = find(strcmp(coeffs_name, 'pupil')); % GET INDEX OF PUPIL COEFFICIENT
 postUP_idx = find(strcmp(coeffs_name, 'post_up')); % GET INDEX OF PUPIL COEFFICIENT
-betas_pupil = importdata(fullfile(data_dir,"betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
 perm = importdata(fullfile(data_dir,"perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
 
 % GET P-VALUE FOR PUPIL COEFFICIENT
@@ -114,7 +114,7 @@ plot(xaxis(find(perm.mask(3,:)==1)), -0.01 * ones(1,length(xaxis(find(perm.mask(
 xlim([-300,2700])
 ylim([-0.02,0.08])
 xlabel('Time since feedback onset (ms)')
-ylabel('Pupil dilation ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
+ylabel('Pupil ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
 text(mean(xaxis(perm.mask(pupil_idx,:) == 1)),pval_pos + 0.0085, pval_str, ...
     "FontName",font_name,"FontSize",font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
 
