@@ -10,7 +10,7 @@ num_sess = importdata("num_sess.mat");
 numSubjs = length(num_sess);
 
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -88,9 +88,8 @@ for n = 1:numSubjs
 end
 
 % Permutation test
-perm_results = get_permtest(1, numSubjs, col_patch, betas_pupil, ...
-    zeros(numSubjs, col_patch), 0, 0);
-
+var1 = reshape(betas_pupil, [1, numSubjs, col_patch]); % [num_vars x num_subjs x col]
+perm_results = get_permtest_updated(1, numSubjs, col_patch, var1);
 % Plot results
 % ------------
 
