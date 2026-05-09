@@ -278,34 +278,10 @@ data_subjs = renamevars(data_subjs, "id", "ID"); % rename ID to use same functio
 [avg_ydataLR, sem_ydataLR] = computeMeanLR(data_subjs, bins, nbins, num_subjs, id_subjs);
 
 % Plot average LRs
-plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binned_dots, 'Mean LR')
+[rho, pval] = plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binned_dots, 'Mean LR');
 data_subjs = renamevars(data_subjs, "ID", "id"); % rename ID back
 
-% PLOT
-s1 = scatter(1:nbins,avg_ydata,"filled",'MarkerEdgeColor',"none",'MarkerFaceColor',"none");
-ls = lsline;
-ls.Color = 'k';
-hold('on')
-errorbar(1:nbins,avg_ydata, sem_ydata, 'k', 'LineWidth',line_width,'LineStyle','none');
-hold on
-s1 = scatter(1:nbins,avg_ydata,"filled",'MarkerEdgeColor',"k",'MarkerFaceColor',binned_dots);
-xlabel("Contrast-difference bins" + newline + "(1 bin = 0.01)")
-ylabel('Mean learning rate (LR)')
-
-% ADJUST FIGURE PROPERTIES
-xlim_vals = [0 10.3];
-ylim_vals = [-0.01 0.17];
-adjust_figprops(ax10_new,font_name,font_size,line_width,xlim_vals,ylim_vals);
-[rho,pval] = corr(avg_ydata,avg_binneddata, 'rows', 'pairwise');
-
-if pval < 0.001
-    pval_str = "\itp\rm < 0.001";
-else
-    pval_str = "\itp\rm = " + num2str(round(pval,3));
-end
-
-title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + pval_str, ...
-    'FontWeight','normal','Interpreter','tex')
+% Save data for manuscript
 if save_csv == 1
     save_figures = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'stats','behavior');
     save_table = table("subplot_d",round(rho,2),round(pval,3),8,'VariableNames',{'name','rho','pval','df'});
@@ -313,6 +289,7 @@ if save_csv == 1
     disp("Single-trial LR");
     display(save_table);
 end
+
 %% PLOT BETA COEFFICIENTS
 
 % INITIALISE VARS FOR PLOTTING COEFFICIENTS
