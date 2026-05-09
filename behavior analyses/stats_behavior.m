@@ -119,7 +119,7 @@ t_vals(1,:) = stats_mixperc.tstat;
 df_vals(1,:) = stats_mixperc.df;
 
 % Cohen's d
-sd_pooled = sqrt((nanstd(perc_avg)^2 + nanstd(mix_avg)^2)./2);
+% sd_pooled = sqrt((nanstd(perc_avg)^2 + nanstd(mix_avg)^2)./2);
 cohen_d(1,1) = compute_cohend_paired(perc_avg, mix_avg);
 
 % Save
