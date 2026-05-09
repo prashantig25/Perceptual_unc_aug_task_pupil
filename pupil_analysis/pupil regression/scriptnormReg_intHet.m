@@ -418,8 +418,8 @@ reg = PupilRegression_intHet();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'patch linear int');
-xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int new');
+xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int patch');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int patch');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 if ~exist(save_dir, 'dir'), mkdir(save_dir); end
 dirs = {
@@ -452,7 +452,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('patch_condiff_linearInt', 'perm_patch_linearInt', '', '');
+reg.setFileNames('patch_condiff_linearInt_gazeCorrected', 'perm_patch_linearInt_gazeCorrected', '', '');
 
 reg.runAnalysis();
 reg.saveResults();
