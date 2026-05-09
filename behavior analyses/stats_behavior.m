@@ -152,7 +152,7 @@ mu = [mix_avg,perc_avg];
 cond_names = ["mix";"perc"];
 
 for i = 1:num_condition
-    cohen_d(i,1) = compute_cohen_ttest(nanmean(mu(:,i)),0,nanstd(mu(:,i)));
+    cohen_d(i,1) = compute_cohen_ttest(nanmean(mu(:,i)),chance_level,nanstd(mu(:,i)));
 end
 
 % save output to .csv file for OVERLEAF
