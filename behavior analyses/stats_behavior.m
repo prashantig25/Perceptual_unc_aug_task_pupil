@@ -81,9 +81,16 @@ display(ttestResults);
 num_condition = 2; % number of conditions
 cohen_d = NaN(num_condition,1); % initialise
 ecoperf = [ecoperf_mix_avg,ecoperf_perc_avg];
+
+% Note: took unpaired function for internal consistency but results are
+% consistent. 
+% for i = 1:num_condition
+%     cohen_d(i,1) = compute_cohend_paired(ecoperf(:,i),repelem(0.5,height(ecoperf),1));
+% end
 for i = 1:num_condition
-    cohen_d(i,1) = compute_cohend_paired(ecoperf(:,i),repelem(0.5,height(ecoperf),1));
+    cohen_d(i,1) = compute_cohen_ttest(nanmean(ecoperf(:,i)),chance_level,nanstd(ecoperf(:,i)));
 end
+
 
 % save output to .csv file for OVERLEAF
 cohenResults = table(cond_names, round(abs(cohen_d),2), ...
