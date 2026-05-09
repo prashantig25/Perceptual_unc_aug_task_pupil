@@ -682,7 +682,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
             starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
 
-            for c = 1:col
+            parfor c = 1:col
                 y     = zsc_pupil(:, c);
                 xgaze = xgaze_z(:, c);
                 ygaze = ygaze_z(:, c);

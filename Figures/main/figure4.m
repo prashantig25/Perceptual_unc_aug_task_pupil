@@ -82,8 +82,8 @@ refMean = mean(refVals);
 refSD   = std(refVals);
 
 % Z-score highPU and lowPU using the reference distribution's parameters
-highPU = (highPU - refMean) / refSD;
-lowPU  = (lowPU  - refMean) / refSD;
+highPU = (highPU_val - refMean) / refSD;
+lowPU  = (lowPU_val  - refMean) / refSD;
 
 highPE = mean(peVals(:,2)); % high PE
 lowPE = mean(peVals(:,1)); % low PE
@@ -229,11 +229,15 @@ h2 = shadedErrorBar(xaxis, pupil_diff2, sem_diff2, {'Color', low_PU, 'LineWidth'
 p1 = plot(xaxis, post_diff1, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 p2 = plot(xaxis, post_diff2, 'Color', low_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 
-% Create the legend using all four handles
+p1 = plot(xaxis, post_diff1_rescaled, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
+p2 = plot(xaxis, post_diff2_rescaled, 'Color', low_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
+highPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(highPU_val,3)),")");
+lowPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(lowPU_val,3)),")");
+
 % Arrange them in an order that makes sense (e.g., Data then Model)
 l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
-    {'Empirical (contrast difference: [0 - 0.05[)', 'Empirical (contrast difference: [0.05 - 0.1])', ...
-    'Prediction (contrast difference = 0.02)', 'Prediction (contrast difference = 0.08)'}, ...
+    {'Empirical (Contrast-difference: [0 - 0.05))', 'Empirical (Contrast-difference: [0.05 - 0.1])', ...
+     highPU_str, lowPU_str'}, ...
     'Location', 'best', 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
     'FontSize', fontsize-1.25, 'FontName', fontname, 'Color', 'none');
 

@@ -24,20 +24,6 @@ subplot(1,3,1)
 
 % Load and process human data
 data = importdata("preprocessed_agentpupil0.06.mat");
-% agent_data = readtable("preprocessed_lr_agent0.06.xlsx");
-% 
-% % IDs 
-% numSims = 300;
-% simID = 1:numSims;
-% 
-% % Create ID column: increment by 1 every 200 trials
-% ids = [];
-% for s = simID
-%     ids = [ids; repelem(s, 100, 1)];
-% end
-% ids = [ids;ids];
-% agent_data.ID = ids;
-% data = agent_data;
 uniqueID = unique(data.ID);
 numSubjs = length(uniqueID);
 sigma = 0.06;
@@ -102,6 +88,7 @@ end
 % Plot group mean and error bars
 hold on
 scatter(1:nbins, mean(BS_diff_binned), 50, binnedDotsColor, 'filled','MarkerEdgeColor','k');
+lsline
 
 % Calculate correlation
 x_data_a = 1:nbins;
@@ -129,7 +116,6 @@ subplot(1,3,2)
 
 % Load and process agent data
 agent_data = importdata("preprocessed_agentpupil0.06.mat");
-% agent_data = readtable("preprocessed_lr_agent0.06.xlsx");
 
 numSims = 300;
 simID = 1:300;
@@ -179,7 +165,3 @@ fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the current
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
 print(fig, 'LRcondiff_BS.png', '-dpng', '-r600')
 
-%% Control plot
-figure()
-hold on
-scatter(1:nbins, mean(BS0_binned), 50, binnedDotsColor, 'filled','MarkerEdgeColor','k');

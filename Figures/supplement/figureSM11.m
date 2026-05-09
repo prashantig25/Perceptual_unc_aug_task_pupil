@@ -14,8 +14,8 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 het_save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', ...
-    'regression', 'control analyses for revisions');
-betas_struct = importdata(fullfile(het_save_dir,"param_estimates_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat"));
+                        'regression', 'control analyses for revisions');
+betas_struct = importdata(fullfile(het_save_dir,"hetModel_linearInt_newSP.mat")); 
 coeffs_name = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
 x = linspace(-300, 2700, 300);
 subj_ids = importdata("subj_ids.mat");
@@ -24,7 +24,7 @@ num_params = 10;
 col = 300;
 
 % PREPARE AND GET PERMUTATION TEST
-perm = importdata(fullfile(het_save_dir,"perm_hetero_noZeroPE_linearInt_20SPAbs3Width_pregenSP.mat"));
+perm = importdata(fullfile(het_save_dir,"perm_hetModel_linearInt_newSP.mat"));
 
 %% PLOT SETTINGS
 neutral = [7, 53, 94]/255;
