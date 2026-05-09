@@ -11,11 +11,11 @@ num_subs = length(subj_ids);
 % -------------------------------------------------------------------------
 % ADJUSTABLE BIN NUMBERS
 % -------------------------------------------------------------------------
-num_pe_bins = 2;      % Number of PE bins
-num_cd_bins = 2;      % Number of condiff bins
+num_pe_bins = 2; % Number of PE bins
+num_cd_bins = 2; % Number of condiff bins
 
-pe_binedges   = [0, 0.5, 1];        % Define PE bin edges (must have num_pe_bins + 1 values)
-cd_binedges   = [0, 0.05, 0.1];                    % Define condiff bin edges (must have num_cd_bins + 1 values)
+pe_binedges   = [0, 0.5, 1]; % Define PE bin edges (must have num_pe_bins + 1 values)
+cd_binedges   = [0, 0.05, 0.1]; % Define condiff bin edges (must have num_cd_bins + 1 values)
 
 % -------------------------------------------------------------------------
 % Storage: [num_cd_bins x num_pe_bins] structure
@@ -43,35 +43,30 @@ save_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines
 pupil_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
 behv_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'raw data');
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
-mkdir(save_dir);
 
-meanPE_all      = NaN(num_subs, num_pe_bins);
+% Create folder, if it does not yet exist
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
+% Initialize variables
+meanPE_all = NaN(num_subs, num_pe_bins);
 meanCondiff_all = NaN(num_subs, num_cd_bins);
 
-% -------------------------------------------------------------------------
+% Initialize object instance
+PupilDescriptive = PupilDescriptive();
+PupilDescriptive.num_sess = num_sess;
+PupilDescriptive.subj_ids = subj_ids;
+PupilDescriptive.behv_dir = behv_dir;
+
+% Cycle over subjects
 for i = 1:num_subs
 
-    % GET BEHAVIORAL DATA
-    behv_data = [];
-    for j = 1:num_sess(i)
-        filename = strcat(behv_dir, filesep, subj_ids{i}, '_', 'main', num2str(j), '.xlsx');
-        if strcmp(subj_ids{i}, '4672')
-            filename = strcat(behv_dir, filesep, subj_ids{i}, '_', 'main', num2str(j), '_red.xlsx');
-        end
-        data_run = readtable(filename, 'VariableNamingRule', 'preserve');
-        rt     = table(data_run.("choice.rt"),              'VariableNames', {'rt'});
-        slider = table(data_run.("slider_respond.response"),'VariableNames', {'slider'});
-        data_run = [data_run(:,1:16), rt, slider];
-        behv_data = [behv_data; data_run];
-    end
+     % GET BEHAVIORAL DATA
+    behv_data = PupilDescriptive.loadBehavioralData(i);
 
-    % REMOVE MISSED TRIALS
-    missed_trials = [];
-    for b = 1:height(behv_data)
-        if isnan(behv_data.rt(b,:))
-            missed_trials = [missed_trials; b];
-        end
-    end
+    % MISSED TRIALS
+    missed_trials = find(isnan(behv_data.rt));
     behv_data(missed_trials,:) = [];
     missedSlider = isnan(behv_data.slider);
 
@@ -79,8 +74,8 @@ for i = 1:num_subs
     preds = preds_all(preds_all.id == str2num(subj_ids{i}), :);
 
     % GET PUPIL DATA
-    filename     = strcat(pupil_dir, filesep, subj_ids{i}, '.mat');
-    pupil        = importdata(filename);
+    filename = strcat(pupil_dir, filesep, subj_ids{i}, '.mat');
+    pupil = importdata(filename);
     pupil_signal = pupil(:, 1:col);
     pupil_signal(missedSlider == 1, :) = [];
 
@@ -119,15 +114,14 @@ for i = 1:num_subs
 end
 
 % SAVE
-safe_saveall(fullfile(save_dir, 'meanPE_all.mat'),      meanPE_all);
+safe_saveall(fullfile(save_dir, 'meanPE_all.mat'), meanPE_all);
 safe_saveall(fullfile(save_dir, 'meanCondiff_all.mat'), meanCondiff_all);
 
 % -------------------------------------------------------------------------
 % PERMUTATION TESTS: for each PE bin, compare condiff bin 1 vs bin 2
 % -------------------------------------------------------------------------
 num_vars  = 1;
-two_tailed = 1;
-betas     = 0;
+betas = 0;
 
 % PERMUTATION TESTS: For each Contrast bin, compare PE bin 1 vs PE bin 2
 perm_results = struct();
@@ -140,6 +134,7 @@ for cd = 1:num_cd_bins
 
     perm_results(cd).perm = get_permtest_updated(num_vars, num_subs, col, var1, var2);
 end
+
 % -------------------------------------------------------------------------
 % SAVE
 % -------------------------------------------------------------------------
