@@ -30,7 +30,7 @@ end
 betas_pupil = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "residual", filesep,"betas_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % add PE bin curves
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "residual", filesep,"perm_betas_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % add PE bin curves
 posterior = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "residual", filesep,"BSarousal_interactions_linearInt.mat")); % add PE bin curves
-coeffs_name = importdata(fullfile(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "residual", filesep,"coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % import coeff names
+coeffs_name = betas_pupil.coeff_names; % importdata(fullfile(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "residual", filesep,"coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat")); % import coeff names
 
 % GET COEFFICIENT INDICES FROM NAMES
 pe_pupil_idx       = find(strcmp(coeffs_name, 'pe:pupil'));

@@ -79,11 +79,11 @@ num_condition = 2; % number of conditions
 cohen_d = NaN(num_condition,1); % initialise
 ecoperf = [ecoperf_mix_avg,ecoperf_perc_avg];
 for i = 1:num_condition
-    cohen_d(i,1) = compute_cohen_ttest(nanmean(ecoperf(:,i)),0,nanstd(ecoperf(:,i)));
+    cohen_d(i,1) = compute_cohend_paired(ecoperf(:,i),repelem(0.5,height(ecoperf),1));
 end
 
 % save output to .csv file for OVERLEAF
-cohenResults = table(cond_names, round(cohen_d,2), ...
+cohenResults = table(cond_names, round(abs(cohen_d),2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'ecoperf_cohen47.csv'),cohenResults);
 %% T-TEST TO COMPARE SLIDER DATA ACROSS UNCERTAINTIES
@@ -109,11 +109,11 @@ df_vals(1,:) = stats_mixperc.df;
 
 % cohen's d
 sd_pooled = sqrt((nanstd(perc_avg)^2 + nanstd(mix_avg)^2)./2);
-cohen_d(1,1) = compute_cohend_ttest2(nanmean(perc_avg), nanmean(mix_avg), sd_pooled);
+cohen_d(1,1) = compute_cohend_paired(perc_avg, mix_avg);
 
 % save
 ttestResults = table(cond_names, round(h_vals(:,1),2), round(p_vals(:,1),2), ...
-    round(t_vals,2), round(df_vals,2), round(cohen_d,2),...
+    round(t_vals,2), round(df_vals,2), round(abs(cohen_d),2),...
     'VariableNames', {'Condition', 'HValue', 'PValue', 'TStat', 'df','cohen_d'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'mu_uncertainty_ttest47.csv'),ttestResults);
 
@@ -156,7 +156,7 @@ for i = 1:num_condition
 end
 
 % save output to .csv file for OVERLEAF
-cohenResults = table(cond_names, round(cohen_d,2), ...
+cohenResults = table(cond_names, round(abs(cohen_d),2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'mu_cohen47.csv'),cohenResults);
 
@@ -191,6 +191,6 @@ for i = 1:num_vars
 end
 
 % save output to .csv file for OVERLEAF
-cohenResults = table(cond_names, round(cohen_d,2), ...
+cohenResults = table(cond_names, round(abs(cohen_d),2), ...
     'VariableNames', {'Condition', 'cohend'}); % Create a table to store the t-test results
 safe_saveall(strcat(save_behavior,filesep,'lr_betas_cohen.csv'),cohenResults);

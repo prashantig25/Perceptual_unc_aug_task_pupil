@@ -91,7 +91,7 @@ for a = 1:length(ncoeffs)
     if disp_perm == 1
         ylim_axes = [ylim_lower(a),ylim_upper(a)];
         [pval_pos] = create_pvalpos(ylim_axes);
-        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 0.08*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
+        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), 2.5*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
             [119, 119, 119]./255, 'markersize', 4);
     end
 
@@ -105,7 +105,7 @@ for a = 1:length(ncoeffs)
         pval_str = sprintf("\\itp\\rm = %.3f", pval);
     end
 
-    text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 0.08,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
+    text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_pos + 2.5,pval_str,"FontSize",7,"FontName",'Arial',"VerticalAlignment","bottom","HorizontalAlignment","center")
     
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
