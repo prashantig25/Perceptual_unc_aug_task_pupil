@@ -50,7 +50,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-descriptive_path = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'descriptive');
+descriptive_path = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'descriptive (n = 47)');
 regression_path  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses');
 
 % load all required data
@@ -322,9 +322,9 @@ end
 title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + pval_str, ...
     'FontWeight','normal','Interpreter','tex')
 if save_csv == 1
-    save_figures = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'stats');
+    save_figures = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'stats','behavior');
     save_table = table("subplot_d",round(rho,2),round(pval,3),8,'VariableNames',{'name','rho','pval','df'});
-    writetable(save_table,strcat(save_figures,filesep,'figure1d.csv'));
+    safe_saveall(strcat(save_figures,filesep,'figure1d.csv'),save_table);
     disp("Single-trial LR");
     display(save_table);
 end
