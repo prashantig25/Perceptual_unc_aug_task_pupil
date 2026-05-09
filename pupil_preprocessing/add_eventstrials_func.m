@@ -13,7 +13,9 @@ function add_eventstrials_func(subj_ids, num_sess, preproc_dir, save_dir, save_d
 %   num_trials_sess  - number of trials for participants with multiple sessions
 
 num_subs = length(subj_ids); % number of subjects
-mkdir(save_dir);
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
 parfor s = 1:num_subs
     for ss = 1:num_sess(s)

@@ -38,7 +38,9 @@ currentDir_dat = strcat(desiredPath, filesep, baseDir, filesep, 'DAT'); % Constr
 
 % Save directory for ASC to DAT conversion (shared)
 save_dirASC = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'asc2dat_converted'); 
-mkdir(save_dirASC);
+if ~exist(save_dirASC, 'dir')
+    mkdir(save_dirASC);
+end
 
 %% RUN MAIN PIPELINE (no filtering, linear interpolation)
 
@@ -53,8 +55,9 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-
-mkdir(save_dir_main);
+if ~exist(save_dir_main, 'dir')
+    mkdir(save_dir_main);
+end
 
 % Preprocess
 preprocessing_fun_merged(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
@@ -86,8 +89,9 @@ dirs = {
 };
 keywords = {'CS', 'cubic spline'};
 checkPathKeywords(dirs, keywords);
-
-mkdir(save_dir_main);
+if ~exist(save_dir_main, 'dir')
+    mkdir(save_dir_main);
+end
 
 % Preprocess
 preprocessing_fun_merged(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
@@ -118,8 +122,9 @@ dirs = {
 };
 keywords = {'deconv', 'deconvolution'};
 checkPathKeywords(dirs, keywords);
-
-mkdir(save_dir_alt);
+if ~exist(save_dir_alt, 'dir')
+    mkdir(save_dir_alt);
+end
 
 % Preprocess
 preprocessing_fun_merged(subj_ids, num_sess, plot_steps, sampling_rate, freqs, ...
