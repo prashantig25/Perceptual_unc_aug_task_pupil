@@ -74,8 +74,8 @@ condiffVals = importdata(fullfile(descriptive_dir, 'meanCondiff_all.mat'));
 betas_field = betas.with_intercept;
 maxTrials = 160; % max trials presented to a participant
 
-highPU = mean(condiffVals(:,1)); % high BS uncertainty
-lowPU = mean(condiffVals(:,2)); % low BS uncertainty
+highPU = mean(condiffVals(:,1)); % high state uncertainty
+lowPU = mean(condiffVals(:,2)); % low state uncertainty
 
 refVals = linspace(0, 0.1, maxTrials);
 refMean = mean(refVals);
@@ -89,10 +89,10 @@ highPE = mean(peVals(:,2)); % high PE
 lowPE = mean(peVals(:,1)); % low PE
 
 refPEMean = mean(abs(preds_all.pe));
-refPESD   = std(abs(preds_all.pe));
+refPESD = std(abs(preds_all.pe));
 
 highPE = (highPE - refPEMean) / refPESD;
-lowPE  = (lowPE  - refPEMean) / refPESD;
+lowPE = (lowPE  - refPEMean) / refPESD;
 
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
@@ -104,15 +104,12 @@ for s = 1:num_subs
         coeffs.intercept(s,c) = betas_field(1,1,s,c);
         coeffs.con_diff(s,c) = betas_field(1,condiff_idx,s,c);
     end
-
-    highPE_vec = highPE;
-    lowPE_vec  = lowPE;
-
-    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*highPU;
-    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*lowPU;
-
-    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*highPU;
-    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*lowPU;
+    
+    % Generate model predictions
+    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE + coeffs.pe(s,:).*highPE + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE + coeffs.pe(s,:).*lowPE + coeffs.con_diff(s,:).*lowPU;
+    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE + coeffs.pe(s,:).*lowPE + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE + coeffs.pe(s,:).*highPE + coeffs.con_diff(s,:).*lowPU;
 
 end
 
@@ -168,7 +165,7 @@ ylabel('Absolute PE modulated pupil ({\bf\beta_1})','FontWeight','normal','FontN
 text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
-%% PLOT BS-WEIGHTED PE
+%% PLOT UNCERTAINTY-WEIGHTED PE
 
 % POSITION CHANGE
 
@@ -179,13 +176,10 @@ ylim_axes = [-0.01,0.023];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
-
 hold on
 plot(xaxis,mean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
-hold on
 shadedErrorBar(xaxis,mean(coeffs.pe_condiff),std(coeffs.pe_condiff)./sqrt(num_subs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
-hold on
 
 % ADJUST FIGURE PROPERTIES
 
@@ -238,8 +232,8 @@ p2 = plot(xaxis, post_diff2, 'Color', low_PU, 'LineWidth', linewidth_curves, 'Li
 % Create the legend using all four handles
 % Arrange them in an order that makes sense (e.g., Data then Model)
 l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
-    {'Empirical (Contrast difference: [0 - 0.05[)', 'Empirical (Contrast difference: [0.05 - 0.1])', ...
-    'Posterior-predicted (Contrast difference = 0.02)', 'Posterior-predicted (Contrast difference = 0.08)'}, ...
+    {'Empirical (contrast difference: [0 - 0.05[)', 'Empirical (contrast difference: [0.05 - 0.1])', ...
+    'Prediction (contrast difference = 0.02)', 'Prediction (contrast difference = 0.08)'}, ...
     'Location', 'best', 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
     'FontSize', fontsize-1.25, 'FontName', fontname, 'Color', 'none');
 
