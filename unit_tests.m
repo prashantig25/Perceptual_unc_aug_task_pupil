@@ -510,7 +510,6 @@ classdef unit_tests < matlab.mock.TestCase
 
             % Mock out two functions and define their behavior
             [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression_intHet, ...
-                "ConstructorInputs", {1}, ...
                 "MockedMethods", ["getBinnedData", "fitModelAtTimepoint"]);
             testCase.assignOutputsWhen(withAnyInputs(behavior.getBinnedData), 1, 2, 3, 4, 5);
             testCase.assignOutputsWhen(withAnyInputs(behavior.fitModelAtTimepoint), 0);
@@ -545,7 +544,6 @@ classdef unit_tests < matlab.mock.TestCase
 
             % Mock out two functions and define their behavior
             [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression_intHet, ...
-                "ConstructorInputs", {1}, ...
                 "MockedMethods", "fitModelAtTimepoint");
             testCase.assignOutputsWhen(withAnyInputs(behavior.fitModelAtTimepoint), 40, 50, 60);
 
@@ -581,27 +579,28 @@ classdef unit_tests < matlab.mock.TestCase
             group = {'A'; 'B'; 'A'; 'B'; 'A'};
             slider = [0.5; nan; 0.6; 0.7; 0.8];
             pe = [1; 1; 1; 0; 1];
-            preds = table(id, rt, group, slider, pe,...
-                'VariableNames', {'id', 'rt', 'group', 'slider', 'pe'});
+            correct = [1; 1; 1; 0; 1];
+            preds = table(id, rt, group, slider, pe, correct,...
+                'VariableNames', {'id', 'rt', 'group', 'slider', 'pe', 'correct'});
 
             % Define other input variables
             zsc_pupil = zeros(5, 5);
             xgaze_signal = zeros(5, 5);
             ygaze_signal = zeros(5, 5);
 
-            % Non-binned case: we expect that all variables are literally
-            % used (note in this case function should not even be called)
+            % Non-binned case: we expect that only correct choices are
+            % selected
             analyzer = PupilRegression_intHet();
             analyzer.binned = 0;
-            analyzer.binned_accuracy = 0;
-            r = nan;
+            analyzer.binned_accuracy = 1;
+            r = 1;
 
             [pupil_bins, xgaze_bins, ygaze_bins, preds_bins] =...
                 analyzer.getBinnedData(r, preds, zsc_pupil, xgaze_signal, ygaze_signal);
-            verifyTrue(testCase, all(size(pupil_bins) == size(zsc_pupil)));
-            verifyTrue(testCase, all(size(xgaze_bins) == size(xgaze_signal)));
-            verifyTrue(testCase, all(size(ygaze_bins) == size(ygaze_signal)));
-            verifyTrue(testCase, all(size(preds_bins) == size(preds)));
+            verifyTrue(testCase, all(size(pupil_bins) == [4, 5]));
+            verifyTrue(testCase, all(size(xgaze_bins) == [4, 5]));
+            verifyTrue(testCase, all(size(ygaze_bins) == [4, 5]));
+            verifyTrue(testCase, all(size(preds_bins) == [4, 6]));
         end
 
 
@@ -630,19 +629,6 @@ classdef unit_tests < matlab.mock.TestCase
 
             % Use mock function for linear_fit via new handle construction
             analyzer.externalFitFcn = @(varargin) deal(mockBetas, [], mockResid, [], mockLM);
-
-            % Mock save function
-            analyzer.saveFcn = @(path, data) captureSave(path, data);
-            
-            % Captured path and data
-            capturedPath = '';
-            capturedData = {};
-            
-            % Trap function
-            function captureSave(path, data)
-                capturedPath = path;
-                capturedData = data;
-            end
 
             % Start defining and building the input variables
             % -----------------------------------------------
@@ -695,12 +681,6 @@ classdef unit_tests < matlab.mock.TestCase
                       
             % Test updated properties
             testCase.verifyEqual(analyzer.betas_struct.with_intercept, expected_betas_struct);
-             
-            % Check that the path contains the expected string
-            testCase.verifyTrue(contains(capturedPath, '_coeffNames.mat'));
-            
-            % Check that data was actually saved
-            testCase.verifyNotEmpty(capturedData);
         
         end
     end

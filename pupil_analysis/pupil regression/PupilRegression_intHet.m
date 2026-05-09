@@ -561,8 +561,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
             elseif obj.binned_accuracy == 1
                 % Use accuracy-based binning
                 idx = preds.correct == r;
-            % else
-            %     idx = true(height(preds), 1);
             end
 
             % Extract data for current bin
