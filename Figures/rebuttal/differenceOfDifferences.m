@@ -43,6 +43,13 @@ save_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines
 pupil_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
 behv_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'raw data');
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
+
+dirs = {
+    'pupil_dir',  pupil_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
 mkdir(save_dir);
 
 meanPE_all      = NaN(num_subs, num_pe_bins);

@@ -23,7 +23,7 @@ end
 behv_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'raw data');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int new');
 
 base_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'baseline before fb');
 
@@ -57,9 +57,19 @@ fprintf('====================================================\n');
 
 reg_het1 = PupilRegression_intHet();
 reg_het1.setSubjects(subj_ids, num_sess);
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
 reg_het1.setPaths(behv_dir, ...
-    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt'), ...
-    xgaze_dir, ygaze_dir, base_dir, het_save_dir);
+    pupil_dir, ...
+    xgaze_dir, ygaze_dir, het_save_dir);
+
+dirs = {
+    'pupil_dir',  pupil_dir;
+    'xgaze_dir',  xgaze_dir;
+    'ygaze_dir',  ygaze_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
 reg_het1.setModel(model_def, pred_vars, cat_vars, num_params_hetero - 1);
 reg_het1.setHeteroskedasticConfig(importdata('minHetParams_linearIntabs.mat'), ...
                                    importdata('maxHetParams_linearIntabs.mat'), lb, ub, 20);
@@ -93,13 +103,13 @@ fprintf('  PIPELINE 2: CUBIC SPLINE\n');
 fprintf('====================================================\n');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS new');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS new');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS');
 
 reg_het2 = PupilRegression_intHet();
 reg_het2.setSubjects(subj_ids, num_sess);
 reg_het2.setPaths(behv_dir, ...
     fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new'), ...
-    xgaze_dir, ygaze_dir, base_dir, het_save_dir);
+    xgaze_dir, ygaze_dir, het_save_dir);
 reg_het2.setModel(model_def, pred_vars, cat_vars, num_params_hetero - 1);
 reg_het2.setHeteroskedasticConfig(importdata('minHetParams_CSabs.mat'), ...
                                    importdata('maxHetParams_CSabs.mat'), lb, ub, 20);
@@ -133,13 +143,13 @@ fprintf('  PIPELINE 3: DECONVOLUTION\n');
 fprintf('====================================================\n');
 
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv fixed seed');
-ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv fixed seed');
+ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv');
 
 reg_het3 = PupilRegression_intHet();
 reg_het3.setSubjects(subj_ids, num_sess);
 reg_het3.setPaths(behv_dir, ...
-    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'alternate pipeline', 'pupil signal', 'fb saccade correction and urai params PG'), ...
-    xgaze_dir, ygaze_dir, base_dir, het_save_dir);
+    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'alternate pipeline', 'pupil signal', 'fb deconv'), ...
+    xgaze_dir, ygaze_dir, het_save_dir);
 
 reg_het3.setModel(model_def, pred_vars, cat_vars, num_params_hetero - 1);
 reg_het3.setHeteroskedasticConfig(importdata('minHetParams_deconvolutionabs.mat'), ...

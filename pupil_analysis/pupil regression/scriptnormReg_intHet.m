@@ -549,7 +549,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'pe_condiff_residuals_mathot_nonBaselineCorrected_cubicSplineNew', 'pe_condiff_predicted_mathot_nonBaselineCorrected_cubicSplineNew');
+reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', '', '');
 
 reg.runAnalysis();
 reg.saveResults(tol);

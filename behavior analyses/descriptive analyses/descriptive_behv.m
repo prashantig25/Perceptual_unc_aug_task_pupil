@@ -25,7 +25,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines', filesep, 'behavior', filesep, 'BIDS');
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'descriptive');
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'descriptive (n = 47)');
 mkdir(save_dir);
 
 % INITIALIZE VARS TO STORE
@@ -48,6 +48,24 @@ for n = 1:num_subjs
             strcat('sub_',num2str(subj_ids{n}),".tsv")); % path and file name for TSV file
     data = readtable(tsv_file,"FileType","text",'Delimiter', '\t'); % read file
 
+    % ADJUST FOR TRIAL MISSING PARTICIPANT
+    if strcmp(subj_ids{n}, "4672")
+        % Block sizes for participant 4672:
+        % Blocks 1-5: 20 trials each
+        % Block 6:    19 trials % because interruption
+        % Blocks 7-8: 20 trials each
+        block_sizes = [20, 20, 20, 20, 20, 19, 20, 20];
+        block_ends  = cumsum(block_sizes);           % [20, 40, 60, 80, 100, 119, 139, 159]
+        block_starts = [1, block_ends(1:end-1) + 1]; % [1,  21, 41, 61, 81, 101, 120, 140]
+    
+        % Assign block number to each trial
+        block_num = zeros(1, sum(block_sizes));
+        for b = 1:length(block_sizes)
+            block_num(block_starts(b):block_ends(b)) = b;
+        end
+        data.blocks = block_num.';
+    end
+
     % CORRECT MU FOR CONGRUENCE
     % futuretodo: no preprocessing at this stage. We should have one
     % preprocessing file that is used consistently.
@@ -69,8 +87,17 @@ for n = 1:num_subjs
     mix_subj = NaN(num_blocks,t);
     perc_subj = NaN(num_blocks,t);
     for b = 1:num_blocks./2
-        mix_subj(b,:) = data.flipped_mu(and(data.blocks == uni_mix(b),data.condition == 1));
-        perc_subj(b,:) = data.flipped_mu(and(data.blocks == uni_perc(b),data.condition == 2));
+
+        mix = data.flipped_mu(and(data.blocks == uni_mix(b),data.condition == 1));
+        perc = data.flipped_mu(and(data.blocks == uni_perc(b),data.condition == 2));
+
+        if length(mix) < 20 
+            mix = [mix; NaN];
+        elseif length(perc) < 20
+            perc = [perc; NaN];
+        end
+        mix_subj(b,:) = mix;
+        perc_subj(b,:) = perc;
     end
     mix_curve(n,:) = nanmean(mix_subj);
     perc_curve(n,:) = nanmean(perc_subj);    
