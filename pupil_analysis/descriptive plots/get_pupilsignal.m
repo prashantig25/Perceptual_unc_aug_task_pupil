@@ -83,9 +83,9 @@ dirs = {
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
 
-mkdir(save_dir);
-mkdir(save_sliderOnset);
-main = 1; % running analyses based on the main pipeline
+% mkdir(save_dir);
+% mkdir(save_sliderOnset);
+% main = 1; % running analyses based on the main pipeline
 
 % Create directories if they don't exist yet
 if ~exist(save_dir, 'dir')
@@ -126,7 +126,7 @@ dirs = {
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
 
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directories if they don't exist yet
 if ~exist(save_dir, 'dir')
@@ -158,7 +158,7 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it don't exist yet
 if ~exist(save_dir, 'dir')
@@ -191,7 +191,7 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -222,7 +222,7 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -254,7 +254,7 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -285,7 +285,7 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -328,7 +328,7 @@ dirs = {
 };
 keywords = {'cubic spline', 'CS'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -357,7 +357,7 @@ dirs = {
 };
 keywords = {'cubic spline', 'CS'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -380,6 +380,7 @@ end
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'preprocessing', filesep, 'alternate pipeline', ...
     filesep, 'preprocessed trials and events added deconv');
+PupilDescriptive.preproc_dir = preproc_dir;
 
 % 3.1 FEEDBACK-LOCKED PUPIL SIGNAL - EVENT-SPECIFIC BASELINE
 % -------------------------------------------------------------------------
@@ -400,7 +401,7 @@ dirs = {
 keywords = {'deconv', 'deconvolution'};
 checkPathKeywords(dirs, keywords);
 
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -430,7 +431,7 @@ dirs = {
 keywords = {'deconv', 'deconvolution'};
 checkPathKeywords(dirs, keywords);
 
-mkdir(save_dir);
+%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
