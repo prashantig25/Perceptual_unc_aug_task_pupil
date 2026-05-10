@@ -102,8 +102,8 @@ xticks_within = (xticks - cum_lengths([1,1,3,3,5,5,5])) * (100/samples_per_100ms
 xlabels = arrayfun(@(t) num2str(round(t)), xticks_within, 'UniformOutput', false);
 set(gca,  'XTick', xticks, 'XTickLabel', xlabels,'box', 'off');
 
-text(length(patch_tp), ylims(1) +  0.05, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
-text(length(patch_tp) + length(resp_tp), ylims(1) +  0.05, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+text(length(patch_tp), ylims(1) +  10, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+text(length(patch_tp) + length(resp_tp), ylims(1) + 10, '//', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
 
 set(gca,'Color','none','FontName','Arial','FontSize',7)
 set(gca,'LineWidth',0.5)
@@ -111,7 +111,7 @@ set(gca,'Color','none')
 box off
 xlabel("Time since event onset (ms)")
 ylabel("Pupil dilation")
-
+ylim([-20,300])
 text(145,-0.05,"Response","FontSize",6,"FontName",'Arial',"BackgroundColor",[222, 228, 233]./255)
 text(375,-0.05,"Feedback","FontSize",6,"FontName",'Arial',"BackgroundColor",[222, 228, 233]./255)
 %% PLOT CURVES FOR PE BINS 

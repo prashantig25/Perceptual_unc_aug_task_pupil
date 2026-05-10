@@ -164,7 +164,7 @@ plot(xaxis(find(pe_pval==1)),pval_pos + ones(1,length(pe_pval(pe_pval == 1))), '
 xlim([-300,2700])
 % ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
-ylabel('Absolute PE modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
+ylabel('Absolute PE-modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
@@ -200,7 +200,7 @@ xlim([-300,2700])
 % ylim(ylim_axes)
 xlabel('Time since feedback onset (ms)')
 % ylabel('BS-weighted-PE (\beta_2)','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-ylabel('Uncertainty-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
+ylabel('Uncertainty-weighted PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 % text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.024","FontName",fontname,"FontSize", ...
 %     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
 text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + 1.1, pecondiff_pval_str, ...
@@ -253,13 +253,13 @@ h2 = shadedErrorBar(xaxis, mean(interaction.subj_pupil(2,2).signal) - mean(inter
 p1 = plot(xaxis, post_diff1_rescaled, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 p2 = plot(xaxis, post_diff2_rescaled, 'Color', low_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 
-highPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(highPU_val,3)),")");
-lowPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(lowPU_val,3)),")");
+highPU_str = strcat("Prediction (contrast-difference:", " ", num2str(round(highPU_val,3)),")");
+lowPU_str = strcat("Prediction (contrast-difference:", " ", num2str(round(lowPU_val,3)),")");
 
 % 3. Create the legend using all four handles
 % Arrange them in an order that makes sense (e.g., Data then Model)
 l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
-    {'Empirical (Contrast-difference: [0 - 0.05))', 'Empirical (Contrast-difference: [0.05 - 0.1])', ...
+    {'Empirical (contrast-difference: [0 - 0.05))', 'Empirical (contrast-difference: [0.05 - 0.1])', ...
      highPU_str, lowPU_str'}, ...
     'Location', 'best', 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
     'FontSize', fontsize-1.25, 'FontName', fontname, 'Color', 'none');
@@ -272,7 +272,7 @@ xlim([-300,2700])
 ylim([-30,120])
 xlabel('Time from feedback onset (ms)')
 % ylabel('Empirical pupil difference curves (high - low PE)')
-ylabel({'Pupil difference curves', '(high - low PE)'});
+ylabel({'Pupil-difference curves', '(high - low PE)'});
 hold on
 a1 = annotation("arrow",[0.78,0.78],[0.52,0.62],'LineWidth',0.5,'Color',low_PU);
 a2 = annotation("arrow",[0.78,0.78],[0.49,0.39],'LineWidth',0.5,'Color',high_PU);
