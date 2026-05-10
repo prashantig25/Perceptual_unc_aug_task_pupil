@@ -49,7 +49,7 @@ ar1.Y = [0.49,0.3];
 %% PLOT LEARNING RATES
 
 % POSITION CHANGE
-position_change = [0.025,0.03,-0.05,-0.05];%[0.1,0.1,-0.1,-0.15]; % change in position % use this if LR is subplot a
+position_change = [0.025,0,-0.05,-0.05];%[0.1,0.1,-0.1,-0.15]; % change in position % use this if LR is subplot a
 new_pos = change_position(ax3,position_change);
 ax3_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax3_new, 'on');
@@ -121,7 +121,7 @@ end
 %% PLOT PU modulated PUPIL
 
 % POSITION CHANGE
-position_change = [0.09,0.03,-0.05,-0.05];% change in position and use this if arousal is subplot b 
+position_change = [0.09,0,-0.05,-0.05];% change in position and use this if arousal is subplot b 
 new_pos = change_position(ax2,position_change);
 ax2_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax2_new, 'on');
@@ -154,7 +154,9 @@ xlim([-300,2700])
 ylim([-5,150])
 xticks([]); % Remove x-axis ticks
 yticks([]); % Remove x-axis ticks
-title('PE reflected in arousal signal','FontWeight','normal')
+
+title({'Prediction error reflected', 'in arousal signal'}, 'FontWeight', 'normal')
+t.Position(2) = t.Position(2) + 0.1;  % increase the y-value to move title up
 adjust_figprops(ax2_new,font_name,font_size,0.5);
 
 % ADD ROTATED TEXT BOXES
@@ -177,7 +179,7 @@ end
 
 ax1_pos = ax3_new.Position;
 adjust_x = -0.09; % adjust x-position of subplot label
-adjust_y = ax1_pos(4) + 0.04; % adjust y-position of subplot label
+adjust_y = ax1_pos(4) + 0.02; % adjust y-position of subplot label
 [label_x,label_y] = change_plotlabel(ax3_new,adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
