@@ -280,6 +280,7 @@ data_subjs = renamevars(data_subjs, "id", "ID"); % rename ID to use same functio
 % Plot average LRs
 [rho, pval] = plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binned_dots, 'Mean LR');
 data_subjs = renamevars(data_subjs, "ID", "id"); % rename ID back
+ylim([-0.02,0.18])
 
 % Save data for manuscript
 if save_csv == 1
