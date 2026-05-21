@@ -1,25 +1,39 @@
 clc
 clearvars
-signed = 1; % if partial R2 to be calculated for signed model
-save_csv = 1; % if stat to be saved as CSV file for overleaf MS
-if signed == 1
-    SSE_best = importdata("SSE_signed.mat"); % SSE for best model
-    SSE_baseline = importdata("SSEsigned_baseline.mat"); % SSE for baseline model
-    partialR2_csv = "partialR2_signed.csv";
-    mdl_name = {'signed'};
-else
-    SSE_best = importdata("SSE_abs.mat");
-    SSE_baseline = importdata("SSE_baseline.mat");
-    partialR2_csv = "partialR2_abs.csv";
-    mdl_name = {'abs'};
+
+% Define model configurations as a struct array
+models(1).name       = 'abs';
+models(1).SSE_best   = "SSE_abs.mat";
+models(1).SSE_base   = "SSE_baseline.mat";
+models(1).csv_out    = "partialR2_abs.csv";
+models(1).mat_out    = "partialR2_abs.mat";
+
+models(2).name       = 'signed';
+models(2).SSE_best   = "SSE_signed.mat";
+models(2).SSE_base   = "SSEsigned_baseline.mat";
+models(2).csv_out    = "partialR2_signed.csv";
+models(2).mat_out    = "partialR2_signed.mat";
+
+subj_ids  = importdata("subj_ids.mat");
+num_sess  = importdata("num_sess.mat");
+numSubjs  = length(num_sess);
+col       = 300;
+
+%% Loop over both model types
+for m = 1:length(models)
+
+    SSE_best     = importdata(models(m).SSE_best);
+    SSE_baseline = importdata(models(m).SSE_base);
+
+    partial_rsq_Wpupil = NaN(numSubjs, col);
+
+    partial_rsq = compute_partialrsqSSE(SSE_baseline, SSE_best);
+
+    safe_saveall(models(m).mat_out, partial_rsq);
+
+    statTbl = table({models(m).name}, round(mean(partial_rsq), 2), ...
+                    'VariableNames', {'name', 'partial_R2'});
+
+    safe_saveall(models(m).csv_out, statTbl);
+
 end
-num_subjs = 47;
-col = 300;
-%%
-
-partial_rsq_Wpupil = NaN(num_subjs,col);
-partial_rsq = compute_partialrsqSSE(SSE_baseline,SSE_best); % using SSE
-
-safe_saveall("partialR2_signed.mat",partial_rsq)
-statTbl = table(mdl_name,round(mean(partial_rsq),2),'VariableNames',{'name','partial_R2'});
-safe_saveall(partialR2_csv,statTbl);
