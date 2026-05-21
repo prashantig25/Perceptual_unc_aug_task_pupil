@@ -336,7 +336,7 @@ end
 
 % Cycle over subjects
 fprintf("\n2.1 Running feedback-locked with event-specific baseline and cubic-spline interpolation\n")
-for s = 1:num_subs
+parfor s = 1:num_subs
     [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
         event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
@@ -365,7 +365,7 @@ end
 
 % Cycle over subjects
 fprintf("\n2.2 Running feedback-locked without baseline and cubic-spline interpolation\n")
-for s = 1:num_subs
+parfor s = 1:num_subs
     [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
         event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
@@ -409,7 +409,7 @@ end
 
 % Cycle over subjects
 fprintf("\n3.1 Running feedback-locked with event-specific baseline and deconvolution\n")
-for s = 1:num_subs
+parfor s = 1:num_subs
     [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
         event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
@@ -439,7 +439,7 @@ end
 
 % Cycle over subjects
 fprintf("\n3.2 Running feedback-locked without baseline and deconvolution\n")
-for s = 1:num_subs
+parfor s = 1:num_subs
     [pupil, ~] = PupilDescriptive.run_PupilSignal(s, time_pupil,...
         event_name, baseline, main);
     safe_saveall(strcat(save_dir, filesep, subj_ids{s}, '.mat'), pupil)
