@@ -74,7 +74,7 @@ end
 % LOOP OVER SUBJECTS
 parfor s = 1:num_subs
   
-    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil);
+    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil, event_name);
 
     % SAVE
     safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event)
@@ -111,7 +111,7 @@ end
 % LOOP OVER SUBJECTS
 parfor s = 1:num_subs
 
-    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil);
+    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil, event_name);
 
     % SAVE
     safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event)
@@ -153,9 +153,50 @@ end
 % LOOP OVER SUBJECTS
 parfor s = 1:num_subs
 
-    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil);
+    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil, event_name);
 
     % SAVE
     safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event) 
+    safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event)
+end
+
+%% GAZE BASED ON LINEAR INTERPOLATION IN THE PATCH PHASE
+
+fprintf("\n1. Gaze based on linear interpolation (patch phase)\n")
+
+save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze linear int patch'); 
+save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze linear int patch'); 
+preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
+    filesep, 'preprocessed linear int trials and events added');
+PupilDescriptive.preproc_dir = preproc_dir;
+
+dirs = {
+    'save_xgaze',  save_xgaze;
+    'save_ygaze',  save_ygaze;
+    'preproc_dir',  preproc_dir;
+};
+keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
+checkPathKeywords(dirs, keywords);
+
+% Create directories if they don't exist yet
+if ~exist(save_xgaze, 'dir')
+    mkdir(save_xgaze);
+end
+
+if ~exist(save_ygaze, 'dir')
+    mkdir(save_ygaze);
+end
+
+time_pupil = 300; % time duration of the pupil
+event_name = 'choice'; % which event
+pre_duration = 29; % set duration for start of pre-event signal (note: good idea to use some pre-event signal)
+
+% LOOP OVER SUBJECTS
+parfor s = 1:num_subs
+  
+    [xgaze_event, ygaze_event] = PupilDescriptive.runGazePosition(s, time_pupil, event_name);
+
+    % SAVE
+    safe_saveall(fullfile(save_xgaze,strcat(subj_ids{s},'.mat')),xgaze_event)
     safe_saveall(fullfile(save_ygaze,strcat(subj_ids{s},'.mat')),ygaze_event)
 end

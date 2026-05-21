@@ -303,7 +303,7 @@ classdef PupilDescriptive
             end
         end
 
-        function [xgaze_event, ygaze_event] = runGazePosition(obj, subjNum, time_pupil)
+        function [xgaze_event, ygaze_event] = runGazePosition(obj, subjNum, time_pupil, event_name)
             %RUNGAZEPOSITION Computes the gaze positions on x and y axis
             %for a subject
             %
@@ -323,7 +323,7 @@ classdef PupilDescriptive
             pupilData = obj.loadPupilData(subjNum);
 
             % GET EVENT-LOCKED GAZE POSITION
-            event_name = "feedback";
+            % event_name = "feedback";
             baseline = "event-specific"; % note: we don't save the baseline here anyway for x and y gaze
             which_signal = "x_gaze";
             [xgaze_event, ~, ~] = obj.get_pupil_event(time_pupil, event_name, ...

@@ -4,7 +4,6 @@
 clc
 clearvars
 
-% Todo: is regress_rt used at all?
 % where do we used saved "sliderOnset"?
 % For each file: indicate which figure/code uses this
 % improve the "main" variable
