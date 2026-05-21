@@ -56,8 +56,13 @@ coeffs_name = betas_pupil.coeff_names;
 
 post_up_idx = find(strcmp(coeffs_name, 'post_up'));
 pupil_idx = find(strcmp(coeffs_name, 'pupil'));
+coeffs = squeeze(mean(betas_pupil.with_intercept(1, post_up_idx, :, :), 4));
+[h, pVals] = ttest(coeffs);
+if pVals < 0.001
+    pVals = 0.001; % for the sake of MS
+end
 
-results = [results; table({'post_up'}, round(min(perm.prob(post_up_idx, perm.mask(post_up_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
+results = [results; table({'post_up'}, pVals, 'VariableNames', {'term', 'pval'})];
 results = [results; table({'pupil'},   round(min(perm.prob(pupil_idx,   perm.mask(pupil_idx,:)   == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
 %% figure S10 MS - non-baseline corrected
