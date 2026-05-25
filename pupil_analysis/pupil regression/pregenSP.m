@@ -21,11 +21,8 @@ else
 end
 
 behv_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'raw data');
-
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
-
-base_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'baseline before fb');
 
 preds_file   = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
 preds_all    = readtable(preds_file);
@@ -46,6 +43,7 @@ ub = [ Inf,  Inf,  Inf, Inf, Inf,  Inf,  Inf,  Inf,  Inf,  Inf];
 % Heteroskedastic parameter names (fixed order matching negativeLogLikelihood)
 coeff_names = {'Intercept', 'PE', 'Condiff', 'omikron_0', 'omikron_1', ...
                'PExCondiff', 'RT', 'UP', 'xgaze', 'ygaze'};
+% todo: necessary to save?
 safe_saveall(fullfile(het_save_dir, 'coeff_names_hetero.mat'), coeff_names);
 
 %% =======================================================================
@@ -58,9 +56,7 @@ fprintf('====================================================\n');
 reg_het1 = PupilRegression_intHet();
 reg_het1.setSubjects(subj_ids, num_sess);
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
-reg_het1.setPaths(behv_dir, ...
-    pupil_dir, ...
-    xgaze_dir, ygaze_dir, het_save_dir);
+reg_het1.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, het_save_dir);
 
 dirs = {
     'pupil_dir',  pupil_dir;
@@ -90,8 +86,8 @@ reg_het1.use_sp              = 0;
 reg_het1.runAnalysis();
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_het_linearInt_ForPregenSP.mat'), reg_het1.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_het_linearInt_ForPregenSP.mat'),          reg_het1.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_het_linearInt_ForPregenSP.mat'),          reg_het1.perm_results);
+safe_saveall(fullfile(het_save_dir, 'negLL_het_linearInt_ForPregenSP.mat'), reg_het1.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_het_linearInt_ForPregenSP.mat'), reg_het1.perm_results);
 
 fprintf('Pipeline 1 saved.\n');
 
@@ -130,8 +126,8 @@ reg_het2.use_sp              = 0;
 reg_het2.runAnalysis();
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_het_CS_ForPregenSP.mat'), reg_het2.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_het_CS_ForPregenSP.mat'),          reg_het2.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_het_CS_ForPregenSP.mat'),          reg_het2.perm_results);
+safe_saveall(fullfile(het_save_dir, 'negLL_het_CS_ForPregenSP.mat'), reg_het2.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_het_CS_ForPregenSP.mat'), reg_het2.perm_results);
 
 fprintf('Pipeline 2 saved.\n');
 
@@ -171,8 +167,8 @@ reg_het3.use_sp              = 0;
 reg_het3.runAnalysis();
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_het_deconv_ForPregenSP.mat'), reg_het3.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_het_deconv_ForPregenSP.mat'),          reg_het3.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_het_deconv_ForPregenSP.mat'),          reg_het3.perm_results);
+safe_saveall(fullfile(het_save_dir, 'negLL_het_deconv_ForPregenSP.mat'), reg_het3.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_het_deconv_ForPregenSP.mat'), reg_het3.perm_results);
 
 fprintf('Pipeline 3 saved.\n');
 
@@ -280,7 +276,6 @@ end
 safe_saveall("startingPoints_deconv.mat",startingPoints)
 
 
-%% Helper Function: Calculate Symmetric Bounds
 function [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width)
     % CALCULATESYMMETRICBOUNDS Compute symmetric min/max bounds for coefficients
     %
