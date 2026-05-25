@@ -1,4 +1,4 @@
-% figure4 plots model-based analysis of pupil data.
+% Figure 4: Plot model-based analysis of pupil data.
 
 clc
 clearvars
@@ -29,7 +29,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 betas = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt.mat")); % add PE bin curves
-coeff_names = betas.coeff_names; %importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas.coeff_names;
 pe_idx = find(strcmp(coeff_names,'pe'));
 up_idx = find(strcmp(coeff_names,'zsc_up'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
@@ -41,13 +41,14 @@ for s = 1:num_subs
         coeffs.up(s,c) = betas.with_intercept(1,up_idx,s,c);
     end
 end
+
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_linearInt.mat")); % add PE bin curves
 pe_pval = perm.mask(pe_idx,:);
 pecondiff_pval = perm.prob(peCondiff_idx,:);
 interaction = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep,"descriptive",filesep,"fb_PE2bins_condiff2bins_linearInt.mat"));
 
 % Compute summary p-values (minimum across timepoints), rounded to 3 decimal places
-pe_min_pval       = round(min(perm.prob(pe_idx,:)), 3);
+pe_min_pval = round(min(perm.prob(pe_idx,:)), 3);
 pecondiff_min_pval = round(min(pecondiff_pval), 3);
 
 % Format as strings
@@ -73,8 +74,8 @@ condiffVals = importdata(fullfile(descriptive_dir, 'meanCondiff_all.mat'));
 betas_field = betas.with_intercept;
 maxTrials = 160; % max trials presented to a participant
 
-highPU_val = mean(condiffVals(:,1)); % high BS uncertainty
-lowPU_val = mean(condiffVals(:,2)); % low BS uncertainty
+highPU = mean(condiffVals(:,1)); % high state uncertainty
+lowPU = mean(condiffVals(:,2)); % low state uncertainty
 
 refVals = linspace(0, 0.1, maxTrials);
 refMean = mean(refVals);
@@ -88,10 +89,10 @@ highPE = mean(peVals(:,2)); % high PE
 lowPE = mean(peVals(:,1)); % low PE
 
 refPEMean = mean(abs(preds_all.pe));
-refPESD   = std(abs(preds_all.pe));
+refPESD = std(abs(preds_all.pe));
 
 highPE = (highPE - refPEMean) / refPESD;
-lowPE  = (lowPE  - refPEMean) / refPESD;
+lowPE = (lowPE  - refPEMean) / refPESD;
 
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
@@ -103,15 +104,12 @@ for s = 1:num_subs
         coeffs.intercept(s,c) = betas_field(1,1,s,c);
         coeffs.con_diff(s,c) = betas_field(1,condiff_idx,s,c);
     end
-
-    highPE_vec = highPE;
-    lowPE_vec  = lowPE;
-
-    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*highPU;
-    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*lowPU;
-
-    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE_vec + coeffs.pe(s,:).*lowPE_vec + coeffs.con_diff(s,:).*highPU;
-    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE_vec + coeffs.pe(s,:).*highPE_vec + coeffs.con_diff(s,:).*lowPU;
+    
+    % Generate model predictions
+    posterior.highPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*highPE + coeffs.pe(s,:).*highPE + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*lowPE + coeffs.pe(s,:).*lowPE + coeffs.con_diff(s,:).*lowPU;
+    posterior.highPU_lowPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*highPU.*lowPE + coeffs.pe(s,:).*lowPE + coeffs.con_diff(s,:).*highPU;
+    posterior.lowPU_highPE(s,:) = coeffs.intercept(s,:) + coeffs.pe_condiff(s,:).*lowPU.*highPE + coeffs.pe(s,:).*highPE + coeffs.con_diff(s,:).*lowPU;
 
 end
 
@@ -138,15 +136,14 @@ new_pos = change_position(ax1,[0,0,0,0]);
 ax1_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax1);
 
-% GET POSITION TO PLOT P-VALUE 
+% GET POSITION TO PLOT P-VALUE
 
 ylim_axes = [-0.04,0.05];
-%ylim_axes = [0,80];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
 
-hold on 
+hold on
 plot(xaxis,mean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
 shadedErrorBar(xaxis,mean(coeffs.pe),std(coeffs.pe)./sqrt(num_subs), ...
@@ -168,7 +165,7 @@ ylabel('Absolute PE-modulated pupil ({\bf\beta_1})','FontWeight','normal','FontN
 text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
-%% PLOT BS-WEIGHTED PE
+%% PLOT UNCERTAINTY-WEIGHTED PE
 
 % POSITION CHANGE
 
@@ -176,17 +173,13 @@ new_pos = change_position(ax2,[-0.005,0,0,0]);
 ax2_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax2);
 ylim_axes = [-0.01,0.023];
-% ylim_axes = [-15,35];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
-
-hold on 
-plot(xaxis,mean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
+plot(xaxis,mean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 shadedErrorBar(xaxis,mean(coeffs.pe_condiff),std(coeffs.pe_condiff)./sqrt(num_subs), ...
     {'Color',neutral,'LineWidth',linewidth_curves},1);
-hold on
 
 % ADJUST FIGURE PROPERTIES
 
@@ -197,43 +190,30 @@ hold on
 plot(xaxis(find(pecondiff_pval < 0.05)), pval_pos + ones(1,length(pecondiff_pval(pecondiff_pval < 0.05))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
-% ylim(ylim_axes)
+
 xlabel('Time since feedback onset (ms)')
-% ylabel('BS-weighted-PE (\beta_2)','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-ylabel('Uncertainty-weighted PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-% text(mean(xaxis(pecondiff_pval == 1)),pval_pos + -0.003,"\itp\rm = 0.024","FontName",fontname,"FontSize", ...
-%     fontsize,"VerticalAlignment","bottom","HorizontalAlignment","center")
+ylabel('Uncertainty-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + 1.1, pecondiff_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 
-%% ADD POSTERIOR CURVES
+%% ADD POSTERIOR-PREDICTED CURVES
 
-std_diff1 = interaction.subj_pupil(1,2).signal - interaction.subj_pupil(1,1).signal;
-std_diff2 = interaction.subj_pupil(2,2).signal - interaction.subj_pupil(2,1).signal;
+% Compute standard error of the mean
+diff1 = interaction.subj_pupil(1,2).signal - interaction.subj_pupil(1,1).signal;
+diff2 = interaction.subj_pupil(2,2).signal - interaction.subj_pupil(2,1).signal;
+sem_diff1 = std(diff1)./sqrt(num_subs);
+sem_diff2 = std(diff2)./sqrt(num_subs);
 
-% 1. Calculate the difference waves for the pupil (interaction) data
+% Calculate the difference waves for the pupil (interaction) data
 pupil_diff1 = mean(interaction.subj_pupil(1,2).signal) - mean(interaction.subj_pupil(1,1).signal);
 pupil_diff2 = mean(interaction.subj_pupil(2,2).signal) - mean(interaction.subj_pupil(2,1).signal);
 
-% 2. Calculate the difference waves for the posterior data
+% Calculate the difference waves for the posterior data
 post_diff1 = mean(posterior.highPU_highPE) - mean(posterior.highPU_lowPE);
 post_diff2 = mean(posterior.lowPU_highPE) - mean(posterior.lowPU_lowPE);
 
-% 3. Find the scaling factor
-% We find the max absolute value across both pupil curves to maintain the relative 
-% magnitude between High and Low PU conditions.
-max_pupil = max([abs(pupil_diff1), abs(pupil_diff2)]);
-max_post  = max([abs(post_diff1), abs(post_diff2)]);
-
-scaling_factor = 1; %max_pupil / max_post;
-
-% 4. Apply scaling to the posterior curves
-post_diff1_rescaled = post_diff1 * scaling_factor;
-post_diff2_rescaled = post_diff2 * scaling_factor;
-
 % POSITION CHANGE
-
 new_pos = change_position(ax3,[0.015,0,0.01,0]);
 ax3_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax3);
@@ -241,22 +221,19 @@ delete(ax3);
 % PLOT
 hold on
 
-% 1. Capture handles for the lines ONLY
 % Note: shadedErrorBar returns a struct. We want the 'mainLine' field.
-h1 = shadedErrorBar(xaxis, mean(interaction.subj_pupil(1,2).signal) - mean(interaction.subj_pupil(1,1).signal), ...
-    std(std_diff1)./sqrt(num_subs), {'Color', high_PU, 'LineWidth', linewidth_curves}, 0.15);
+h1 = shadedErrorBar(xaxis, pupil_diff1, sem_diff1, {'Color', high_PU, 'LineWidth', linewidth_curves}, 0.15);
+h2 = shadedErrorBar(xaxis, pupil_diff2, sem_diff2, {'Color', low_PU, 'LineWidth', linewidth_curves}, 0.15);
 
-h2 = shadedErrorBar(xaxis, mean(interaction.subj_pupil(2,2).signal) - mean(interaction.subj_pupil(2,1).signal), ...
-    std(std_diff2)./sqrt(num_subs), {'Color', low_PU, 'LineWidth', linewidth_curves}, 0.15);
+% Capture handles for the posterior curves (Model Data)
+p1 = plot(xaxis, post_diff1, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
+p2 = plot(xaxis, post_diff2, 'Color', low_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 
-% 2. Capture handles for the posterior curves (Model Data)
 p1 = plot(xaxis, post_diff1_rescaled, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 p2 = plot(xaxis, post_diff2_rescaled, 'Color', low_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
+highPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(highPU_val,3)),")");
+lowPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(lowPU_val,3)),")");
 
-highPU_str = strcat("Prediction (contrast-difference:", " ", num2str(round(highPU_val,3)),")");
-lowPU_str = strcat("Prediction (contrast-difference:", " ", num2str(round(lowPU_val,3)),")");
-
-% 3. Create the legend using all four handles
 % Arrange them in an order that makes sense (e.g., Data then Model)
 l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
     {'Empirical (contrast-difference: [0 - 0.05))', 'Empirical (contrast-difference: [0.05 - 0.1])', ...
@@ -271,8 +248,7 @@ yline(0,'--','LineWidth',0.5)
 xlim([-300,2700])
 ylim([-30,120])
 xlabel('Time from feedback onset (ms)')
-% ylabel('Empirical pupil difference curves (high - low PE)')
-ylabel({'Pupil-difference curves', '(high - low PE)'});
+ylabel({'Pupil-difference curves', '(high - low PE)'}, 'FontSize', fontsize);
 hold on
 a1 = annotation("arrow",[0.78,0.78],[0.52,0.62],'LineWidth',0.5,'Color',low_PU);
 a2 = annotation("arrow",[0.78,0.78],[0.49,0.39],'LineWidth',0.5,'Color',high_PU);
@@ -301,4 +277,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'regression_pupil_linearInt1New_3panels.png', '-dpng', '-r600') 
+print(fig, 'regression_pupil_linearInt1New_3panels.png', '-dpng', '-r600')

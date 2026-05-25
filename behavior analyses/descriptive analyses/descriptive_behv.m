@@ -67,6 +67,8 @@ for n = 1:num_subjs
     end
 
     % CORRECT MU FOR CONGRUENCE
+    % futuretodo: no preprocessing at this stage. We should have one
+    % preprocessing file that is used consistently.
     data.flipped_mu = data.mu;
     for h = 1:height(data)
         if data.congruence(h) == 0

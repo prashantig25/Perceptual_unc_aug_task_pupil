@@ -1,3 +1,5 @@
+% Figure S5: Example pupil curves 
+
 clc
 clearvars
 
@@ -23,7 +25,10 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
-xaxis = linspace(-0.3,9.7,1000);
+
+% Plot properties
+xaxisMax = 1000;
+xaxis = linspace(-0.3,9.7,xaxisMax);
 
 % LOOP OVER SUBJECTS
 figure("Position",[100,100,400,400],"Visible","on")
@@ -34,11 +39,11 @@ for i = 1:length(participants)
     fb = importdata(filename); 
 
     % CONCATANATE
-    trial_subj = nanmean(fb(:,1:1000),1);
+    trial_subj = nanmean(fb(:,1:xaxisMax),1);
     hold on
     subplot(2,3,i)
     hold on
-    plot(xaxis,fb(:,1:1000),"Color",[200,200,200]./255,'LineWidth',0.5)
+    plot(xaxis,fb(:,1:xaxisMax),"Color",[200,200,200]./255,'LineWidth',0.5)
     hold on
     plot(xaxis,trial_subj,"Color",'k','LineWidth',2)
     xlim([-0.3,6])

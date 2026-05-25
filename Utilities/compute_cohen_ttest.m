@@ -1,5 +1,4 @@
 function cohen_d = compute_cohen_ttest(sample_mean,population_mean,sample_std)
-    
     % function compute_cohen_ttest computes cohen's d value for one-tailed t-test.
     % INPUTS:
     %   sample_mean: mean of the sample data

@@ -1,4 +1,4 @@
-% figureSM2 plots results from all regressors of the pupil analysis.
+% Figure S8: Plot results from all regressors of the pupil analysis.
 
 clc
 clearvars
@@ -41,7 +41,7 @@ ax5_new = ax5;
 axes_new = [ax1_new,ax2_new,ax3_new,ax4_new,ax5_new];
 axes_old = [ax1,ax2,ax3,ax4,ax5];
 
-%% PLOT COEFFICIENT CURVES 
+%% PLOT COEFFICIENT CURVES
 
 ylabel_strings = {'Uncertainty-modulated pupil','UP-modulated pupil','RT-modulated pupil','x-gaze-modulated pupil','y-gaze-modulated pupil'};
 condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
@@ -49,8 +49,7 @@ ygaze_idx = find(strcmp(coeff_names,'ygaze'));
 xgaze_idx = find(strcmp(coeff_names,'xgaze'));
 up_idx = find(strcmp(coeff_names,'zsc_up'));
 rt_idx = find(strcmp(coeff_names,'rt'));
-ncoeffs = [condiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients 
-pval = {'',' = 0.03','< 0.001',' = 0.04',' < 0.001'};
+ncoeffs = [condiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
 xpos_change = [-0.07,-0.0325,0,-0.07,-0.0325]; % change in axis position
 ylim_lower = [-0.02,-0.02,-0.1,-0.1,-0.1]; % lower limit of y-axis
 ylim_upper = [0.01,0.08,0.1,0.1,0.1]; % upper limit of y-axis
@@ -67,8 +66,8 @@ for a = 1:length(ncoeffs)
     ylim_axes = [ylim_lower(a),ylim_upper(a)];
     [pval_pos] = create_pvalpos(ylim_axes);
 
-    color_cell = {neutral}; % colors for low and high perceptual uncertainty data
-    col = 300; 
+    color_cell = {neutral};
+    col = 300;
 
     % PLOT
     data_plot = zeros(num_subjs,col);
@@ -79,11 +78,11 @@ for a = 1:length(ncoeffs)
     end
     hold on
     color = color_cell;
-    ySmoothed = mean(data_plot);
-    plot(x,ySmoothed,"Color",color{1,:},'LineWidth',2)
+    ySignal = mean(data_plot);
+    plot(x,ySignal,"Color",color{1,:},'LineWidth',2)
     hold on
     color = cell2mat(color_cell);
-    shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
+    shadedErrorBar(x,ySignal,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
     hold on
 
     % PLOT P-VALUE
@@ -110,7 +109,6 @@ for a = 1:length(ncoeffs)
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
     xlim([-300,2700])
-    % ylim([ylim_lower(a),ylim_upper(a)])
     xline(0,'--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')
@@ -146,4 +144,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'reg_full2_linearInt1.png', '-dpng', '-r600') 
+print(fig, 'reg_full2_linearInt1.png', '-dpng', '-r600')

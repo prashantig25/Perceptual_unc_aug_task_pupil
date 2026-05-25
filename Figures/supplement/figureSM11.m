@@ -1,4 +1,5 @@
-% figureSM8 plots betas from pupil model after regressing out RTs.
+% Figure S11: Plot heteroskedastic model.
+
 clc
 clearvars
 
@@ -16,12 +17,11 @@ het_save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', .
                         'regression', 'control analyses for revisions');
 betas_struct = importdata(fullfile(het_save_dir,"hetModel_linearInt_newSP.mat")); 
 coeffs_name = importdata(fullfile(het_save_dir,"coeff_names_hetero.mat"));
-x = linspace(-300, 2700, 300); 
+x = linspace(-300, 2700, 300);
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
 num_params = 10;
 col = 300;
-% [num_subjs, num_params, col] = size(betas_struct);
 
 % PREPARE AND GET PERMUTATION TEST
 perm = importdata(fullfile(het_save_dir,"perm_hetModel_linearInt_newSP.mat"));
@@ -56,9 +56,9 @@ ylabel_strings = [ ...
     "Residual intercept", ...
     "Residual slope"];
 
-xpos_change = [-0.05,-0.02,0.02, 0.05,-0.05,-0.02, 0.05, 0.05, 0.05]; 
-pval_position = [0.005, 0.005, -0.01, -0.01, -0.12, 0.01, 0.01, 0.01, 0.01] * 100; 
-pval_position_text = [4, 1.5, -2, 1, -0.15, 3, 3, 20, 2]; 
+xpos_change = [-0.05,-0.02,0.02, 0.05,-0.05,-0.02, 0.05, 0.05, 0.05];
+pval_position = [0.005, 0.005, -0.01, -0.01, -0.12, 0.01, 0.01, 0.01, 0.01] * 100;
+pval_position_text = [4, 1.5, -2, 1, -0.15, 3, 3, 20, 2];
 
 %% TILED LAYOUT
 
@@ -71,7 +71,7 @@ letters = 'a':'i';   % 9 subplots
 for a = ncoeffs-1
     nexttile(a);
     hold on;
-    
+
     current_idx = ncoeffs(a);
 
     for s = 1:num_subjs
@@ -82,41 +82,41 @@ for a = ncoeffs-1
             data_plot(s,c) = betas_struct.with_intercept(1, current_idx, s, c);
         end
     end
-    
+
     % Extract data for this specific coefficient
     % data_plot: [num_subjs x col]
     % data_plot = squeeze(betas_struct(:, current_idx, :));
-    
+
     % Compute Mean and SEM
     yAvg = nanmean(data_plot, 1);
     ySem = nanstd(data_plot, 1) ./ sqrt(num_subjs);
     ySmoothed = yAvg;
-    
+
     % Plot Shaded Error Bar
     shadedErrorBar(x, ySmoothed, ySem, {'LineWidth', 2, 'Color', neutral}, 1);
-    
+
     % PLOT PERMUTATION RESULTS (Significance Line)
     sig_mask = find(perm.prob(current_idx, :) < 0.05);
     if ~isempty(sig_mask)
         % Plot dots for significant timepoints
         plot(x(sig_mask), pval_position(a) * ones(1, length(sig_mask)), '.', ...
             'Color', [0.5 0.5 0.5], 'MarkerSize', 5);
-        
+
         % Annotate p-value (minimum probability in the mask)
         p_val = min(perm.prob(current_idx, sig_mask));
-        
+
         % Dynamic p-value text formatting
         if p_val < 0.001
             p_text = '\itp\rm < 0.001';
         else
             p_text = strcat("\itp\rm = ",num2str(round(p_val,3)));
         end
-        
+
         % Position text in the middle of the significant cluster
         text(mean(x(sig_mask)), pval_position(a) + (pval_position_text(a) * pval_position(a)), ...
             p_text, 'FontSize', 7, 'HorizontalAlignment', 'center');
     end
-    
+
     % Adjust Axes
     ylabel(ylabel_strings(:,a), 'FontSize', font_size,'FontWeight','normal');
     xlim([-300, 2700]);
@@ -139,4 +139,4 @@ end
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'coeffs_HeteroSkedasticModel_linearInt20SP.png', '-dpng', '-r600') 
+print(fig, 'coeffs_HeteroSkedasticModel_linearInt20SP.png', '-dpng', '-r600')

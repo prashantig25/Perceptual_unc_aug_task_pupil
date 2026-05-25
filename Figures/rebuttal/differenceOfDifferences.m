@@ -58,6 +58,8 @@ meanCondiff_all = NaN(num_subs, num_cd_bins);
 % -------------------------------------------------------------------------
 for i = 1:num_subs
 
+    % todo: should be based on descriptive object    
+
     % GET BEHAVIORAL DATA
     behv_data = [];
     for j = 1:num_sess(i)
@@ -92,7 +94,7 @@ for i = 1:num_subs
     pupil_signal(missedSlider == 1, :) = [];
 
     % BIN PE AND CONDIFF
-    preds.pe_bins = discretize(abs(preds.pe),      pe_binedges);
+    preds.pe_bins = discretize(abs(preds.pe), pe_binedges);
     preds.cd_bins = discretize(abs(preds.con_diff), cd_binedges);
     pupil_signal(preds.pe == 0,:) = [];
     preds(preds.pe == 0,:) = [];

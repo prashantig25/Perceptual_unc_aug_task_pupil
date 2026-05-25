@@ -1,18 +1,12 @@
-% Multiverse plot with STANDARDIZED values - 12 SPECIFICATIONS
-% This includes heteroskedasticity analyses with coefficient 6
-% All values normalized for comparability
+% Multiverse plot with standardized values
+% for uncertainty-weighted PE coefficient
 
 clc
 clearvars
 
-% INITIALIZE VARS
-fontname = 'Arial';
-fontsize = 7;
-linewidth_plot = 0.5; % line width for plot
-xaxis = linspace(-300,2700,300);
-subj_ids = importdata("subj_ids.mat");
-num_subjs = length(subj_ids); % number of subjects
-col = 300;
+coeffStringHet = 'PExCondiff';
+coeffStringNormal = 'zsc_condiff:pe';
+multiversePlot(coeffStringHet, coeffStringNormal)
 
 currentDir = cd;
 reqPath    = 'Perceptual_unc_aug_task_pupil';

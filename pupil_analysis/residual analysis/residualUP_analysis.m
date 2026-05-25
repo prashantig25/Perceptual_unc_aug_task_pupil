@@ -32,7 +32,7 @@ end
 
 posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, "post_absUP_predict.mat")); % posterior update
 pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
-save_dir = fullfile(desiredPath, 'Data', 'GB data two pipelines', 'pupil', 'residual');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
 
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
@@ -46,6 +46,8 @@ checkPathKeywords(dirs, keywords);
 mkdir(save_dir);
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
+% todo: ideally ID is included somewhere here for easier verification
+% of the match across data sets
 subj_ids_num = [];
 for n = 1:length(subj_ids)
     subj_ids_num = [subj_ids_num;str2num(subj_ids{n})];
@@ -59,6 +61,7 @@ end
 for n = 1:num_subjs
 
     % GET MISSED TRIALS
+    % todo: use PupilDescriptive class?
     behv_data = [];
     data_run = [];
     for j = 1:num_sess(n)

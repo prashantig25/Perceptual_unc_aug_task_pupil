@@ -294,7 +294,7 @@ for s = 1:num_subs
             ub_blink = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, 2, 5];
             ub_sacc  = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, 3, 5];
 
-            options = optimoptions('fmincon','Display','iter', 'Algorithm', 'interior-point');
+            options = optimoptions('fmincon','Display','none', 'Algorithm', 'interior-point');
 
             % PERFORM THE OPTIMIZATION
             rng(42); % set seed for reproducability for fmincon

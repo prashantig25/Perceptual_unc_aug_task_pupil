@@ -1,4 +1,4 @@
-% figure2 plots task, choice and learning behavior.
+% Figure 2: Plot task, choice and learning behavior.
 
 % INITIALISE VARIABLES
 
@@ -56,14 +56,15 @@ regression_path  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behav
 % load all required data
 mix_curve = importdata(fullfile(descriptive_path,"mix_curve.mat")); % learning curves
 perc_curve = importdata(fullfile(descriptive_path,"perc_curve.mat"));
-mean_curves(1,:) = nanmean(mix_curve);
-mean_curves(2,:) = nanmean(perc_curve);
-sem_curves(1,:) = nanstd(mix_curve)./sqrt(num_subjs);
-sem_curves(2,:) = nanstd(perc_curve)./sqrt(num_subjs);
+mean_curves(1,:) = mean(mix_curve);
+mean_curves(2,:) = mean(perc_curve);
+sem_curves(1,:) = std(mix_curve)./sqrt(num_subjs);
+sem_curves(2,:) = std(perc_curve)./sqrt(num_subjs);
 data_subjs = readtable(fullfile(regression_path,"preprocessed_lr_pupil_no_zerope.xlsx")); % preprocessed LR data
 betas_all = importdata(fullfile(regression_path,"betas_signed.mat")); % betas from signed analysis
 [~,p_vals] = ttest(betas_all);
 id_subjs = unique(data_subjs.id); % subject IDs
+
 %% INITIALISE TILE LAYOUT
 
 figure
@@ -78,6 +79,7 @@ ax12 = nexttile(21,[1,1]);
 ax11 = nexttile(22,[1,1]);
 ax15 = nexttile(23,[1,2]);
 ax1 = nexttile(1,[2,4]);
+
 %% PLOT TRIAL PROCEDURE
 
 % POSITION CHANGE
@@ -151,6 +153,7 @@ end
 set(gca, 'Color', 'None')
 box off
 axis off
+
 %% PLOT S-A-R CONTINGENCY
 
 % POSITION CHANGE
@@ -233,6 +236,7 @@ a1.Parent = gca;
 set(gca, 'Color', 'None','FontName','Arial')
 box off
 axis off
+
 %% DESCRIPTIVE PLOTS
 
 % POSITION CHANGE
@@ -265,62 +269,20 @@ ax10_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax10_new, 'off');
 delete(ax10);
 
-% INITIALISE VARS TO BE PLOTTED
-binned_data = abs(data_subjs.con_diff); % absolute contrast difference
+% Compute bins
 nbins = 10; % number of bins
-bin_edges = prctile(binned_data, 0:10:100); % calculate percentile edges
-bins = discretize(binned_data, bin_edges); % bin contrast differences 
-data_subjs.lr = data_subjs.up./data_subjs.pe; % learning rates
-data_subjs.abs_lr = abs(data_subjs.lr); % absolute learning rates
-data_subjs.abs_up = abs(data_subjs.up); % absolute updates
+bins = createCondiffBins(data_subjs.con_diff);
 
-% GET RID OF TRIALS WHERE PE = 0 AND OUTLIER LRs
-run_id = data_subjs.id(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
-y_data = data_subjs.lr(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
-bins = bins(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
-binned_data = binned_data(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
+% Compute mean and SEM learning rates
+data_subjs = renamevars(data_subjs, "id", "ID"); % rename ID to use same function
+[avg_ydataLR, sem_ydataLR] = computeMeanLR(data_subjs, bins, nbins, num_subjs, id_subjs);
 
-% MEAN LRs for CONDIFF BINS
-avg_ydata_bins = NaN(nbins,num_subjs); 
-avg_behv_bins = NaN(nbins,num_subjs); 
-for b = 1:nbins
-    for n = 1:num_subjs
-        bins_subj = bins(run_id == id_subjs(n));
-        y_data_subj = y_data(run_id == id_subjs(n));
-        binned_data_subj = binned_data(run_id == id_subjs(n));
-        avg_behv_bins(b,n) = nanmean(binned_data_subj(bins_subj == b));
-        avg_ydata_bins(b,n) = nanmean(y_data_subj(bins_subj == b));
-    end
-end
-avg_ydata = nanmean(avg_ydata_bins,2);
-avg_binneddata = nanmean(avg_behv_bins,2);
-sem_ydata = nanstd(avg_ydata_bins,0,2)./sqrt(num_subjs);
+% Plot average LRs
+[rho, pval] = plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binned_dots, 'Mean LR');
+data_subjs = renamevars(data_subjs, "ID", "id"); % rename ID back
+ylim([-0.02,0.18])
 
-% PLOT
-s1 = scatter(1:nbins,avg_ydata,"filled",'MarkerEdgeColor',"none",'MarkerFaceColor',"none");
-ls = lsline;
-ls.Color = 'k';
-hold('on')
-errorbar(1:nbins,avg_ydata, sem_ydata, 'k', 'LineWidth',line_width,'LineStyle','none');
-hold on
-s1 = scatter(1:nbins,avg_ydata,"filled",'MarkerEdgeColor',"k",'MarkerFaceColor',binned_dots);
-xlabel("Contrast-difference bins" + newline + "(1 bin = 0.01)")
-ylabel('Mean learning rate (LR)')
-
-% ADJUST FIGURE PROPERTIES
-xlim_vals = [0 10.3];
-ylim_vals = [-0.01 0.17];
-adjust_figprops(ax10_new,font_name,font_size,line_width,xlim_vals,ylim_vals);
-[rho,pval] = corr(avg_ydata,avg_binneddata, 'rows', 'pairwise');
-
-if pval < 0.001
-    pval_str = "\itp\rm < 0.001";
-else
-    pval_str = "\itp\rm = " + num2str(round(pval,3));
-end
-
-title(strcat("\itr\rm =",{' '},num2str(round(rho,2)),{' '}) + newline + pval_str, ...
-    'FontWeight','normal','Interpreter','tex')
+% Save data for manuscript
 if save_csv == 1
     save_figures = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'stats','behavior');
     save_table = table("subplot_d",round(rho,2),round(pval,3),8,'VariableNames',{'name','rho','pval','df'});
@@ -328,6 +290,7 @@ if save_csv == 1
     disp("Single-trial LR");
     display(save_table);
 end
+
 %% PLOT BETA COEFFICIENTS
 
 % INITIALISE VARS FOR PLOTTING COEFFICIENTS

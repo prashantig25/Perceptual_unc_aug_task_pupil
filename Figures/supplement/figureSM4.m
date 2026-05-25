@@ -58,9 +58,9 @@ box(ax2_new, 'off'); % box off
 delete(ax2); % delete old axis
 
 % PLOT
-title_name = {''}; 
+title_name = {''};
 bar_plots_pval([rsquared_full;rsquared_signed],[mean(rsquared_full),mean(rsquared_signed)].',[std(rsquared_full)./sqrt(num_subjs),std(rsquared_signed)./sqrt(num_subjs)].',num_subjs, ...
-    2,1,{''},[1,2],{'Absolute','Signed'},title_name,{'Model'},{''},0,1,dot_size,1,font_size,line_width,font_name,0,darkblue_muted) 
+    2,1,{''},[1,2],{'Absolute','Signed'},title_name,{'Model'},{''},0,1,dot_size,1,font_size,line_width,font_name,0,darkblue_muted)
 hold on
 
 % PLOT PROPERTIES
@@ -109,13 +109,14 @@ l.ItemTokenSize = [7 7];
 xlabel('Update')
 
 ax1_new = gca;
-ticks      = ax1_new.YTick;        % tick positions
-tickLabels = ax1_new.YTickLabel;   % tick labels as cell array
-tickLables = str2double(tickLabels)./100;
-C = num2cell(tickLables.');   % produces an 11x1 cell array
+ticks = ax1_new.YTick; % tick positions
+tickLabels = ax1_new.YTickLabel; % tick labels as cell array
+toThePower = 2;
+tickLabels = str2double(tickLabels)./10^toThePower;
+C = num2cell(tickLabels.');
 yticklabels(C)
-ylabel('Frequency (x 10^2)','Interpreter','tex')
-
+text = ['Frequency (x 10^', num2str(toThePower),')'];
+ylabel(text,'Interpreter','tex')
 title('Posterior-predicted and empirical distribution','FontWeight','normal')
 set(gca,'Color','none')
 box off
@@ -137,4 +138,4 @@ end
 %% Save
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'reg_diagnostics1.png', '-dpng', '-r600') 
+print(fig, 'reg_diagnostics1.png', '-dpng', '-r600')

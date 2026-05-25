@@ -1,4 +1,4 @@
-% figureSM2 plots results from all regressors of the binned pupil analysis.
+% Figure S6: Plot results from all regressors of the binned pupil analysis.
 
 clc
 clearvars
@@ -15,7 +15,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt.mat")); % add PE bin curves
-coeff_names = betas_struct.coeff_names; % importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"pe_condiff2bins_linearInt_coeffNames.mat")); % add PE bin curves
+coeff_names = betas_struct.coeff_names; 
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff2bins_linearInt.mat")); % add PE bin curves
 
 [~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
@@ -80,8 +80,8 @@ for a = 1:length(ncoeffs)
         end
         hold on
         color = color_cell;
-        ySmoothed = mean(data_plot);
-        plot(x,ySmoothed,"Color",color{j,:},'LineWidth',2)
+        ySignal = mean(data_plot);
+        plot(x,ySignal,"Color",color{j,:},'LineWidth',2)
         hold on
     end
 
@@ -93,9 +93,9 @@ for a = 1:length(ncoeffs)
                 data_plot(s,c) = betas_struct.with_intercept(j,ncoeffs(a),s,c);
             end
         end
-        ySmoothed = mean(data_plot);
+        ySignal = mean(data_plot);
         color = cell2mat(color_cell);
-        shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
+        shadedErrorBar(x,ySignal,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(j,:)},1)
         hold on
     end
 
@@ -124,7 +124,6 @@ for a = 1:length(ncoeffs)
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a),'Arial',7,0.5)
     xlim([-300,2700])
-    % ylim([ylim_lower(a),ylim_upper(a)])
     xline(0,'--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')
