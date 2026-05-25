@@ -670,6 +670,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             % Update bar label once before launching parfor
             obj.updateProgress(sprintf('Subj %d/%d | het timepoints (0/%d)…', ...
                 subj_idx, obj.num_subs, col));
+        end
 
         % ── Private helper: write results back to obj ─────────────────────────────
         function storeResults(obj, subj_idx, negLL_row, betas_row)
