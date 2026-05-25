@@ -635,9 +635,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-        % Todo: needs docstring
-        function fitHeteroAllTimepoints( ...
-                obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
+        % ── Private helper: shared preprocessing ─────────────────────────────────
+        function [x1_z, x2_z, rt_z, up_z, zsc_pupil, xgaze_z, ygaze_z, dq] = ...
+                preprocessSignals(obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
 
             col = obj.col;
 
