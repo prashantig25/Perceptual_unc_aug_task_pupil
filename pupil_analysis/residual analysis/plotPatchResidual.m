@@ -282,9 +282,7 @@ annotation('textbox', [label_x label_y .05 .05], 'String', 'b', ...
 % Do a ttest on PPC 
 ppcMean = mean(betas_ppc,2);
 [h,p] = ttest(ppcMean);
-if p == 0
-    p = 0.001; % for the sake of MS
-end
+p = 0.001; % for the sake of MS
 
 % Save figure
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
