@@ -57,7 +57,8 @@ up_idx = find(strcmp(coeff_names,'zsc_up'));
 rt_idx = find(strcmp(coeff_names,'rt'));
 ncoeffs = [condiff_idx,pe_idx,xgaze_idx,ygaze_idx,up_idx,rt_idx]; % order of coefficients
 xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02]; % position change for axes
-pval_position = [NaN,-0.02,-0.01,0.01,-0.12,-0.01]; % position to plot p-values
+pval_position = [NaN,-10,10,10,-0.12,-0.01]; % position to plot p-values
+pval_position_pos = [NaN,3,4,4,2,2,2,2]; % position to plot p-values
 ylim_lower = [-0.02,-0.04,-0.02,-0.1,-0.17,-0.025]; % lower limit for y-axis
 ylim_upper = [0.01,0.07,0.05,0.05,0.15,0.15,0.025]; % upper limit for y-axis
 
@@ -98,11 +99,11 @@ for a = 1:length(ncoeffs)
         p_val = min(unique(perm.prob(ncoeffs(a),perm.mask(ncoeffs(a),:) == 1)));
     end
     if p_val < 0.001
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.01
-            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.05 & p_val > 0.01
-            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     end
 
     % ADJUST FIGURE PROPERTIES

@@ -62,7 +62,8 @@ ylabel_strings = [{"Uncertainty-modulated";"pupil"},{"PE-modulated";"pupil"},{"U
 ncoeffs = [condiff_idx,pe_idx,peCondiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
 
 xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02]; % position change for axes
-pval_position = [NaN,-0.02,-0.01,-0.01,-0.12,0.01,0.01]; % position to plot p-values
+pval_position = [NaN,0.02,-0.01,-0.02,-0.1,0.1,0.1] * 200; % position to plot p-values
+pval_position_pos = [NaN,3,1,2,3.5,3.5,3.5,3,3,3]; % position to plot p-values
 ylim_lower = [-0.02,-0.04,-0.02,-0.025,-0.17,-0.1,-0.1]; % lower limit for y-axis
 ylim_upper = [0.01,0.07,0.025,0.05,0.15,0.15,0.05,-0.1]; % upper limit for y-axis
 
@@ -102,11 +103,11 @@ for a = 1:length(ncoeffs)
         p_val = min(unique(perm.prob(ncoeffs(a),perm.mask(ncoeffs(a),:) == 1)));
     end
     if p_val < 0.001
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.01
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.05 & p_val > 0.01
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     end
 
     % ADJUST FIGURE PROPERTIES

@@ -44,7 +44,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             obj.betas_struct    = struct();
             obj.model_type      = 'OLS';
             obj.n_sp            = 20;
-            obj.use_sp          = 0; 
+            obj.use_sp          = 0;
             obj.wb              = [];
             obj.total_steps     = 0;
             obj.completed_steps = 0;
@@ -520,8 +520,13 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     
                     % Heteroskedastic model
                     obj.updateProgress(sprintf('%s | Het model…', binLabel));
-                    obj.fitHeteroAllTimepoints( ...
-                        pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, subj_idx);
+                    if obj.use_sp == 1
+                        obj.fitHeteroAllTimepoints( ...
+                            pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, subj_idx);
+                    else
+                        obj.forPregenSP( ...
+                            pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, subj_idx);
+                    end
 
                 else
                     
@@ -630,26 +635,17 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-        % Todo: needs docstring
-        function fitHeteroAllTimepoints( ...
-                obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
+        % ── Private helper: shared preprocessing ─────────────────────────────────
+        function [x1_z, x2_z, rt_z, up_z, zsc_pupil, xgaze_z, ygaze_z, dq] = ...
+                preprocessSignals(obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
 
-            % Extract all obj fields into plain variables (parfor-safe)
-            col        = obj.col;
-            n_sp       = obj.n_sp;
-            lb         = obj.lb;
-            ub         = obj.ub;
-            foptions   = obj.fmincon_options;
-            num_params = obj.num_vars + 1;
-            use_sp     = obj.use_sp;
-            bestParams = obj.p0;
+            col = obj.col;
 
             % Pre-compute z-scored predictors
             x1_z = zscore(abs(preds_bins.pe));
             x2_z = zscore(preds_bins.con_diff);
             rt_z = zscore(log(preds_bins.rt));
             up_z = zscore(abs(preds_bins.up));
-
             xgaze_z = nan(size(xgaze_signal));
             ygaze_z = nan(size(ygaze_signal));
             for c = 1:col
@@ -664,9 +660,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
             rt_z = rt_z(valid_rows);
             up_z = up_z(valid_rows);
             zsc_pupil = zsc_pupil(valid_rows, :);
-            xgaze_z = xgaze_z(valid_rows, :);
-            ygaze_z = ygaze_z(valid_rows, :);
-            %N_trials  = sum(valid_rows);
+            xgaze_z   = xgaze_z(valid_rows, :);
+            ygaze_z   = ygaze_z(valid_rows, :);
 
             % Update progress bar
             dq = parallel.pool.DataQueue;
@@ -676,51 +671,103 @@ classdef PupilRegression_intHet < pupilReg_Vars
             obj.updateProgress(sprintf('Subj %d/%d | het timepoints (0/%d)…', ...
                 subj_idx, obj.num_subs, col));
 
+        % ── Private helper: write results back to obj ─────────────────────────────
+        function storeResults(obj, subj_idx, negLL_row, betas_row)
+            obj.negLL_values(1, subj_idx, :) = negLL_row;
+            for c = 1:obj.col
+                obj.betas_struct.with_intercept(1, :, subj_idx, c) = betas_row(c, :);
+            end
+        end
+
+        % ── fitHeteroAllTimepoints (slimmed down) ─────────────────────────────────
+        function fitHeteroAllTimepoints( ...
+                obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
+            % Extract all obj fields into plain variables (parfor-safe)
+            col        = obj.col;
+            n_sp       = obj.n_sp;
+            lb         = obj.lb;
+            ub         = obj.ub;
+            foptions   = obj.fmincon_options;
+            num_params = obj.num_vars + 1;
+            % bestParams = obj.p0;
+            starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
+
+            [x1_z, x2_z, rt_z, up_z, zsc_pupil, xgaze_z, ygaze_z, dq] = ...
+                obj.preprocessSignals(zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx);
+
             % Pre-allocate outputs
             negLL_row = nan(1, col);
             betas_row = nan(col, num_params);
-
-            starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
 
             parfor c = 1:col
                 y     = zsc_pupil(:, c);
                 xgaze = xgaze_z(:, c);
                 ygaze = ygaze_z(:, c);
-
                 negLLfun = @(params) PupilRegression_intHet.negativeLogLikelihood( ...
                     params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); % todo: check this!! %#ok<PFBNS>
 
                 bestNegLL  = inf;
-                % bestParams = obj.p0;
-
-                if use_sp == 1
-                    for i = 1:n_sp
-                        p0 = squeeze(starts_subj(c, i, :))';
-                        [p_est, nLL_val] = fmincon(negLLfun, p0, [], [], [], [], lb, ub, [], foptions);
-                        if nLL_val < bestNegLL
-                            bestNegLL  = nLL_val;
-                            bestParams = p_est;
-                        end
+                bestParams = zeros(1, num_params); % safe parfor initialisation
+                for i = 1:n_sp
+                    p0 = squeeze(starts_subj(c, i, :))';
+                    [p_est, nLL_val] = fmincon(negLLfun, p0, [], [], [], [], lb, ub, [], foptions);
+                    if nLL_val < bestNegLL
+                        bestNegLL  = nLL_val;
+                        bestParams = p_est;
                     end
-                else
-                    [p_est, nLL_val] = fmincon(negLLfun, bestParams, [], [], [], [], lb, ub, [], foptions);
-                    bestNegLL  = nLL_val;
-                    bestParams = p_est;
-                    p0 = bestParams;
                 end
 
                 % k            = num_params;
                 negLL_row(c) = bestNegLL;
                 betas_row(c, :) = bestParams;
-
                 % Notify main thread: one timepoint done
                 send(dq, 1); %#ok<PFBNS>
             end
 
-            obj.negLL_values(1, subj_idx, :) = negLL_row;
-            for c = 1:obj.col
-                obj.betas_struct.with_intercept(1, :, subj_idx, c) = betas_row(c, :);
+            obj.storeResults(subj_idx, negLL_row, betas_row);
+        end
+
+        % ── forPregenSP (slimmed down) ────────────────────────────────────────────
+        function forPregenSP( ...
+                obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
+            % Extract all obj fields into plain variables (parfor-safe)
+            col        = obj.col;
+            lb         = obj.lb;
+            ub         = obj.ub;
+            foptions   = obj.fmincon_options;
+            num_params = obj.num_vars + 1;
+            bestParams = obj.p0;
+
+            [x1_z, x2_z, rt_z, up_z, zsc_pupil, xgaze_z, ygaze_z, dq] = ...
+                obj.preprocessSignals(zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx);
+
+            % Pre-allocate outputs
+            negLL_row = nan(1, col);
+            betas_row = nan(col, num_params);
+            starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
+
+            for c = 1:col
+                y     = zsc_pupil(:, c);
+                xgaze = xgaze_z(:, c);
+                ygaze = ygaze_z(:, c);
+                negLLfun = @(params) PupilRegression_intHet.negativeLogLikelihood( ...
+                    params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); %#ok<PFBNS>
+
+                bestNegLL  = inf;
+                % bestParams = obj.p0;
+                [p_est, nLL_val] = fmincon(negLLfun, bestParams, [], [], [], [], lb, ub, [], foptions);
+                bestNegLL  = nLL_val;
+                bestParams = p_est;
+                p0 = bestParams;
+
+                k            = num_params;
+                negLL_row(c) = bestNegLL;
+                betas_row(c, :) = bestParams;
+                % Notify main thread: one timepoint done
+                send(dq, 1); %#ok<PFBNS>
             end
+
+            obj.storeResults(subj_idx, negLL_row, betas_row);
         end
 
 

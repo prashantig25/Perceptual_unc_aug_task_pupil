@@ -15,9 +15,9 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"patch_condiff_linearInt.mat")); % add PE bin curves
-coeffs_names = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"patch_condiff_linearInt_coeffNames.mat")); % add PE bin curves
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_patch_linearInt.mat")); % add PE bin curves
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"patch_condiff_linearInt_gazeCorrected.mat")); % add PE bin curves
+coeffs_names = betas_struct.coeff_names; % importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"patch_condiff_linearInt_coeffNames.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_patch_linearInt_gazeCorrected.mat")); % add PE bin curves
 
 xgaze_idx = find(strcmp(coeffs_names, 'xgaze')); 
 ygaze_idx = find(strcmp(coeffs_names, 'ygaze')); 
@@ -54,7 +54,7 @@ axes_old = [ax1,ax2,ax3,ax4];
 ylabel_strings = [{"Gaze position";"on x-axis"},{"Gaze position";"on y-axis"},{"Uncertainty-modulated";"pupil"},{"Low reward";"uncertainty"},{"UP-modulated";"pupil"},{"RT-modulated";"pupil"},{"xgaze-modulated";"pupil"},{"ygaze-modulated";"pupil"}];
 ncoeffs = [xgaze_idx,ygaze_idx,condiff_idx,condition_idx]; % order in which coefficients are to be plotted
 xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02,0.05]; % change in axes position
-pval_position = [NaN,-0.03,-0.01,0.1,0.08,-0.01,-0.005,0.005]-0.001; % position to plot p-value
+pval_position = [NaN,5,-0.01,0.1,0.08,-0.01,-0.005,0.005]-0.001; % position to plot p-value
 ylim_lower = [-0.03,-0.07,-0.02,0.05,0.03,-0.05,-0.4,-0.3]; % lower limit for y-axis
 ylim_upper = [0.02,0.12,0.04,0.25,0.2,0.06,0,0.2]; % upper limit for y-axis
 
@@ -95,11 +95,11 @@ for a = 1:length(ncoeffs)
         p_val = min(unique(perm.prob(ncoeffs(a),perm.mask(ncoeffs(a),:) == 1)));
     end
     if p_val < 0.001
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + 3,"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.01
-            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + 3,strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.05 & p_val > 0.01
-            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos,strcat("\itp\rm = ",num2str(round(p_val,2))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + 3,strcat("\itp\rm = ",num2str(round(p_val,2))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
     end
 
     % ADJUST FIGURE PROPERTIES
