@@ -934,13 +934,13 @@ classdef PupilRegression_intHet < pupilReg_Vars
             %                      omik1   = noise scaling by |x2|,
             %                      beta21  = x1 × x2 interaction coefficient,
             %                      beta3-6 = coefficients for x3-x6 (rt, up, xgaze, ygaze).
-            %     x1     - Z-scored |PE| [trials × 1]
-            %     x2     - Z-scored condition difficulty [trials × 1]
-            %     y      - Pupil signal at one timepoint [trials × 1]
-            %     x3     - Z-scored log-RT [trials × 1]
-            %     x4     - Z-scored |UP| [trials × 1]
-            %     x5     - Z-scored x-gaze [trials × 1]
-            %     x6     - Z-scored y-gaze [trials × 1]
+            %     x1     - Z-scored |PE| [trials × 1].
+            %     x2     - Z-scored condition difficulty [trials × 1].
+            %     y      - Pupil signal at one timepoint [trials × 1].
+            %     x3     - Z-scored log-RT [trials × 1].
+            %     x4     - (vector) Z-scored |UP| [trials × 1].
+            %     x5     - (vector) Z-scored x-gaze [trials × 1].
+            %     x6     - (vector) Z-scored y-gaze [trials × 1].
             %
             %   Outputs:
             %     nLL - (scalar) Negative summed log-likelihood (to be minimised).
