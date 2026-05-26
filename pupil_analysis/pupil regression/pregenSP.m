@@ -43,11 +43,6 @@ num_params_hetero = 10;
 lb = [-Inf, -Inf, -Inf,   0,   0, -Inf, -Inf, -Inf, -Inf, -Inf];
 ub = [ Inf,  Inf,  Inf, Inf, Inf,  Inf,  Inf,  Inf,  Inf,  Inf];
 
-% Heteroskedastic parameter names (fixed order matching negativeLogLikelihood)
-coeff_names = {'Intercept', 'PE', 'Condiff', 'omikron_0', 'omikron_1', ...
-               'PExCondiff', 'RT', 'UP', 'xgaze', 'ygaze'};
-safe_saveall(fullfile(het_save_dir, 'coeff_names_hetero.mat'), coeff_names);
-
 %% =======================================================================
 %  PIPELINE 1: LINEAR INTERPOLATION
 % =======================================================================
