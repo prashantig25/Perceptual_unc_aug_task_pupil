@@ -1,12 +1,12 @@
 % Multiverse plot with standardized values
 % for PE coefficient
 
-clc
-clearvars
-
-coeffStringHet = 'PE';
-coeffStringNormal = 'pe';
-multiversePlot(coeffStringHet, coeffStringNormal)
+% clc
+% clearvars
+% 
+% coeffStringHet = 'PE';
+% coeffStringNormal = 'pe';
+% multiversePlot(coeffStringHet, coeffStringNormal)
 
 currentDir = cd;
 reqPath    = 'Perceptual_unc_aug_task_pupil';
@@ -20,8 +20,8 @@ end
 main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
 alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
 
-% Load hetero coefficient names and find PExCondiff index dynamically
-het_coeff_names    = importdata(fullfile(alt_dir, 'coeff_names_hetero.mat'));
+% Load heteroskedastic model coefficient names and find PExCondiff index dynamically
+het_coeff_names = importdata(fullfile(alt_dir, 'coeff_names_hetero.mat'));
 pe_condiff_idx_het = find(strcmp(het_coeff_names, 'PE'));
 
 %% LOAD ALL DATA (9 original + 3 heteroskedasticity)

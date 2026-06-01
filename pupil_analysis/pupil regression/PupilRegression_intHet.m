@@ -34,20 +34,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
     methods
 
         function obj = PupilRegression_intHet()
-            % PUPILREGRESSION_INTHET  Construct a PupilRegression_intHet object.
-            %
-            %   OBJ = PupilRegression_intHet() creates a new instance with default
-            %   settings: OLS model type, 20 starting points, single starting-point
-            %   mode disabled, and an initial parameter vector P0 of length 10.
-            %
-            %   OBJ = PupilRegression_intHet(CONFIG) accepts an optional
-            %   PupilRegressionConfig object (currently unused; the copyFromConfig
-            %   path is commented out but reserved for future use).
-            %
-            %   Inputs (optional):
-            %     config - (PupilRegressionConfig) Configuration object. Currently
-            %              not used; kept for forward compatibility.
-            %
+            % PUPILREGRESSION_INTHET Construct a PupilRegression_intHet object.
             %   Outputs:
             %     obj - Initialised PupilRegression_intHet instance.
 
@@ -61,28 +48,19 @@ classdef PupilRegression_intHet < pupilReg_Vars
             obj.completed_steps = 0;
             obj.p0 = [0, 0, 0, 0.1, 0.1, 0, 0, 0, 0, 0];
         end
-
-        %% ----------------------------------------------------------------
-        %  HETEROSKEDASTIC CONFIGURATION SETTER
-        %% ----------------------------------------------------------------
-        % todo: needs proper documentation
+     
         function setHeteroskedasticConfig(obj, minBound, maxBound, lb, ub, n_sp)
             % SETHETEROSKEDASTICCONFIG  Configure the object for heteroskedastic
             %   maximum-likelihood estimation.
             %
-            %   setHeteroskedasticConfig(OBJ, MINBOUND, MAXBOUND, LB, UB, N_SP)
-            %   switches the model type to 'heteroskedastic', stores the parameter
-            %   search bounds, and initialises the fmincon solver options used in
-            %   fitHeteroAllTimepoints and forPregenSP.
-            %
             %   Inputs:
-            %     minBound - (numeric) Scalar or vector of lower search bounds used
+            %     minBound - Scalar or vector of lower search bounds used
             %                for generating starting points (stored as OBJ.minBound).
-            %     maxBound - (numeric) Scalar or vector of upper search bounds used
+            %     maxBound - Scalar or vector of upper search bounds used
             %                for generating starting points (stored as OBJ.maxBound).
-            %     lb       - (numeric) Lower bound vector passed directly to fmincon.
-            %     ub       - (numeric) Upper bound vector passed directly to fmincon.
-            %     n_sp     - (numeric) Number of random starting points to evaluate
+            %     lb       - Lower bound vector passed directly to fmincon.
+            %     ub       - Upper bound vector passed directly to fmincon.
+            %     n_sp     - Number of random starting points to evaluate
             %                per timepoint when OBJ.use_sp == 1.
 
             obj.model_type      = 'heteroskedastic';
@@ -100,16 +78,11 @@ classdef PupilRegression_intHet < pupilReg_Vars
         end
 
         function initProgress(obj, total, titleStr)
-            % INITPROGRESS Open a new waitbar. Call once at the start of runAnalysis.
-            %
-            %   initProgress(OBJ, TOTAL, TITLESTR) initialises the progress tracking
-            %   by setting the total number of expected steps to TOTAL, resetting the
-            %   completed step counter to zero, and opening a waitbar dialog with the
-            %   title TITLESTR and a Cancel button.
+            % INITPROGRESS Open a new waitbar.
             %
             %   Inputs:
-            %     total    - (numeric) Total number of steps expected in the analysis.
-            %     titleStr - (char) Message string displayed inside the waitbar dialog.
+            %     total    - Total number of steps expected in the analysis.
+            %     titleStr - Message string displayed inside the waitbar dialog.
             
             obj.total_steps     = total;
             obj.completed_steps = 0;
@@ -122,14 +95,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
         function updateProgress(obj, msg)
             % UPDATEPROGRESS Increment the step counter by 1 and refresh the waitbar.
             %
-            %   updateProgress(OBJ, MSG) increments the completed step count by one,
-            %   recomputes the fractional progress, and updates the waitbar label to
-            %   MSG.  If the user has pressed Cancel, the waitbar is closed and an
-            %   error is thrown.  Safe to call from the main thread only — do NOT
-            %   call from inside a parfor loop.
-            %
             %   Inputs:
-            %     msg - (char) Status message displayed in the waitbar on this update.
+            %     msg - Status message displayed in the waitbar on this update.
+
             if isempty(obj.wb) || ~isvalid(obj.wb)
                 return
             end
@@ -146,14 +114,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
         function incrementProgress(obj, n)
             % INCREMENTPROGRESS Add N steps to the counter without changing the message.
             %
-            %   incrementProgress(OBJ, N) adds N to the completed step count and
-            %   recomputes the fractional progress on the waitbar.  The existing
-            %   waitbar message is left unchanged.  Intended for absorbing batched
-            %   step increments forwarded from a DataQueue (e.g. from worker threads
-            %   inside a parfor loop).
-            %
             %   Inputs:
             %     n - (numeric) Number of steps to add to the completed step count.
+
             if isempty(obj.wb) || ~isvalid(obj.wb)
                 return
             end
@@ -164,11 +127,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
         function closeProgress(obj)
             % CLOSEPROGRESS Delete the waitbar dialog and reset the handle to empty.
-            %
-            %   closeProgress(OBJ) closes the waitbar window if it is still open and
-            %   valid, then sets the internal handle OBJ.wb to [] so subsequent
-            %   guard checks in updateProgress and incrementProgress exit cleanly.
-            %   Call once after runAnalysis completes (or errors out).
+            
             if ~isempty(obj.wb) && isvalid(obj.wb)
                 delete(obj.wb);
             end
@@ -177,16 +136,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
         function runAnalysis(obj)
             % RUNANALYSIS  Execute the full pupil regression pipeline.
-            %
-            %   runAnalysis(OBJ) validates the object configuration, pre-allocates
-            %   output arrays, iterates over subjects via processSubject, optionally
-            %   runs a permutation test (OLS and heteroskedastic paths differ), and
-            %   closes the progress bar on completion.
-            %
-            %   The method dispatches to either the OLS or heteroskedastic path
-            %   depending on OBJ.model_type.  Results are stored in
-            %   OBJ.betas_struct, OBJ.perm_results, OBJ.residuals_all,
-            %   OBJ.predicted_all, and (heteroskedastic only) OBJ.negLL_values.
 
             % Validate configuration before starting analysis
             obj.validateConfig();
@@ -242,7 +191,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
                     num_vars = 1:obj.num_vars+1;
                     var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
                     var2 = squeeze(obj.betas_struct.with_intercept(2, :, :, :)); % [num_vars x num_subjs x col]
-                    % obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1, var2);
                     obj.perm_results = obj.permtestFcn(num_vars, obj.num_subs, obj.col, var1, var2);
 
                 else
@@ -264,18 +212,11 @@ classdef PupilRegression_intHet < pupilReg_Vars
             
             % Close progress bar
             obj.closeProgress();
-
         end
 
 
         function processSubject(obj, subj_idx, binnedAnalysis)
             % PROCESSSUBJECT  Load data and run the regression for one subject.
-            %
-            %   processSubject(OBJ, SUBJ_IDX, BINNEDANALYSIS) orchestrates all
-            %   per-subject steps: loading behavioural and pupil/gaze data, handling
-            %   missed trials, optionally regressing out RT effects, loading baseline
-            %   data, computing behavioural predictors, and then dispatching to
-            %   processBinsAndTimepoints for the actual model fitting.
             %
             % Inputs:
             %
@@ -327,10 +268,10 @@ classdef PupilRegression_intHet < pupilReg_Vars
             %   concatenates all sessions into a single table.
             %
             %   Inputs:
-            %     subj_idx  - (numeric) 1-based index into OBJ.subj_ids.
+            %     subj_idx  - 1-based index into OBJ.subj_ids.
             %
             %   Outputs:
-            %     behv_data - (table) Concatenated behavioural table with columns
+            %     behv_data - Concatenated behavioural table with columns
             %                 1:16 from the raw file plus 'rt' and 'slider'.
 
             behv_data = [];
@@ -392,14 +333,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
         function [zsc_pupil, xgaze_signal, ygaze_signal] = loadPupilGazeData(obj, subj_idx, missedtrials_slider)
             % LOADPUPILGAZEDATA  Load z-scored pupil and gaze signals for one subject.
             %
-            %   [ZSC_PUPIL, XGAZE_SIGNAL, YGAZE_SIGNAL] = loadPupilGazeData(OBJ,
-            %   SUBJ_IDX, MISSEDTRIALS_SLIDER) reads the subject's pupil, x-gaze,
-            %   and y-gaze .mat files from the directories specified in OBJ.pupil_dir,
-            %   OBJ.xgaze_dir, and OBJ.ygaze_dir.  Time-window trimming is applied
-            %   according to OBJ.timewindow ('patch' keeps all columns and updates
-            %   OBJ.col; 'feedback' trims to OBJ.col columns).  Rows corresponding
-            %   to missed slider trials are then removed.
-            %
             % Parameters:
             %   subj_idx - Index of subject to load data for
             %   missedtrials_slider - Logical index of missed slider trials
@@ -442,11 +375,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             ygaze_signal(missedtrials_slider == 1, :) = [];
         end
 
-        %% ----------------------------------------------------------------
-        %  REGRESS RT EFFECTS
-        %% ----------------------------------------------------------------
         function residual = remove_rt_effects(obj, pupil,rt)
-
             % NOTE: code is based on Urai et al., 2017
             % function REMOVE_RT_EFFECTS removes trial-by-trial variations in pupil
             % signal caused by very slow/long RTs
@@ -465,9 +394,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
             residual = pupil - (pupil'*rt_norm)*rt_norm;
         end
 
-        %% ----------------------------------------------------------------
-        %  REGRESS RT EFFECTS
-        %% ----------------------------------------------------------------
         function zsc_pupil = regressRTEffects(obj, zsc_pupil, behv_data)
             % REGRESSRTEFFECTS  Remove log-RT variance from the pupil signal at
             %   every timepoint.
@@ -692,7 +618,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-        % ── Private helper: shared preprocessing ─────────────────────────────────
         function [x1_z, x2_z, rt_z, up_z, zsc_pupil, xgaze_z, ygaze_z, dq] = ...
                 preprocessSignals(obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
             % PREPROCESSSIGNALS  Z-score predictors and gaze signals, remove NaN
@@ -750,7 +675,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 subj_idx, obj.num_subs, col));
         end
 
-        % ── Private helper: write results back to obj ─────────────────────────────
         function storeResults(obj, subj_idx, negLL_row, betas_row)
             % STORERESULTS  Write heteroskedastic MLE results into object arrays.
             %
@@ -768,7 +692,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-        % ── fitHeteroAllTimepoints (slimmed down) ─────────────────────────────────
         function fitHeteroAllTimepoints( ...
                 obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
             % FITHETEREALLTIMEPOINTS  Fit the heteroskedastic model at all timepoints
@@ -827,18 +750,13 @@ classdef PupilRegression_intHet < pupilReg_Vars
             obj.storeResults(subj_idx, negLL_row, betas_row);
         end
 
-        % ── forPregenSP (slimmed down) ────────────────────────────────────────────
         function forPregenSP( ...
                 obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
-            % FORPREGENSP  Fit the heteroskedastic model at all timepoints using a
-            %   single warm-started sequence (sequential, no parfor).
+            % FORPREGENSP Fit the heteroskedastic model at all timepoints using a
+            %   single warm-started sequence.
             %
-            %   forPregenSP(OBJ, ZSC_PUPIL, XGAZE_SIGNAL, YGAZE_SIGNAL, PREDS_BINS,
-            %   SUBJ_IDX) runs fmincon sequentially over timepoints, initialising
-            %   each call with the best-fit parameters from the previous timepoint
-            %   (warm-start / continuation strategy).  The first timepoint uses
-            %   OBJ.p0 as the initial parameter vector.  Use this method when
-            %   OBJ.use_sp == 0.
+            %   Runs fmincon sequentially over timepoints, initialising
+            %   each call with the best-fit parameters from the previous timepoint.
             %
             %   Inputs:
             %     zsc_pupil    - Pupil signal 
@@ -919,10 +837,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
     methods (Static)
         
         function nLL = negativeLogLikelihood(params, x1, x2, y, x3, x4, x5, x6)
-            % NEGATIVELOGLIKELIHOOD  Evaluate the negative log-likelihood of a
+            % NEGATIVELOGLIKELIHOOD Evaluate the negative log-likelihood of a
             %   heteroskedastic Gaussian regression model.
-            %
-            %
+            % 
             %   Inputs:
             %     params - Parameter vector:
             %                [beta0, beta1, beta2, omik0, omik1, beta21,

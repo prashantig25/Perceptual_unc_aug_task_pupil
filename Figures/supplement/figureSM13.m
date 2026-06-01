@@ -4,9 +4,9 @@
 clc
 clearvars
 
-coeffStringHet = 'PExCondiff';
-coeffStringNormal = 'zsc_condiff:pe';
-multiversePlot(coeffStringHet, coeffStringNormal)
+% coeffStringHet = 'PExCondiff';
+% coeffStringNormal = 'zsc_condiff:pe';
+% multiversePlot(coeffStringHet, coeffStringNormal)
 
 currentDir = cd;
 reqPath    = 'Perceptual_unc_aug_task_pupil';
