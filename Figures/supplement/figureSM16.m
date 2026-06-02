@@ -157,7 +157,9 @@ for i = 1:size(tests, 1)
     fprintf('Running permutation test for: %s (N=%d, Time=%d)\n', label, num_subjs, col_len);
 
     % Run the Permutation Test
-    perm_results{i} = get_permtest(1, num_subjs, col_len, var1_data, var2_data, two_tailed, betas_flag);
+    var1_data = reshape(var1_data, [1, num_subjs, col_len]);
+    perm_results{i} = get_permtest_updated(1, num_subjs, col_len, var1_data);
+    % perm_results{i} = get_permtest_updated(1, num_subjs, col_len, var1_data, var2_data, two_tailed, betas_flag);
 
 end
 
