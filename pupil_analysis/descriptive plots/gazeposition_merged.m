@@ -121,8 +121,7 @@ end
 %% GAZE BASED ON DECONVOLUTION
 
 fprintf("\n3. Gaze based on deconvolution\n")
-% save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze deconv fixed seed');
-% save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze deconv fixed seed');
+
 % Todo: also here - ensure consistent folder name x and y after refactoring
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze deconv'); 
 save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze deconv'); 
