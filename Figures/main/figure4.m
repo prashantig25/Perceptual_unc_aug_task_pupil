@@ -4,14 +4,12 @@ clc
 clearvars
 
 % INITIALIZE VARS
-
 fontname = 'Arial'; % font name
 fontsize = 7; % font size
 linewidth_plot = 0.5; % line width for plot
 linewidth_curves = 2; % line width for curves
 xaxis = linspace(-300,2700,300); % x-axis
-[~,high_PU,mid_PU,low_PU,~,~,~,~,~,~,~,~,binned_dots,~,...
-    ~,~,~,~,study2_blue] = colors_rgb(); % colors
+[~,high_PU_col,~,low_PU_col,~,~,~,~,~,~,~,~,~,~,~,~,~,~,~] = colors_rgb(); % colors
 neutral = [7, 53, 94]/255;
 subj_ids = importdata("subj_ids.mat");
 num_subs = length(subj_ids); % number of subjects
@@ -74,25 +72,29 @@ condiffVals = importdata(fullfile(descriptive_dir, 'meanCondiff_all.mat'));
 betas_field = betas.with_intercept;
 maxTrials = 160; % max trials presented to a participant
 
-highPU = mean(condiffVals(:,1)); % high state uncertainty
-lowPU = mean(condiffVals(:,2)); % low state uncertainty
+% Compute contrast-difference values
+highPU_val = mean(condiffVals(:,1)); % high state uncertainty
+lowPU_val = mean(condiffVals(:,2)); % low state uncertainty
 
+% Mean and standard deviation of uniform contrast-difference distribution
 refVals = linspace(0, 0.1, maxTrials);
 refMean = mean(refVals);
-refSD   = std(refVals);
+refSD = std(refVals);
 
 % Z-score highPU and lowPU using the reference distribution's parameters
 highPU = (highPU_val - refMean) / refSD;
-lowPU  = (lowPU_val  - refMean) / refSD;
+lowPU = (lowPU_val  - refMean) / refSD;
 
+% Compute prediction-error values
 highPE = mean(peVals(:,2)); % high PE
 lowPE = mean(peVals(:,1)); % low PE
 
+% Mean and standard deviation of prediction-error distribution
 refPEMean = mean(abs(preds_all.pe));
 refPESD = std(abs(preds_all.pe));
 
 highPE = (highPE - refPEMean) / refPESD;
-lowPE = (lowPE  - refPEMean) / refPESD;
+lowPE  = (lowPE  - refPEMean) / refPESD;
 
 % LOOP OVER SUBJECTS
 for s = 1:num_subs
@@ -117,7 +119,6 @@ end
 safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_zscoredValues.mat"),posterior);
 
 %% INITIALIZE TILE LAYOUT
-
 figure(Position=[200,200,450,175])
 hold on
 t = tiledlayout(1,3,"Padding","compact","TileSpacing","compact");
@@ -131,18 +132,15 @@ sg = sgtitle('Pupil dilation = \beta_0 + \beta_1 \cdot |\delta| + \beta_2 \cdot 
 %% PLOT MAIN EFFECT OF PE
 
 % POSITION CHANGE
-
 new_pos = change_position(ax1,[0,0,0,0]);
 ax1_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax1);
 
 % GET POSITION TO PLOT P-VALUE
-
 ylim_axes = [-0.04,0.05];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
-
 hold on
 plot(xaxis,mean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
 hold on
@@ -153,7 +151,6 @@ xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 
 % ADJUST FIGURE PROPERTIES
-
 adjust_figprops(ax1_new,fontname,fontsize,linewidth_plot);
 hold on
 plot(xaxis(find(pe_pval==1)),pval_pos + ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
@@ -165,10 +162,10 @@ ylabel('Absolute PE-modulated pupil ({\bf\beta_1})','FontWeight','normal','FontN
 text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
+
 %% PLOT UNCERTAINTY-WEIGHTED PE
 
 % POSITION CHANGE
-
 new_pos = change_position(ax2,[-0.005,0,0,0]);
 ax2_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax2);
@@ -182,7 +179,6 @@ shadedErrorBar(xaxis,mean(coeffs.pe_condiff),std(coeffs.pe_condiff)./sqrt(num_su
     {'Color',neutral,'LineWidth',linewidth_curves},1);
 
 % ADJUST FIGURE PROPERTIES
-
 xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 adjust_figprops(ax2_new,fontname,fontsize,linewidth_plot);
@@ -222,21 +218,20 @@ delete(ax3);
 hold on
 
 % Note: shadedErrorBar returns a struct. We want the 'mainLine' field.
-h1 = shadedErrorBar(xaxis, pupil_diff1, sem_diff1, {'Color', high_PU, 'LineWidth', linewidth_curves}, 0.15);
-h2 = shadedErrorBar(xaxis, pupil_diff2, sem_diff2, {'Color', low_PU, 'LineWidth', linewidth_curves}, 0.15);
+h1 = shadedErrorBar(xaxis, pupil_diff1, sem_diff1, {'Color', high_PU_col, 'LineWidth', linewidth_curves}, 0.15);
+h2 = shadedErrorBar(xaxis, pupil_diff2, sem_diff2, {'Color', low_PU_col, 'LineWidth', linewidth_curves}, 0.15);
 
 % Capture handles for the posterior curves (Model Data)
-p1 = plot(xaxis, post_diff1, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
-p2 = plot(xaxis, post_diff2, 'Color', low_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
+p1 = plot(xaxis, post_diff1, 'Color', high_PU_col, 'LineWidth', linewidth_curves, 'LineStyle', ':');
+p2 = plot(xaxis, post_diff2, 'Color', low_PU_col, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 
-p1 = plot(xaxis, post_diff1_rescaled, 'Color', high_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
-p2 = plot(xaxis, post_diff2_rescaled, 'Color', low_PU, 'LineWidth', linewidth_curves, 'LineStyle', ':');
+% Legend text
 highPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(highPU_val,3)),")");
 lowPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(lowPU_val,3)),")");
 
 % Arrange them in an order that makes sense (e.g., Data then Model)
 l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
-    {'Empirical (contrast-difference: [0 - 0.05))', 'Empirical (contrast-difference: [0.05 - 0.1])', ...
+    {'Empirical (contrast difference: [0 - 0.05))', 'Empirical (contrast difference: [0.05 - 0.1])', ...
      highPU_str, lowPU_str'}, ...
     'Location', 'best', 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
     'FontSize', fontsize-1.25, 'FontName', fontname, 'Color', 'none');
@@ -250,8 +245,8 @@ ylim([-30,120])
 xlabel('Time from feedback onset (ms)')
 ylabel({'Pupil-difference curves', '(high - low PE)'}, 'FontSize', fontsize);
 hold on
-a1 = annotation("arrow",[0.78,0.78],[0.52,0.62],'LineWidth',0.5,'Color',low_PU);
-a2 = annotation("arrow",[0.78,0.78],[0.49,0.39],'LineWidth',0.5,'Color',high_PU);
+a1 = annotation("arrow",[0.78,0.78],[0.52,0.62],'LineWidth',0.5,'Color',low_PU_col);
+a2 = annotation("arrow",[0.78,0.78],[0.49,0.39],'LineWidth',0.5,'Color',high_PU_col);
 a1.HeadLength = 5; a2.HeadLength = 5;
 adjust_figprops(ax3_new,fontname,fontsize,linewidth_plot);
 
