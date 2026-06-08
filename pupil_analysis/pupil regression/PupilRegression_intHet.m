@@ -205,7 +205,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 num_vars = 1:obj.num_vars+1;
                 obj.updateProgress('Running permutation test…');
                 var1 = squeeze(obj.betas_struct.with_intercept(1, :, :, :)); % [num_vars x num_subjs x col]
-                % obj.perm_results = get_permtest_updated(num_vars, obj.num_subs, obj.col, var1);
                 obj.perm_results = obj.permtestFcn(num_vars, obj.num_subs, obj.col, var1);
 
             end
@@ -296,7 +295,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             end
         end
 
-        function [behv_data, missedtrials_slider] = handleMissedTrials(obj, behv_data)
+        function [behv_data, missedtrials_slider] = handleMissedTrials(~, behv_data)
             % HANDLEMISSEDTRIALS  Remove trials with missing RT or slider responses.
             %
             %   [BEHV_DATA, MISSEDTRIALS_SLIDER] = handleMissedTrials(OBJ, BEHV_DATA)
@@ -375,7 +374,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             ygaze_signal(missedtrials_slider == 1, :) = [];
         end
 
-        function residual = remove_rt_effects(obj, pupil,rt)
+        function residual = remove_rt_effects(~, pupil,rt)
             % NOTE: code is based on Urai et al., 2017
             % function REMOVE_RT_EFFECTS removes trial-by-trial variations in pupil
             % signal caused by very slow/long RTs
@@ -453,16 +452,15 @@ classdef PupilRegression_intHet < pupilReg_Vars
             
             % Remove trials with zero prediction error 
             % (not useful for regression since predicted UP would be 0 as well)
-            % todo: just rename since the identified number is the zero PE, not the valide ones
-            validIndices = find(preds.pe == 0); 
-            preds(validIndices, :) = [];
-            zsc_pupil(validIndices, :) = [];
-            xgaze_signal(validIndices, :) = [];
-            ygaze_signal(validIndices, :) = [];
+            invalidIndices = find(preds.pe == 0); 
+            preds(invalidIndices, :) = [];
+            zsc_pupil(invalidIndices, :) = [];
+            xgaze_signal(invalidIndices, :) = [];
+            ygaze_signal(invalidIndices, :) = [];
 
             % Remove corresponding baseline trials if applicable
             if obj.baseline_mdl == 1
-                zsc_base(validIndices, :) = [];
+                zsc_base(invalidIndices, :) = [];
             end
         end
 
@@ -595,10 +593,6 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 'VariableNames', {'pupil','xgaze','ygaze','zsc_condiff','signed_pe', ...
                 'pe','zsc_up','rt','condition','ecoperf','reward','pe_condiff'});
 
-            % if obj.baseline_mdl == 1
-            %     tbl.baseline = zsc_base(validIdx);
-            % end
-
             % Fit linear regression model
             [betas, ~, ~, ~, lm] = obj.externalFitFcn(tbl, obj.model_def, ...
                 obj.pred_vars, obj.resp_var, obj.cat_vars, obj.num_vars, 0);
@@ -620,7 +614,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
         function [x1_z, x2_z, rt_z, up_z, zsc_pupil, xgaze_z, ygaze_z, dq] = ...
                 preprocessSignals(obj, zsc_pupil, xgaze_signal, ygaze_signal, preds_bins, subj_idx)
-            % PREPROCESSSIGNALS  Z-score predictors and gaze signals, remove NaN
+            % PREPROCESSSIGNALS Z-score predictors and gaze signals, remove NaN
             %   rows, and create a DataQueue for parfor progress reporting.
             %
             %
@@ -705,14 +699,13 @@ classdef PupilRegression_intHet < pupilReg_Vars
             %     preds_bins   - Predictor table for the current bin.
             %     subj_idx     - 1-based subject index.
 
-            % Extract all obj fields into plain variables (parfor-safe)
+            % Extract all obj fields into plain variables
             col        = obj.col;
-            n_sp       = obj.n_sp;
-            lb         = obj.lb;
-            ub         = obj.ub;
-            foptions   = obj.fmincon_options;
+            n_sp_parfor = obj.n_sp;
+            lb_parfor = obj.lb;
+            ub_parfor = obj.ub;
+            foptions = obj.fmincon_options;
             num_params = obj.num_vars + 1;
-            % bestParams = obj.p0;
             starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
 
             [x1_z, x2_z, rt_z, up_z, zsc_pupil, xgaze_z, ygaze_z, dq] = ...
@@ -731,9 +724,9 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
                 bestNegLL  = inf;
                 bestParams = zeros(1, num_params); % safe parfor initialisation
-                for i = 1:n_sp
-                    p0 = squeeze(starts_subj(c, i, :))';
-                    [p_est, nLL_val] = fmincon(negLLfun, p0, [], [], [], [], lb, ub, [], foptions);
+                for i = 1:n_sp_parfor
+                    p0_parfor = squeeze(starts_subj(c, i, :))';
+                    [p_est, nLL_val] = fmincon(negLLfun, p0_parfor, [], [], [], [], lb_parfor, ub_parfor, [], foptions);
                     if nLL_val < bestNegLL
                         bestNegLL  = nLL_val;
                         bestParams = p_est;
@@ -765,11 +758,11 @@ classdef PupilRegression_intHet < pupilReg_Vars
             %     preds_bins   - Predictor table for the current bin
             %     subj_idx     - 1-based subject index
 
-            % Extract all obj fields into plain variables (parfor-safe)
-            col        = obj.col;
-            lb         = obj.lb;
-            ub         = obj.ub;
-            foptions   = obj.fmincon_options;
+            % Extract all obj fields into plain variables
+            col = obj.col;
+            lb_parfor = obj.lb;
+            ub_parfor = obj.ub;
+            foptions = obj.fmincon_options;
             num_params = obj.num_vars + 1;
             bestParams = obj.p0;
 
@@ -779,7 +772,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
             % Pre-allocate outputs
             negLL_row = nan(1, col);
             betas_row = nan(col, num_params);
-            starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
+            %starts_subj = squeeze(obj.starting_points(subj_idx, :, :, :));
 
             for c = 1:col
                 y     = zsc_pupil(:, c);
@@ -788,14 +781,14 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 negLLfun = @(params) PupilRegression_intHet.negativeLogLikelihood( ...
                     params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); %#ok<PFBNS>
 
-                bestNegLL  = inf;
+                %bestNegLL  = inf;
                 % bestParams = obj.p0;
-                [p_est, nLL_val] = fmincon(negLLfun, bestParams, [], [], [], [], lb, ub, [], foptions);
+                [p_est, nLL_val] = fmincon(negLLfun, bestParams, [], [], [], [], lb_parfor, ub_parfor, [], foptions);
                 bestNegLL  = nLL_val;
                 bestParams = p_est;
-                p0 = bestParams;
+                %p0 = bestParams;
 
-                k            = num_params;
+                %k            = num_params;
                 negLL_row(c) = bestNegLL;
                 betas_row(c, :) = bestParams;
                 % Notify main thread: one timepoint done
