@@ -180,8 +180,8 @@ betas_struct = importdata("param_estimates_het_linearInt_ForPregenSP.mat");
 [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
 
 % Save results
-safe_saveall("minHetParams_linearIntabs.mat", minCoeff);
-safe_saveall("maxHetParams_linearIntabs.mat", maxCoeff);
+safe_saveall(fullfile(het_save_dir, "minHetParams_linearIntabs.mat"), minCoeff);
+safe_saveall(fullfile(het_save_dir, "maxHetParams_linearIntabs.mat"), maxCoeff);
 
 %% Process Cubic Spline Model
 fprintf('Processing Cubic Spline parameters...\n');
@@ -189,8 +189,8 @@ betas_struct = importdata("param_estimates_het_CS_ForPregenSP.mat");
 [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
 
 % Save results
-safe_saveall("minHetParams_CSabs.mat", minCoeff);
-safe_saveall("maxHetParams_CSabs.mat", maxCoeff);
+safe_saveall(fullfile(het_save_dir, "minHetParams_CSabs.mat"), minCoeff);
+safe_saveall(fullfile(het_save_dir, "maxHetParams_CSabs.mat"), maxCoeff);
 
 %% Process Deconvolution Model
 fprintf('Processing Deconvolution parameters...\n');
@@ -198,8 +198,8 @@ betas_struct = importdata("param_estimates_het_deconv_ForPregenSP.mat");
 [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
 
 % Save results
-safe_saveall("minHetParams_deconvolutionabs.mat", minCoeff);
-safe_saveall("maxHetParams_deconvolutionabs.mat", maxCoeff);
+safe_saveall(fullfile(het_save_dir, "minHetParams_deconvolutionabs.mat"), minCoeff);
+safe_saveall(fullfile(het_save_dir, "maxHetParams_deconvolutionabs.mat"), maxCoeff);
 
 fprintf('All bounds calculated and saved successfully.\n');
 
@@ -214,8 +214,8 @@ rng(123)
 
 %% SP for linear interpolation ...
 
-minBound = importdata("minHetParams_linearIntabs.mat");
-maxBound = importdata("maxHetParams_linearIntabs.mat");
+minBound = importdata(fullfile(het_save_dir, "minHetParams_linearIntabs.mat"));
+maxBound = importdata(fullfile(het_save_dir, "maxHetParams_linearIntabs.mat"));
 
 startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
 
@@ -229,12 +229,12 @@ for n = 1:nSubjs
     end
 end
 
-safe_saveall("startingPoints_linearInt.mat",startingPoints)
+safe_saveall(fullfile(het_save_dir, "startingPoints_linearInt.mat"),startingPoints)
 
 %% SP for cubic-spline int ...
 
-minBound = importdata("minHetParams_CSabs.mat");
-maxBound = importdata("maxHetParams_CSabs.mat");
+minBound = importdata(fullfile(het_save_dir, "minHetParams_CSabs.mat"));
+maxBound = importdata(fullfile(het_save_dir, "maxHetParams_CSabs.mat"));
 
 startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
 
@@ -248,12 +248,12 @@ for n = 1:nSubjs
     end
 end
 
-safe_saveall("startingPoints_CS.mat",startingPoints)
+safe_saveall(fullfile(het_save_dir, "startingPoints_CS.mat"),startingPoints)
 
 %% SP for deconvolution-based preprocessing
 
-minBound = importdata("minHetParams_deconvolutionabs.mat");
-maxBound = importdata("maxHetParams_deconvolutionabs.mat");
+minBound = importdata(fullfile(het_save_dir, "minHetParams_deconvolutionabs.mat"));
+maxBound = importdata(fullfile(het_save_dir, "maxHetParams_deconvolutionabs.mat"));
 
 startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
 
@@ -267,7 +267,7 @@ for n = 1:nSubjs
     end
 end
 
-safe_saveall("startingPoints_deconv.mat",startingPoints)
+safe_saveall(fullfile(het_save_dir, "startingPoints_deconv.mat"),startingPoints)
 
 
 function [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width)

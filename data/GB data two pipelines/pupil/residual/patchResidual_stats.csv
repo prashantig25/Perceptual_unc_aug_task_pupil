@@ -1,5 +1,6 @@
 term,pval
 pupil_choicePhase,0.005
-condiff_choicePhase,0.089
+ppc,0.001
+condiff_choicePhase,0.105
 condition_choicePhase,0
 muZsc_choicePhase,0

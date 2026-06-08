@@ -19,6 +19,19 @@ num_sess  = importdata("num_sess.mat");
 numSubjs  = length(num_sess);
 col       = 300;
 
+currentDir = cd; % current directory
+reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+pathParts = strsplit(currentDir, filesep);
+if startsWith(pathParts{end}, reqPath)
+    disp('Current directory is already the desired path. No need to run createSavePaths.');
+    desiredPath = currentDir;
+else
+    % Call the function to create the desired path
+    desiredPath = createSavePaths(currentDir, reqPath);
+end
+
+save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses');
+
 %% Loop over both model types
 for m = 1:length(models)
 
@@ -34,6 +47,6 @@ for m = 1:length(models)
     statTbl = table({models(m).name}, round(mean(partial_rsq), 2), ...
                     'VariableNames', {'name', 'partial_R2'});
 
-    safe_saveall(models(m).csv_out, statTbl);
+    safe_saveall(fullfile(save_dir, models(m).csv_out), statTbl);
 
 end

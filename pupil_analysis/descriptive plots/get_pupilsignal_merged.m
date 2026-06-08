@@ -118,7 +118,7 @@ baseline = "event-specific";
 
 % Save directories
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb linearInt');
 dirs = {
     'save_dir',  save_dir;
 };
@@ -320,7 +320,7 @@ baseline = "event-specific";
 
 % Save directory
 save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 cubic spline new');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb cubic spline new');
 dirs = {
     'save_dir',  save_dir;
     'preproc_dir',  preproc_dir;
