@@ -18,11 +18,14 @@ else
 end
 
 main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
-alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for supplement');
 
 % Load heteroskedastic model coefficient names and find PExCondiff index dynamically
 het_coeff_names = importdata(fullfile(alt_dir, 'coeff_names_hetero.mat'));
 pe_condiff_idx_het = find(strcmp(het_coeff_names, 'PE'));
+subj_ids = importdata("subj_ids.mat");
+num_sess = importdata("num_sess.mat");
+num_subjs = length(num_sess);
 
 %% LOAD ALL DATA (9 original + 3 heteroskedasticity)
 

@@ -32,7 +32,7 @@ preds_all = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 het_save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', ...
-                        'regression', 'control analyses for revisions');
+                        'regression', 'control analyses for supplement');
 if ~exist(het_save_dir, 'dir'); mkdir(het_save_dir); end
 
 % Shared model specification
