@@ -29,7 +29,7 @@ preds_all    = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 het_save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', ...
-                        'regression', 'control analyses for revisions');
+                        'regression', 'control analyses for supplement');
 if ~exist(het_save_dir, 'dir'); mkdir(het_save_dir); end
 
 % Shared model specification
@@ -49,7 +49,7 @@ fprintf('====================================================\n');
 
 reg_het1 = PupilRegression_intHet();
 reg_het1.setSubjects(subj_ids, num_sess);
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
 reg_het1.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, het_save_dir);
 
 dirs = {
@@ -98,7 +98,7 @@ ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pup
 reg_het2 = PupilRegression_intHet();
 reg_het2.setSubjects(subj_ids, num_sess);
 reg_het2.setPaths(behv_dir, ...
-    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new'), ...
+    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb cubic spline new'), ...
     xgaze_dir, ygaze_dir, het_save_dir);
 reg_het2.setModel(model_def, pred_vars, cat_vars, num_params_hetero - 1);
 reg_het2.setHeteroskedasticConfig(importdata('minHetParams_CSabs.mat'), ...
