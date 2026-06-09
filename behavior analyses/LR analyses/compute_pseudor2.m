@@ -42,7 +42,7 @@ for m = 1:length(models)
 
     partial_rsq = compute_partialrsqSSE(SSE_baseline, SSE_best);
 
-    safe_saveall(models(m).mat_out, partial_rsq);
+    safe_saveall(fullfile(save_dir, models(m).mat_out), partial_rsq);
 
     statTbl = table({models(m).name}, round(mean(partial_rsq), 2), ...
                     'VariableNames', {'name', 'partial_R2'});
