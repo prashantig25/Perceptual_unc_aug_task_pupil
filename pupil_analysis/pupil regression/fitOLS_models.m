@@ -32,7 +32,7 @@ preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 fprintf('\n=== Running Analysis 1: Main Model (Figure 4) linear interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
@@ -79,7 +79,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 1: Main Model (Figure 4) cubic spline interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb cubic spline new');
@@ -128,7 +128,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis ADDITIVE MODEL linear interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
@@ -174,7 +174,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis ADDITIVE MODEL cubic spline interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb cubic spline new');
@@ -223,7 +223,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) linear interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
@@ -271,7 +271,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) cubic spline interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb cubic spline new');
@@ -321,7 +321,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) linear interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
@@ -368,7 +368,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) cubic spline interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb cubic spline new');
@@ -416,7 +416,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 5: Patch-Locked Pupil Dilation (Figure S9) ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'patch linear int');
@@ -463,7 +463,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 6: Non-baseline corrected Linear Interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb linearInt');
@@ -510,7 +510,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 6: Non-baseline corrected cubic spline interpolation ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb cubic spline new');
@@ -558,7 +558,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb deconv');
@@ -607,7 +607,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 10: Main Model - Deconvolution Pipeline ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'non-baseline corrected deconv');
@@ -656,7 +656,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 3: Regressed RT Model (Figure S8) ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb deconv');
@@ -705,7 +705,7 @@ reg.saveResults(tol);
 
 fprintf('\n=== Running Analysis 2: Binned Regression Approach (Figure 3c) ===\n');
 
-reg = PupilRegression_intHet();
+reg = PupilRegression();
 reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', filesep, 'alternate pipeline', filesep, 'pupil signal', filesep, 'fb deconv');

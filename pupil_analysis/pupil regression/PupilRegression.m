@@ -1,4 +1,4 @@
-classdef PupilRegression_intHet < pupilReg_Vars
+classdef PupilRegression < pupilReg_Vars
 
     properties
         % Results storage (inherited from original PupilRegression)
@@ -33,8 +33,8 @@ classdef PupilRegression_intHet < pupilReg_Vars
 
     methods
 
-        function obj = PupilRegression_intHet()
-            % PUPILREGRESSION_INTHET Construct a PupilRegression_intHet object.
+        function obj = PupilRegression()
+            % PUPILREGRESSION Construct a PupilRegression_intHet object.
             %   Outputs:
             %     obj - Initialised PupilRegression_intHet instance.
 
@@ -719,7 +719,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 y     = zsc_pupil(:, c);
                 xgaze = xgaze_z(:, c);
                 ygaze = ygaze_z(:, c);
-                negLLfun = @(params) PupilRegression_intHet.negativeLogLikelihood( ...
+                negLLfun = @(params) PupilRegression.negativeLogLikelihood( ...
                     params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); % todo: check this!! %#ok<PFBNS>
 
                 bestNegLL  = inf;
@@ -778,7 +778,7 @@ classdef PupilRegression_intHet < pupilReg_Vars
                 y     = zsc_pupil(:, c);
                 xgaze = xgaze_z(:, c);
                 ygaze = ygaze_z(:, c);
-                negLLfun = @(params) PupilRegression_intHet.negativeLogLikelihood( ...
+                negLLfun = @(params) PupilRegression.negativeLogLikelihood( ...
                     params, x1_z, x2_z, y, rt_z, up_z, xgaze, ygaze); %#ok<PFBNS>
 
                 %bestNegLL  = inf;

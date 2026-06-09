@@ -116,7 +116,7 @@ for s = 1:num_subs
 end
 
 % SAVE
-safe_saveall(strcat(save_dir, filesep, "4c_MathotComments_zscoredValues.mat"),posterior);
+safe_saveall(strcat(save_dir, filesep, "posteriorCurves_regression.mat"),posterior);
 
 %% INITIALIZE TILE LAYOUT
 figure(Position=[200,200,450,175])

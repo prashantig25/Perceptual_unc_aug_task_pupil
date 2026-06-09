@@ -55,7 +55,7 @@ fprintf('\n====================================================\n');
 fprintf('  PIPELINE 1: LINEAR INTERPOLATION\n');
 fprintf('====================================================\n');
 
-reg_het1 = PupilRegression_intHet();
+reg_het1 = PupilRegression();
 reg_het1.setSubjects(subj_ids, num_sess);
 reg_het1.setPaths(behv_dir, ...
     fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt'), ...
@@ -95,7 +95,7 @@ fprintf('====================================================\n');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS');
 
-reg_het2 = PupilRegression_intHet();
+reg_het2 = PupilRegression();
 reg_het2.setSubjects(subj_ids, num_sess);
 reg_het2.setPaths(behv_dir, ...
     fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb cubic spline new'), ...
@@ -135,7 +135,7 @@ fprintf('====================================================\n');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv');
 
-reg_het3 = PupilRegression_intHet();
+reg_het3 = PupilRegression();
 reg_het3.setSubjects(subj_ids, num_sess);
 reg_het3.setPaths(behv_dir, ...
     fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'alternate pipeline', 'pupil signal', 'fb deconv'), ...
