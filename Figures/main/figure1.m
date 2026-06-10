@@ -36,7 +36,7 @@ t.Padding = 'compact';
 
 ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color','k','HeadWidth',10);
 ar1.X = [0.47 0.54];
-ar1.Y = [0.525,0.525];
+ar1.Y = [0.5,0.5];
 
 ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color',low_PU,'HeadWidth',10);
 ar1.X = [0.7 0.7];
@@ -97,8 +97,8 @@ l1.ItemTokenSize = [7, 7];
 box off
 
 % Now set the header text manually
-l1.String{1} = '\bfUncertainty-weighted RL account'; % bold header
-l1.String{4} = '\bfClassic RL account'; % bold header
+l1.String{1} = '\bfUncertainty-weighted RL'; % bold header
+l1.String{4} = '\bfClassic RL'; % bold header
 box off
 
 % ADD ROTATED TEXT BOXES
@@ -192,4 +192,5 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'hypothesis7.png', '-dpng', '-r600') 
+% print(fig, 'hypothesis7.png', '-dpng', '-r600') 
+print(fig, 'Figure_1.png', '-dpng', '-r600') 

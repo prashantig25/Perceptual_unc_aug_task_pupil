@@ -47,7 +47,7 @@ fprintf('\n====================================================\n');
 fprintf('  PIPELINE 1: LINEAR INTERPOLATION\n');
 fprintf('====================================================\n');
 
-reg_het1 = PupilRegression_intHet();
+reg_het1 = PupilRegression();
 reg_het1.setSubjects(subj_ids, num_sess);
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
 reg_het1.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, het_save_dir);
