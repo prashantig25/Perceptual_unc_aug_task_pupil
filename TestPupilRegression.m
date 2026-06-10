@@ -1,4 +1,4 @@
-classdef TestPupilRegression < PupilRegression_intHet
+classdef TestPupilRegression < PupilRegression
     % Mock class for testing PupilRegression
     
     methods
