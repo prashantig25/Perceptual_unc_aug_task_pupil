@@ -137,7 +137,7 @@ ar1.X = [1 6];
 ar1.Y = [6,2];
 
 % ADD TEXTBOXES
-all_strings = {{'Fixation (1.6-2.1s)', ''},{'Choice options (0.5s)' ,''},{'Delay (0.2-0.5s)', ''},{'Go cue (1s)'},{'Delay (0.5-1s)', ''},{'Feedback (0.25s)', ''},{'Delay (0.5-1s)', ''},{'Slider (7s)', ''}};
+all_strings = {{'Fixation (1.6-2.1s)', ''},{'Choice options (0.5s)' ,''},{'Delay (0.2-0.5s)', ''},{'Go cue (1s)'},{'Delay (0.5-1s)', ''},{'Feedback (0.25s)', ''},{'Delay (0.5-1s)', ''},{'Slider (6s)', ''}};
 num_strings = 8;
 text_xpos = [2.3,3.45,4.6,5.75,6.9,8.05,9.2,10.35]-0.1;
 text_ypos = [8.9,8,7.1,6.2,5.3,4.4,3.5,2.6] + 0.1;
