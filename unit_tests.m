@@ -31,7 +31,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the initialization of the pupil-regression object.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
 
             % General properties
             testCase.verifyEqual(analyzer.betas_struct, struct())
@@ -101,7 +101,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the setSubjects function in pupilReg_Vars.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
 
             subj_ids = {'01', '02', '03'};
             num_sess = [1, 1, 2];
@@ -120,7 +120,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Test the setPaths function in pupilReg_Vars.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
 
             % Mock directories
             behv_dir = "my_path/raw_data";
@@ -142,7 +142,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the setModel in pupilReg_Vars.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
 
             % Set model parameters
             model_def = 'y ~ a + b';
@@ -162,7 +162,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the setFilenames function.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
 
             betas_save = 'a';
             perm_save = 'b';
@@ -271,7 +271,7 @@ classdef unit_tests < matlab.mock.TestCase
 
             % % Since this is sort of a wrapper function, we mock out
             % % multiple methods
-            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression_intHet, ...
+            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression, ...
                 "MockedMethods", ["loadBehavioralData",...
                 "handleMissedTrials", "loadPupilGazeData",...
                 "loadBaselineData", "getBehavioralPredictors",...
@@ -336,7 +336,7 @@ classdef unit_tests < matlab.mock.TestCase
             writetable(mockTable, fullFilePath);
 
             % Initialize analyzer
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
             analyzer.behv_dir = testDir;
             analyzer.subj_ids = {subjID};
             analyzer.num_sess = 1;
@@ -358,7 +358,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Tests the handleMissedTrials function.
 
             % Initialize pupil-regression object
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
 
             % Create behavioral data
             % We have 2 nan values that are expected to be removed.
@@ -429,7 +429,7 @@ classdef unit_tests < matlab.mock.TestCase
             save(fullFilePathYGaze, 'dummyData');
 
             % Initialize analyzer and add directory info for testing
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
             analyzer.pupil_dir = pupil_dir;
             analyzer.xgaze_dir = xgaze_dir;
             analyzer.ygaze_dir = ygaze_dir;
@@ -483,7 +483,7 @@ classdef unit_tests < matlab.mock.TestCase
             ygaze_signal = zeros(5, 5);
 
             % Initialize analyzer
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
 
             % Input variables and attributes
             subj_idx = 1;
@@ -509,7 +509,7 @@ classdef unit_tests < matlab.mock.TestCase
             % In this case with binnedAnalysis == 1
 
             % Mock out two functions and define their behavior
-            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression_intHet, ...
+            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression, ...
                 "MockedMethods", ["getBinnedData", "fitModelAtTimepoint"]);
             testCase.assignOutputsWhen(withAnyInputs(behavior.getBinnedData), 1, 2, 3, 4, 5);
             testCase.assignOutputsWhen(withAnyInputs(behavior.fitModelAtTimepoint), 0);
@@ -543,7 +543,7 @@ classdef unit_tests < matlab.mock.TestCase
             % In this case w binnedAnalysis == 0
 
             % Mock out two functions and define their behavior
-            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression_intHet, ...
+            [mockPupilRegression, behavior] = testCase.createMock(?PupilRegression, ...
                 "MockedMethods", "fitModelAtTimepoint");
             testCase.assignOutputsWhen(withAnyInputs(behavior.fitModelAtTimepoint), 40, 50, 60);
 
@@ -590,7 +590,7 @@ classdef unit_tests < matlab.mock.TestCase
 
             % Non-binned case: we expect that only correct choices are
             % selected
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
             analyzer.binned = 0;
             analyzer.binned_accuracy = 1;
             r = 1;
@@ -608,7 +608,7 @@ classdef unit_tests < matlab.mock.TestCase
             % Test fitModelAtTimepoint function
 
             % Initialize analyzer
-            analyzer = PupilRegression_intHet();
+            analyzer = PupilRegression();
 
             % Define mock data
             mockBetas = [2, 10, 7, 1];

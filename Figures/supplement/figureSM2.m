@@ -4,7 +4,7 @@ clc
 clearvars
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil-main';
+reqPath    = 'Perceptual_unc_aug_task_pupil';
 pathParts  = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -92,6 +92,9 @@ t_stats  = NaN(1, size(betas_RT, 2));
 for i = 1:size(betas_RT, 2)
     [~, p_values(i), ~, stats] = ttest(betas_RT(:, i));
     t_stats(i) = stats.tstat;
+    if p_values(i) < 0.001
+        p_values(i) = 0.001;
+    end
 end
 
 % 3. Prepare data for bar_plots_pval
@@ -155,10 +158,33 @@ for i = 1:3
 end
 
 % Save statistics
+% termString = {"condition"; "condiff"; "PE_prevTrial"};
+% T = table(termString, round(p_values,3).', 'VariableNames', {'term', 'pValuesRT'});
+% saveStat = fullfile(desiredPath,"data","GB data two pipelines","pupil","stats");
+% safe_saveall(strcat(saveStat, filesep, 'RTRegression_previousTrial.csv'), T);
+
+% Save statistics
 termString = {"condition"; "condiff"; "PE_prevTrial"};
-T = table(termString, round(p_values,3).', 'VariableNames', {'term', 'pValuesRT'});
+
+% Compute 95% CI
+df = numSubjs - 1;
+t_crit = tinv(0.975, df);
+CI_low  = mean_betas' - t_crit * SEM_betas';
+CI_high = mean_betas' + t_crit * SEM_betas';
+
+T = table(termString, ...
+    round(t_stats,3).', ...
+    repmat(df, 3, 1), ...
+    round(mean_betas,3).', ...
+    round(SEM_betas,3).', ...
+    round(CI_low,3), ...
+    round(CI_high,3), ...
+    round(p_values,3).', ...
+    'VariableNames', {'term','t_stat','df','mean','SEM','CI_low','CI_high','pValuesRT'});
+
 saveStat = fullfile(desiredPath,"data","GB data two pipelines","pupil","stats");
 safe_saveall(strcat(saveStat, filesep, 'RTRegression_previousTrial.csv'), T);
+
 
 % Save figure
 fig = gcf;

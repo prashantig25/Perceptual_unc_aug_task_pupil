@@ -14,9 +14,9 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_mathot_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
 coeff_names = betas_struct.coeff_names;
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_mathot_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condif_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
 
 pe_idx = find(strcmp(coeff_names,'pe'));
 xgaze_idx = find(strcmp(coeff_names,'xgaze'));

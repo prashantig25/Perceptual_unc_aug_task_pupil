@@ -26,6 +26,7 @@ ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pup
 preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
 preds_all = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
+tol = 1e-9; %1e-12;
 
 %% ANALYSIS 1: MAIN MODEL (Figure 4)
 %%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%%%%%%%%
@@ -70,7 +71,6 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', '', '');
 
 reg.runAnalysis();
-tol = 1e-9; %1e-12;
 %tol = 1e-12;
 reg.saveResults(tol);
 
@@ -500,7 +500,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_linearInt', 'perm_pe_condiff_mathot_nonBaselineCorrected_linearInt', '', '');
+reg.setFileNames('pe_condiff_nonBaselineCorrected_linearInt', 'perm_pe_condiff_nonBaselineCorrected_linearInt', '', '');
 
 reg.runAnalysis();
 reg.saveResults(tol);
@@ -549,7 +549,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', 'perm_pe_condiff_mathot_nonBaselineCorrected_cubicSplineNew', '', '');
+reg.setFileNames('pe_condiff_nonBaselineCorrected_cubicSplineNew', 'perm_pe_condiff_nonBaselineCorrected_cubicSplineNew', '', '');
 
 reg.runAnalysis();
 reg.saveResults(tol);
@@ -598,7 +598,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG', 'perm_pe_condiff_deconvolution_updatedClusterStat_saccCorr_uraiParams_PG', '', '');
+reg.setFileNames('pe_condiff_deconvolution', 'perm_pe_condiff_deconvolution', '', '');
 
 reg.runAnalysis();
 reg.saveResults(tol);
@@ -647,7 +647,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG', 'perm_pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG', '', '');
+reg.setFileNames('pe_condiff_deconvolution_nonBaselineCorrected', 'perm_pe_condiff_deconvolution_nonBaselineCorrected', '', '');
 
 reg.runAnalysis();
 reg.saveResults(tol);
@@ -696,7 +696,7 @@ reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG', 'perm_pe_condiff_regressedRT_deconvolution_saccCorr_uraiParamsPG', '', '');
+reg.setFileNames('pe_condiff_regressedRT_deconvolution', 'perm_pe_condiff_regressedRT_deconvolution', '', '');
 
 reg.runAnalysis();
 reg.saveResults(tol);
@@ -746,7 +746,7 @@ reg.two_tailed          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
-reg.setFileNames('pe_condiff2bins_deconv_saccCorr_uraiParamsPG', 'perm_pe_condiff2bins_deconv_saccCorr_uraiParamsPG', '', '');
+reg.setFileNames('pe_condiff2bins_deconv', 'perm_pe_condiff2bins_deconv', '', '');
 
 reg.runAnalysis();
 reg.saveResults(tol);

@@ -1,4 +1,4 @@
-term,pValuesRT
-condition,0.748
-condiff,0
-PE_prevTrial,0.568
+term,t_stat,df,mean,SEM,CI_low,CI_high,pValuesRT
+condition,0.324,46,0.005,0.016,-0.027,0.038,0.748
+condiff,-5.886,46,-0.039,0.007,-0.052,-0.025,0.001
+PE_prevTrial,0.575,46,0.004,0.007,-0.01,0.018,0.568

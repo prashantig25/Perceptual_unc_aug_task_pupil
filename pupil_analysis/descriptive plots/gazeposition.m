@@ -43,11 +43,6 @@ PupilDescriptive.base_duration = 9; % todo: put in defaults
 
 fprintf("\n1. Gaze based on linear interpolation\n")
 
-% save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze linear int');
-% save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze linear int');
-
-% Todo: keep in mind to get rid of 'y-gaze linear int new' ultimately
-% (y-gaze linear int) once refactored
 save_xgaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'x-gaze linear int'); 
 save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'y-gaze linear int'); 
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
@@ -90,6 +85,8 @@ save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed cubic spline new trials and events added');
 PupilDescriptive.preproc_dir = preproc_dir;
+time_pupil = 1000; % time duration of the pupil
+time_base = 10; % time duration of the base
 
 dirs = {
     'save_xgaze',  save_xgaze;
@@ -131,6 +128,8 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, ...
     'preprocessed trials and events added deconv');
 PupilDescriptive.preproc_dir = preproc_dir;
 % behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+time_pupil = 1000; % time duration of the pupil
+time_base = 10; % time duration of the base
 
 dirs = {
     'save_xgaze',  save_xgaze;
