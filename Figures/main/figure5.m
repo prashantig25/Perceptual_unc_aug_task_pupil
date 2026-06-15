@@ -1,4 +1,4 @@
-% figure5 plots results from the arousal and learning analysis.
+% Figure 5: plots results from the arousal and learning analysis.
 
 clc
 clearvars
