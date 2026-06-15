@@ -50,7 +50,11 @@ pe_idx = find(strcmp(coeff_names,'pe'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
 
 results = [results; table({'pe_main'}, round(min(perm.prob(pe_idx, perm.mask(pe_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
-results = [results; table({'peCondiff_main'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
+pVals = round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3);
+if pVals == 0.010
+    pVals = 0.010; % for the sake of MS
+end
+results = [results; table({'peCondiff_main'}, pVals, 'VariableNames', {'term', 'pval'})];
 
 %% Figure 5 MS - learning residual analysis
 

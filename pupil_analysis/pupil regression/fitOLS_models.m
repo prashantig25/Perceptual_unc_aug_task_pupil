@@ -26,6 +26,7 @@ ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pup
 preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
 preds_all = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
+tol = 1e-9; %1e-12;
 
 %% ANALYSIS 1: MAIN MODEL (Figure 4)
 %%%%%%%%% WITH LINEAR INTERPOLATION %%%%%%%%%%%%%%%%%
@@ -70,7 +71,6 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', '', '');
 
 reg.runAnalysis();
-tol = 1e-9; %1e-12;
 %tol = 1e-12;
 reg.saveResults(tol);
 

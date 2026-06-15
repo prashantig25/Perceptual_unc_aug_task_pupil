@@ -1,6 +1,6 @@
-Condition,HValue,PValue,TStat,df,mean,sem
-pe,1,0,5.1,46,0.09,0.018
-pe_condiff,1,0,5.27,46,0.1,0.019
-pe_salience,0,0.35,-0.94,46,-0.01,0.011
-pe_congruence,0,0.7135,-0.37,46,-0,0.008
-pe_pesign,1,0.0257,2.31,46,0.03,0.013
+Condition,HValue,PValue,TStat,df,mean,sem,CI_Lower,CI_Upper
+pe,1,0,5.097,46,0.093,0.018,0.056,0.13
+pe_condiff,1,0,5.27,46,0.102,0.019,0.063,0.141
+pe_salience,0,0.35,-0.944,46,-0.011,0.011,-0.033,0.012
+pe_congruence,0,0.714,-0.369,46,-0.003,0.008,-0.019,0.013
+pe_pesign,1,0.026,2.305,46,0.029,0.013,0.004,0.055
