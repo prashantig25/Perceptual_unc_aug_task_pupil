@@ -9,7 +9,7 @@
 % multiversePlot(coeffStringHet, coeffStringNormal)
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil';
+reqPath    = 'GBSliderPupil_NatComms';
 pathParts  = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;

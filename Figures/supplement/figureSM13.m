@@ -9,7 +9,7 @@ clearvars
 % multiversePlot(coeffStringHet, coeffStringNormal)
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil';
+reqPath    = 'GBSliderPupil_NatComms';
 pathParts  = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;
@@ -28,6 +28,9 @@ subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 num_subjs = length(num_sess);
 col = 300; 
+fontname = 'Arial';
+fontsize = 7;
+linewidth_plot = 1; 
 
 %% LOAD ALL DATA (9 original + 3 heteroskedasticity)
 
@@ -195,6 +198,8 @@ xlim_axes = [-300,2700];
 
 ax1 = nexttile(1,[1,1]);
 hold on
+
+xaxis = linspace(-300,2700,300);
 
 % Plot all 12 standardized curves
 plot(xaxis, mean1, 'Color', color_linear, 'LineWidth', 2, 'LineStyle', '-', 'DisplayName', 'Linear');

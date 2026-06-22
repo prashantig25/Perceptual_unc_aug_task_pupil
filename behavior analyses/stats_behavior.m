@@ -8,7 +8,7 @@ clearvars
 % USER-BASED PATH
 currentDir = cd; % current directory
 pathParts = strsplit(currentDir, filesep);
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;

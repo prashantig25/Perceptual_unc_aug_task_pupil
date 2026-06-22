@@ -2,7 +2,7 @@ clc
 clearvars
 % USER-BASED PATH
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil';
+reqPath = 'GBSliderPupil_NatComms';
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -39,8 +39,8 @@ results = [results; table({'pe_mainCS'}, round(min(perm.prob(pe_idx, perm.mask(p
 results = [results; table({'peCondiff_mainCS'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
 % Deconv
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_deconvolution.mat"));
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_deconvolution.mat"));
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"perm_pe_condiff_deconvolution.mat"));
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"pe_condiff_deconvolution.mat"));
 coeff_names = betas_struct.coeff_names;
 pe_idx = find(strcmp(coeff_names,'pe'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
@@ -50,8 +50,8 @@ results = [results; table({'peCondiff_mainDeconv'}, round(min(perm.prob(peCondif
 
 %% figure S10 MS - non-baseline corrected
 
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_nonBaselineCorrected_linearInt.mat"));
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_nonBaselineCorrected_linearInt.mat"));
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"perm_pe_condiff_nonBaselineCorrected_linearInt.mat"));
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"pe_condiff_nonBaselineCorrected_linearInt.mat"));
 coeff_names = betas_struct.coeff_names;
 pe_idx = find(strcmp(coeff_names,'pe'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
@@ -60,8 +60,8 @@ results = [results; table({'pe_NBC'},       round(min(perm.prob(pe_idx,       pe
 results = [results; table({'peCondiff_NBC'}, round(min(perm.prob(peCondiff_idx, perm.prob(peCondiff_idx,:) < 0.05)), 3), 'VariableNames', {'term', 'pval'})];
 
 % CS
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_nonBaselineCorrected_cubicSplineNew.mat"));
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_nonBaselineCorrected_cubicSplineNew.mat"));
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"perm_pe_condiff_nonBaselineCorrected_cubicSplineNew.mat"));
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"pe_condiff_nonBaselineCorrected_cubicSplineNew.mat"));
 coeff_names = betas_struct.coeff_names;
 pe_idx = find(strcmp(coeff_names,'pe'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
@@ -70,8 +70,8 @@ results = [results; table({'pe_NBC_CS'},       round(min(perm.prob(pe_idx,      
 results = [results; table({'peCondiff_NBC_CS'}, round(min(perm.prob(peCondiff_idx, perm.prob(peCondiff_idx,:) < 0.05)), 3), 'VariableNames', {'term', 'pval'})];
 
 % Deconv
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG.mat"));
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_deconvolution_nonBaselineCorrected_saccCorr_uraiParamsPG.mat"));
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"perm_pe_condiff_deconvolution_nonBaselineCorrected.mat"));
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"pe_condiff_deconvolution_nonBaselineCorrected.mat"));
 coeff_names = betas_struct.coeff_names;
 pe_idx = find(strcmp(coeff_names,'pe'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
@@ -101,9 +101,9 @@ results = [results; table({'pe_regressedRT_CS'},        round(min(perm.prob(pe_i
 results = [results; table({'peCondiff_regressedRT_CS'}, round(min(perm.prob(peCondiff_idx, perm.mask(peCondiff_idx,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 
 % Deconv
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_regressedRT_deconvolution.mat"));
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"pe_condiff_regressedRT_deconvolution.mat"));
 coeff_names = betas_struct.coeff_names;
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condiff_regressedRT_deconvolution.mat"));
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"perm_pe_condiff_regressedRT_deconvolution.mat"));
 pe_idx = find(strcmp(coeff_names,'pe'));
 peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
 
