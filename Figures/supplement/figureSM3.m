@@ -9,7 +9,7 @@ binnedDotsColor = [159, 210, 235]./255; % bluish green color for binned analysis
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -23,7 +23,7 @@ end
 subplot(1,3,1)
 
 % Load and process human data
-data = readtable("preprocessed_lr_agent.xlsx");
+data = importdata("preprocessed_agentpupil0.06.mat");
 uniqueID = unique(data.ID);
 numSubjs = length(uniqueID);
 sigma = 0.06;
@@ -88,6 +88,7 @@ end
 % Plot group mean and error bars
 hold on
 scatter(1:nbins, mean(BS_diff_binned), 50, binnedDotsColor, 'filled','MarkerEdgeColor','k');
+lsline
 
 % Calculate correlation
 x_data_a = 1:nbins;
@@ -114,14 +115,13 @@ set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
 subplot(1,3,2)
 
 % Load and process agent data
-agent_data = importdata("preprocessed_agent.mat");
+agent_data = importdata("preprocessed_agentpupil0.06.mat");
+
+numSims = 300;
+simID = 1:300;
 
 % Compute bins
 bins = createCondiffBins(agent_data.contrast_diff);
-
-% IDs 
-numSims = 99;
-simID = 1:numSims;
 
 % Compute mean and SEM learning rates
 [avg_ydataLR, sem_ydataLR] = computeMeanLR(agent_data, bins, nbins, numSims, simID);
@@ -165,7 +165,3 @@ fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the current
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
 print(fig, 'LRcondiff_BS.png', '-dpng', '-r600')
 
-%% Control plot
-figure()
-hold on
-scatter(1:nbins, mean(BS0_binned), 50, binnedDotsColor, 'filled','MarkerEdgeColor','k');

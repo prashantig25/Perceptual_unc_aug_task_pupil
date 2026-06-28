@@ -42,8 +42,8 @@ perc_avg = mean(perc_ecoperf,1);
 mean_avg = [mix_avg; perc_avg;];
 
 % SEM ACROSS SUBJECTS
-mix_sd = std(mix_ecoperf,1)/sqrt(num_subjs);
-perc_sd = std(perc_ecoperf,1)/sqrt(num_subjs);
+mix_sd = std(mix_ecoperf,0)/sqrt(num_subjs);
+perc_sd = std(perc_ecoperf,0)/sqrt(num_subjs);
 mean_sd = [mix_sd; perc_sd;];
 xticks = [1; 2];
 
