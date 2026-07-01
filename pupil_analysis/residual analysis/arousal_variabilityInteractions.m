@@ -21,7 +21,7 @@ else
 end
 
 betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
-coeff_names = betas_pupil.coeff_names; % importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+coeff_names = betas_pupil.coeff_names; 
 pupil_idx = find(strcmp(coeff_names,'pupil'));
 up_idx = find(strcmp(coeff_names,'post_up'));
 pePupil_idx = find(strcmp(coeff_names,'pe:pupil'));

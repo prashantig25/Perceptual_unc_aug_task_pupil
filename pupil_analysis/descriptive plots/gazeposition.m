@@ -13,9 +13,8 @@ subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 num_subs = length(subj_ids);
 pre_duration = 29; % set duration for start of pre-event signal (note: good idea to use some pre-event signal)
-time_pupil = 1000; % time duration of the pupil
-time_base = 10; % time duration of the base
 event_name = 'feedback'; % which event
+time_base = 10; % baseline length
 
 % SETUP PATHS (common to both pipelines)
 currentDir = cd; % current directory
@@ -48,6 +47,9 @@ save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed linear int trials and events added');
 PupilDescriptive.preproc_dir = preproc_dir;
+
+time_pupil = 1000; % time duration of the pupil
+time_base = 10; % time duration of the base
 
 dirs = {
     'save_xgaze',  save_xgaze;
@@ -85,6 +87,9 @@ save_ygaze = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',
 preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', ...
     filesep, 'preprocessed cubic spline new trials and events added');
 PupilDescriptive.preproc_dir = preproc_dir;
+
+% Re-initialize in case one wants to get the gaze data independently for
+% this pipeline
 time_pupil = 1000; % time duration of the pupil
 time_base = 10; % time duration of the base
 
@@ -128,6 +133,9 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, ...
     'preprocessed trials and events added deconv');
 PupilDescriptive.preproc_dir = preproc_dir;
 % behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
+
+% Re-initialize in case one wants to get the gaze data independently for
+% this pipeline
 time_pupil = 1000; % time duration of the pupil
 time_base = 10; % time duration of the base
 
@@ -185,6 +193,9 @@ if ~exist(save_ygaze, 'dir')
     mkdir(save_ygaze);
 end
 
+% Re-initialize in case one wants to get the gaze data independently for
+% this pipeline and because time_pupil is different for patch-based gaze
+% and pupil data
 time_pupil = 300; % time duration of the pupil
 event_name = 'choice'; % which event
 pre_duration = 29; % set duration for start of pre-event signal (note: good idea to use some pre-event signal)

@@ -23,7 +23,8 @@ end
 subplot(1,3,1)
 
 % Load and process human data
-data = importdata("preprocessed_agentpupil0.06.mat");
+sims_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses');
+data = importdata(fullfile(sims_dir, "preprocessed_agentpupil0.06.mat"));
 uniqueID = unique(data.ID);
 numSubjs = length(uniqueID);
 sigma = 0.06;

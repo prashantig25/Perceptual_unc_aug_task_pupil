@@ -16,7 +16,6 @@ subj_pupil_signal_pebin2correct = NaN(num_subs,col); % initialised array for PE 
 subj_pupil_signal_pebin1correct = NaN(num_subs,col); % initialised array for PE bin = 1
 subj_pupil_signal_pebin2incorrect = NaN(num_subs,col); % initialised array for PE bin = 2
 subj_pupil_signal_pebin1incorrect = NaN(num_subs,col); % initialised array for PE bin = 1
-plot_accuracy = 0; % get PE bins for accuracy
 
 % USER-BASED PATH
 currentDir = cd; % current directory
@@ -73,32 +72,15 @@ for i = 1:num_subs
     filename = strcat(pupil_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename);
 
-    if strcmp(timewindow,'patch') == 1
-        pupil_signal = pupil;
-    elseif strcmp(timewindow,'feedback') == 1
-        pupil_signal = pupil(:,1:col);
-        pupil_signal(missedSlider == 1,:) = [];
-    end
+    pupil_signal = pupil(:,1:col);
+    pupil_signal(missedSlider == 1,:) = [];
+
     pe_binedges = [0,0.5,1]; % set bin edges
     preds.bins = discretize(abs(preds.pe),pe_binedges); % bin data
 
-    subj_pupil_signal_pebin1(i,:) = nanmean(pupil_signal(preds.bins == 1,:));
-    subj_pupil_signal_pebin2(i,:) = nanmean(pupil_signal(preds.bins == 2,:));
+    subj_pupil_signal_pebin1(i,:) = mean(pupil_signal(preds.bins == 1,:));
+    subj_pupil_signal_pebin2(i,:) = mean(pupil_signal(preds.bins == 2,:));
     
-    % todo: is this used?
-    if plot_accuracy == 1
-        pupil_signalcorrect = pupil_signal(preds.correct == 1,:);
-        pupil_signalincorrect = pupil_signal(preds.correct == 0,:);
-
-        preds_incorrect = preds(preds.correct == 0,:);
-        preds_correct = preds(preds.correct == 1,:);
-
-        subj_pupil_signal_pebin1correct(i,:) = mean(pupil_signalcorrect(preds_correct.bins == 1,:));
-        subj_pupil_signal_pebin2correct(i,:) = mean(pupil_signalcorrect(preds_correct.bins == 2,:));
-
-        subj_pupil_signal_pebin1incorrect(i,:) = mean(pupil_signalincorrect(preds_incorrect.bins == 1,:));
-        subj_pupil_signal_pebin2incorrect(i,:) = mean(pupil_signalincorrect(preds_incorrect.bins == 2,:));
-    end
 end
 
 % RUN PERM TEST

@@ -7,7 +7,7 @@ clearvars
 % where do we used saved "sliderOnset"?
 % For each file: indicate which figure/code uses this
 % improve the "main" variable
-
+t
 %% ========================================================================
 %  SHARED INITIALIZATION - USED BY BOTH PIPELINES
 %  ========================================================================
@@ -57,7 +57,7 @@ PupilDescriptive.preproc_dir = preproc_dir;
 % 1.1 FEEDBACK-LOCKED PUPIL SIGNAL - TRIAL-SPECIFIC BASELINE
 % -------------------------------------------------------------------------
 
-% Basic regression attributes
+% Basic descriptive signal attributes
 time_pupil = 1000; % time window of interest
 time_base = 10; % baseline length
 event_name = 'feedback'; % trial phase

@@ -50,13 +50,9 @@ for n = 1:num_subjs
 
     % ADJUST FOR TRIAL MISSING PARTICIPANT
     if strcmp(subj_ids{n}, "4672")
-        % Block sizes for participant 4672:
-        % Blocks 1-5: 20 trials each
-        % Block 6:    19 trials % because interruption
-        % Blocks 7-8: 20 trials each
         block_sizes = [20, 20, 20, 20, 20, 19, 20, 20];
-        block_ends  = cumsum(block_sizes);           % [20, 40, 60, 80, 100, 119, 139, 159]
-        block_starts = [1, block_ends(1:end-1) + 1]; % [1,  21, 41, 61, 81, 101, 120, 140]
+        block_ends  = cumsum(block_sizes);           
+        block_starts = [1, block_ends(1:end-1) + 1]; 
     
         % Assign block number to each trial
         block_num = zeros(1, sum(block_sizes));
@@ -67,7 +63,7 @@ for n = 1:num_subjs
     end
 
     % CORRECT MU FOR CONGRUENCE
-    % futuretodo: no preprocessing at this stage. We should have one
+    % future todo: no preprocessing at this stage. We should have one
     % preprocessing file that is used consistently.
     data.flipped_mu = data.mu;
     for h = 1:height(data)
