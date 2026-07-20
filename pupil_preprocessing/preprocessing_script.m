@@ -20,7 +20,7 @@ using_DAT = 1; % always set to 0 if you are preprocessing files for the VERY (!!
 
 % SETUP PATHS (common to both pipelines)
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -76,11 +76,11 @@ prev_num_trials = 0; % number of trials from previous blocks
 num_trials_sess = 0; % number of trials for participants with multiple sessions
 add_eventstrials_func(subj_ids, num_sess, preproc_dir, save_dir, save_dirASC, behv_dir, prev_num_trials, num_trials_sess); 
 
-%% RUN MAIN PIPELINE (no filtering, cubic-spline interpolation)
+%% RUN PIPELINE (no filtering, cubic-spline interpolation)
 
 disp('===== RUNNING MAIN PIPELINE WITH CUBIC SPLINE INTERPOLATION =====');
-noFiltering = 1; % no filter applied (main MS pipeline)
-linearInt = 0; % cubic-spline interpolation (main MS pipeline)
+noFiltering = 1; % no filter applied (supplement pipeline)
+linearInt = 0; % cubic-spline interpolation (supplement pipeline)
 
 % Set up save directory for main pipeline
 save_dir_main = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed cubic spline new'); 

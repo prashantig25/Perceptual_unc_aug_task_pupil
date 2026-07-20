@@ -14,7 +14,7 @@ font_size = 7;
 
 % Path setup
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil';
+reqPath = 'GBSliderPupil_NatComms';
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -54,9 +54,8 @@ perc_avg = mean(perc_ecoperf,1);
 mean_avg = [mix_avg; perc_avg;];
 
 % SEM ACROSS SUBJECTS
-% TODO: check 0 vs. 1 in Std
-mix_sd = std(mix_ecoperf, 0)/sqrt(num_subjs);
-perc_sd = std(perc_ecoperf, 0)/sqrt(num_subjs);
+mix_sd = std(mix_ecoperf,0)/sqrt(num_subjs);
+perc_sd = std(perc_ecoperf,0)/sqrt(num_subjs);
 mean_sd = [mix_sd; perc_sd;];
 xticks = [1; 2];
 

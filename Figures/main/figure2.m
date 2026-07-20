@@ -11,7 +11,7 @@ save_csv = 1; % save stats for 2(d) in CSV file for overleaf
 
 % Path setup
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil';
+reqPath = 'GBSliderPupil_NatComms';
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');

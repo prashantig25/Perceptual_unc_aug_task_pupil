@@ -1,15 +1,21 @@
 % Multiverse plot with standardized values
 % for PE coefficient
 
-% clc
-% clearvars
+clc
+clearvars
+
+col = 300; 
+xaxis = linspace(-300,2700,300);
+fontname = 'Arial';
+fontsize = 7;
+linewidth_plot = 1; 
 % 
 % coeffStringHet = 'PE';
 % coeffStringNormal = 'pe';
 % multiversePlot(coeffStringHet, coeffStringNormal)
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil';
+reqPath    = 'GBSliderPupil_NatComms';
 pathParts  = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;

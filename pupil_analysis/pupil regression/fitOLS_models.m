@@ -1,6 +1,6 @@
 clc
 clearvars
-
+p
 %% =======================================================================
 %                            SETUP COMMON PARAMETERS
 % =======================================================================
@@ -9,7 +9,7 @@ subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -62,8 +62,6 @@ reg.col                 = 300;
 reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -71,7 +69,6 @@ reg.residuals_predicted = 0;
 reg.setFileNames('pe_condiff_linearInt', 'perm_pe_condiff_linearInt', '', '');
 
 reg.runAnalysis();
-%tol = 1e-12;
 reg.saveResults(tol);
 
 %%
@@ -113,8 +110,6 @@ reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
 reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
-reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
@@ -159,8 +154,6 @@ reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
 reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
-reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
@@ -208,8 +201,6 @@ reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
 reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
-reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
@@ -256,8 +247,6 @@ reg.baseline_mdl        = 0;
 reg.binned              = 1;
 reg.bins                = prctile(preds_all.con_diff, 0:50:100);
 reg.bins_array          = 1:2;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
@@ -306,8 +295,6 @@ reg.baseline_mdl        = 0;
 reg.binned              = 1;
 reg.bins                = prctile(preds_all.con_diff, 0:50:100);
 reg.bins_array          = 1:2;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 
@@ -352,8 +339,6 @@ reg.col                 = 300;
 reg.regress_rt          = 1;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -401,8 +386,6 @@ reg.col                 = 300;
 reg.regress_rt          = 1;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -448,8 +431,6 @@ reg.col                 = 300;
 reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -494,8 +475,6 @@ reg.col                 = 300;
 reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -543,8 +522,6 @@ reg.col                 = 300;
 reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -592,8 +569,6 @@ reg.col                 = 300;
 reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -641,8 +616,6 @@ reg.col                 = 300;
 reg.regress_rt          = 0;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -690,8 +663,6 @@ reg.col                 = 300;
 reg.regress_rt          = 1;
 reg.baseline_mdl        = 0;
 reg.binned              = 0;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 0;
 reg.bins_array          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
@@ -741,8 +712,6 @@ reg.baseline_mdl        = 0;
 reg.binned              = 1;
 reg.bins                = prctile(preds_all.con_diff, 0:50:100);
 reg.bins_array          = 1:2;
-reg.binned_accuracy     = 0;
-reg.two_tailed          = 1;
 reg.preds_all           = preds_all;
 reg.residuals_predicted = 0;
 

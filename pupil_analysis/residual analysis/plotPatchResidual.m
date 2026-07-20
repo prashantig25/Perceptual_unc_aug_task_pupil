@@ -10,7 +10,7 @@ num_sess = importdata("num_sess.mat");
 numSubjs = length(num_sess);
 
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -23,6 +23,7 @@ preds_file = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 
 preds_all = readtable(preds_file);
 behv_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'raw data');
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'patch linear int');
+save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
 
 % Number of time points for pupil data
 col_patch = 130;
@@ -207,7 +208,7 @@ delete(ax2);
 % Prepare pupil time series data
 data_ts = squeeze(betas_pupil);
 perm = perm_results;
-safe_saveall("perm_residualPatch.mat", perm);
+safe_saveall(fullfile(save_dir, "perm_residualPatch.mat"), perm);
 
 col_len = size(data_ts, 2);
 time_points = linspace(-300, 1000, 130);
@@ -298,4 +299,4 @@ results = [results; table({'ppc'}, round(p, 3), 'VariableNames', {'term', 'pval'
 results = [results; table({'condiff_choicePhase'}, round(pVals(1), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'condition_choicePhase'}, round(pVals(2), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'muZsc_choicePhase'}, round(pVals(3), 3), 'VariableNames', {'term', 'pval'})];
-safe_saveall(fullfile('patchResidual_stats.csv'),results);
+safe_saveall(fullfile(save_dir, 'patchResidual_stats.csv'),results);

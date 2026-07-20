@@ -10,7 +10,7 @@ num_sess = importdata("num_sess.mat");
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -21,7 +21,7 @@ else
 end
 
 betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
-coeff_names = betas_pupil.coeff_names; % importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+coeff_names = betas_pupil.coeff_names; 
 pupil_idx = find(strcmp(coeff_names,'pupil'));
 up_idx = find(strcmp(coeff_names,'post_up'));
 pePupil_idx = find(strcmp(coeff_names,'pe:pupil'));

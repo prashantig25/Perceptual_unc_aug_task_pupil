@@ -4,7 +4,7 @@ clc
 clearvars
 
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -14,9 +14,9 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"pe_condiff_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
+betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"pe_condiff_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
 coeff_names = betas_struct.coeff_names;
-perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for revisions", filesep,"perm_pe_condif_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
+perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "control analyses for supplement", filesep,"perm_pe_condiff_nonBaselineCorrected_linearInt.mat")); % add PE bin curves
 
 pe_idx = find(strcmp(coeff_names,'pe'));
 xgaze_idx = find(strcmp(coeff_names,'xgaze'));

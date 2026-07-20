@@ -16,7 +16,7 @@ num_subjs = length(subj_ids); % number of subjects
 col = 300;
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil';
+reqPath    = 'GBSliderPupil_NatComms';
 pathParts  = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     desiredPath = currentDir;
@@ -25,7 +25,7 @@ else
 end
 
 main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
-alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for revisions');
+alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'control analyses for supplement');
 
 % Load heteroskedastic coefficient names and find index dynamically
 het_coeff_names    = importdata(fullfile(alt_dir, 'coeff_names_hetero.mat'));

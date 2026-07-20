@@ -7,7 +7,7 @@ clearvars
 % where do we used saved "sliderOnset"?
 % For each file: indicate which figure/code uses this
 % improve the "main" variable
-
+t
 %% ========================================================================
 %  SHARED INITIALIZATION - USED BY BOTH PIPELINES
 %  ========================================================================
@@ -24,7 +24,7 @@ base_duration = 9; % duration for baseline signal
 
 % SETUP PATHS (common to both pipelines)
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -57,7 +57,7 @@ PupilDescriptive.preproc_dir = preproc_dir;
 % 1.1 FEEDBACK-LOCKED PUPIL SIGNAL - TRIAL-SPECIFIC BASELINE
 % -------------------------------------------------------------------------
 
-% Basic regression attributes
+% Basic descriptive signal attributes
 time_pupil = 1000; % time window of interest
 time_base = 10; % baseline length
 event_name = 'feedback'; % trial phase

@@ -10,7 +10,7 @@ subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -71,8 +71,6 @@ reg_het1.col               = 300;
 reg_het1.regress_rt        = 0;
 reg_het1.baseline_mdl      = 0;
 reg_het1.binned            = 0;
-reg_het1.binned_accuracy   = 0;
-reg_het1.two_tailed        = 0;
 reg_het1.bins_array        = 1;
 reg_het1.residuals_predicted = 0;
 reg_het1.use_sp              = 1;
@@ -111,8 +109,6 @@ reg_het2.col               = 300;
 reg_het2.regress_rt        = 0;
 reg_het2.baseline_mdl      = 0;
 reg_het2.binned            = 0;
-reg_het2.binned_accuracy   = 0;
-reg_het2.two_tailed        = 0;
 reg_het2.bins_array        = 1;
 reg_het2.residuals_predicted = 0;
 reg_het2.use_sp              = 1;
@@ -152,8 +148,6 @@ reg_het3.col               = 300;
 reg_het3.regress_rt        = 0;
 reg_het3.baseline_mdl      = 0;
 reg_het3.binned            = 0;
-reg_het3.binned_accuracy   = 0;
-reg_het3.two_tailed        = 0;
 reg_het3.bins_array        = 1;
 reg_het3.residuals_predicted = 0;
 reg_het3.use_sp              = 1;
