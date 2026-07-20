@@ -24,11 +24,11 @@ else
     % Call the function to create the desired path
     desiredPath = createSavePaths(currentDir, reqPath);
 end
-fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
+fb_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
 
 % Plot properties
 xaxisMax = 1000;
-xaxis = linspace(-0.3,9.7,xaxisMax);
+xaxis = linspace(-0.3, 9.7, xaxisMax);
 
 % LOOP OVER SUBJECTS
 figure("Position",[100,100,400,400],"Visible","on")

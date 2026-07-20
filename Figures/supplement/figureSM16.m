@@ -1,4 +1,4 @@
-% This script runs logistic regressions on the patch phase to examine how much
+% Figure S16: This script runs a logistic regressions on the patch phase to examine how much
 % residual variance pupil data can explain
 
 clc
@@ -10,7 +10,7 @@ num_sess = importdata("num_sess.mat");
 numSubjs = length(num_sess);
 
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'Perceptual_unc_aug_task_pupil-main'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -91,6 +91,7 @@ end
 % Permutation test
 var1 = reshape(betas_pupil, [1, numSubjs, col_patch]); % [num_vars x num_subjs x col]
 perm_results = get_permtest_updated(1, numSubjs, col_patch, var1);
+
 % Plot results
 % ------------
 
@@ -112,7 +113,18 @@ num_subjs = size(betas_pupil, 1);
 neutral = [7, 53, 94]/255;
 
 % Tile layout
-figure('Position', [200, 200, 450, 200])
+f1 = figure;
+set(f1, 'Visible', 'on');
+
+% Size in CM
+width_cm = 13; 
+height_cm = 6;
+set(f1, 'Units', 'centimeters');
+set(f1, 'Position', [10, 10, width_cm, height_cm]);
+set(f1, 'PaperUnits', 'centimeters');
+set(f1, 'PaperSize', [width_cm, height_cm]);
+set(f1, 'PaperPosition', [0, 0, width_cm, height_cm]);
+
 t = tiledlayout(1, 2, 'Padding', 'compact', 'TileSpacing', 'compact');
 ax1 = nexttile(1);
 ax2 = nexttile(2);
@@ -172,7 +184,7 @@ adjust_figprops(ax1_new, font_name, font_size, line_width, xlim_vals, ylim_vals)
 multiline_labs = {
     sprintf('Perceptual\ncondition'), ...
     sprintf('Contrast\ndifference'), ...
-    sprintf('Reward prob.\n(previous trial)')
+    sprintf('Reward prob.\n(prev. trial)')
     };
 
 set(ax1_new, 'XTickLabels', {}); % clear any residual labels
@@ -193,7 +205,7 @@ plot(xlim, [0 0], 'k--', 'LineWidth', linewidth_plot);
 hold off
 
 % Title
-title('Behavioral Predictors', 'FontWeight', 'Normal', 'FontSize', font_size + 1);
+title('Behavioral predictors', 'FontWeight', 'Normal', 'FontSize', font_size + 1);
 
 % Subplot 2: pupil time course
 % ----------------------------
@@ -253,11 +265,12 @@ end
 
 % Adjust figure properties
 xlim([-300, 1000]);
+ylim([-0.165, 0.01])
 adjust_figprops(ax2_new, font_name, font_size, linewidth_plot);
 
 % Labels
 xlabel('Time since patch onset (ms)', 'FontSize', font_size);
-ylabel('Mean beta coefficient', 'FontWeight', 'normal', 'FontSize', font_size);
+ylabel('Pupil predictor', 'FontWeight', 'normal', 'FontSize', font_size);
 title('Pupil dilation in choice phase', 'FontWeight', 'Normal', 'FontSize', font_size + 1);
 
 hold off
@@ -268,7 +281,7 @@ hold off
 % Label for subplot 1
 ax1_pos = ax1_new.Position;
 adjust_x = -0.09;
-adjust_y = ax1_pos(4); % + 0.04;
+adjust_y = ax1_pos(4);
 [label_x, label_y] = change_plotlabel(ax1_new, adjust_x, adjust_y);
 annotation('textbox', [label_x label_y .05 .05], 'String', 'a', ...
     'FontSize', 12, 'LineStyle', 'none', ...
@@ -281,14 +294,27 @@ annotation('textbox', [label_x label_y .05 .05], 'String', 'b', ...
     'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
 
 % Do a ttest on PPC 
-ppcMean = mean(betas_ppc,2);
-[h,p] = ttest(ppcMean);
-p = 0.001; % for the sake of MS
+ppcMean = mean(betas_ppc, 2);
+[h, p] = ttest(ppcMean);
+if p < 0.001
+    p = 0.001; % for the sake of MS
+end
 
 % Save figure
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'coeffs_logRegModel_pupil.png', '-dpng', '-r600')
+fig = gcf;
+fig.PaperPositionMode = 'auto';
+% print(fig, 'coeffs_logRegModel_pupil.png', '-dpng', '-r600')
+% exportgraphics(gcf, 'Figure_SM16.pdf', 'ContentType', 'vector')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none';
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM16.pdf', style);
 
 % Save stats
 results = table({}, [], 'VariableNames', {'term', 'pval'});

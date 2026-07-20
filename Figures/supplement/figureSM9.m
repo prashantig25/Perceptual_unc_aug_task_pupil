@@ -18,15 +18,15 @@ betas_struct = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data
 coeff_names = betas_struct.coeff_names;
 perm = importdata(strcat(desiredPath, filesep, "data", filesep, "GB data two pipelines", filesep, "pupil", filesep, "regression", filesep, "main", filesep,"perm_pe_condiff_regressedRT_linearInt.mat")); % add PE bin curves
 
-pe_idx = find(strcmp(coeff_names,'pe'));
-xgaze_idx = find(strcmp(coeff_names,'xgaze'));
-ygaze_idx = find(strcmp(coeff_names,'ygaze'));
-up_idx = find(strcmp(coeff_names,'zsc_up'));
-condiff_idx = find(strcmp(coeff_names,'zsc_condiff'));
-rt_idx = find(strcmp(coeff_names,'rt'));
-peCondiff_idx = find(strcmp(coeff_names,'zsc_condiff:pe'));
+pe_idx = find(strcmp(coeff_names, 'pe'));
+xgaze_idx = find(strcmp(coeff_names, 'xgaze'));
+ygaze_idx = find(strcmp(coeff_names, 'ygaze'));
+up_idx = find(strcmp(coeff_names, 'zsc_up'));
+condiff_idx = find(strcmp(coeff_names, 'zsc_condiff'));
+rt_idx = find(strcmp(coeff_names, 'rt'));
+peCondiff_idx = find(strcmp(coeff_names, 'zsc_condiff:pe'));
 
-x = linspace(-300,2700,300); % x-axis
+x = linspace(-300, 2700, 300); % x-axis
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
 neutral = [7, 53, 94]/255;
@@ -36,16 +36,26 @@ line_style = '-'; % line style
 
 %% TILED LAYOUT
 
-figure(Position=[200,200,450,300])
+fig = figure;
+
+% Size in CM
+width_cm = 17; 
+height_cm = 10.5; 
+set(fig, 'Units', 'centimeters');
+set(fig, 'Position', [10, 10, width_cm, height_cm]);
+set(fig, 'PaperUnits', 'centimeters');
+set(fig, 'PaperSize', [width_cm, height_cm]);
+set(fig, 'PaperPosition', [0, 0, width_cm, height_cm]);
+
 hold on
 tiledlayout(2,4);
-ax1 = nexttile(1,[1,1]);
-ax2 = nexttile(2,[1,1]);
-ax3 = nexttile(3,[1,1]);
-ax4 = nexttile(4,[1,1]);
-ax5 = nexttile(5,[1,1]);
-ax6 = nexttile(6,[1,1]);
-ax7 = nexttile(7,[1,1]);
+ax1 = nexttile(1, [1, 1]);
+ax2 = nexttile(2, [1, 1]);
+ax3 = nexttile(3, [1, 1]);
+ax4 = nexttile(4, [1, 1]);
+ax5 = nexttile(5, [1, 1]);
+ax6 = nexttile(6, [1, 1]);
+ax7 = nexttile(7, [1, 1]);
 ax1_new = ax1;
 ax2_new = ax2;
 ax3_new = ax3;
@@ -53,25 +63,51 @@ ax4_new = ax4;
 ax5_new = ax5;
 ax6_new = ax6;
 ax7_new = ax7;
-axes_new = [ax1_new,ax2_new,ax3_new,ax4_new,ax5_new,ax6_new,ax7_new];
-axes_old = [ax1,ax2,ax3,ax4,ax5,ax6,ax7];
+axes_new = [ax1_new, ax2_new, ax3_new, ax4_new, ax5_new, ax6_new, ax7_new];
+axes_old = [ax1, ax2, ax3, ax4, ax5, ax6, ax7];
 
 %% PLOT COEFFICIENT CURVES
 
-ylabel_strings = [{"Uncertainty-modulated";"pupil"},{"PE-modulated";"pupil"},{"Uncertainty-weighted PE";"pupil"},{"UP-modulated";"pupil"},{"RT-modulated";"pupil"},{"x-gaze-modulated";"pupil"},{"y-gaze-modulated";"pupil"}];
-ncoeffs = [condiff_idx,pe_idx,peCondiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
+ylabel_strings = ["Uncertainty-modulated pupil", "PE-modulated pupil", "Uncertainty-weighted PE", "UP-modulated pupil", "RT-modulated pupil", "x-gaze-modulated pupil", "y-gaze-modulated pupil"];
+ncoeffs = [condiff_idx, pe_idx, peCondiff_idx, up_idx, rt_idx, xgaze_idx, ygaze_idx]; % order of coefficients
 
-xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02]; % position change for axes
-pval_position = [NaN,0.02,-0.01,-0.02,-0.1,0.1,0.1] * 200; % position to plot p-values
-pval_position_pos = [NaN,3,1,2,3.5,3.5,3.5,3,3,3]; % position to plot p-values
-ylim_lower = [-0.02,-0.04,-0.02,-0.025,-0.17,-0.1,-0.1]; % lower limit for y-axis
-ylim_upper = [0.01,0.07,0.025,0.05,0.15,0.15,0.05,-0.1]; % upper limit for y-axis
+xpos_change = [0, 0, 0, 0, 0, 0, 0]; % position change for axes
+pval_position = [NaN, 0.02, -0.01, -0.02, -0.1, 0.1, 0.1] * 200; % position to plot p-values
+pval_position_pos = [NaN, 3, 1, 2, 3.5, 3.5, 3.5, 3, 3, 3]; % position to plot p-values
+ylim_lower = [-0.02, -0.04, -0.02, -0.025, -0.17, -0.1, -0.1]; % lower limit for y-axis
+ylim_upper = [0.01, 0.07, 0.025, 0.05, 0.15, 0.15, 0.05, -0.1]; % upper limit for y-axis
+
+% Read out the positions calculated by tiledlayout
+first_plot_pos = axes_old(1).Position; 
+fifth_plot_pos = axes_old(5).Position; 
+
+start_left = first_plot_pos(1)-0.06; % inherit the exact left anchor from tile 1
+row1_bottom = first_plot_pos(2); % vertical position for plots 1-4
+row2_bottom = fifth_plot_pos(2); % vertical position for plot 5 (shifted down)
+plot_width = first_plot_pos(3); % keep the precise width of the tile
+plot_height = first_plot_pos(4); % keep the precise height of the tile
+
+% Define fixed horizontal gap
+horizontal_gap = 0.08;
 
 for a = 1:length(ncoeffs)
 
-    % POSITION CHANGE
-    new_pos = change_position(axes_old(a),[xpos_change(a),0,0,-0.02]);
-    axes_new(a) = axes('Units', 'Normalized', 'Position', new_pos); % update
+    if a <= 4
+        % Top row
+        exact_left = start_left + (a - 1) * (plot_width + horizontal_gap);
+        current_bottom = row1_bottom;
+    else
+        % Bottom row
+        col_idx = a - 4;
+        exact_left = start_left + (col_idx - 1) * (plot_width + horizontal_gap);
+        current_bottom = row2_bottom;
+    end
+    
+    % Construct the position vector
+    new_pos = [exact_left, current_bottom, plot_width, plot_height];
+    
+    % Generate the updated axis layer
+    axes_new(a) = axes('Units', 'Normalized', 'Position', new_pos);
     box(axes_new(a), 'off'); % remove box
     delete(axes_old(a)); % delete old axis
 
@@ -86,44 +122,39 @@ for a = 1:length(ncoeffs)
         end
     end
     hold on
-    color = color_cell;
     ySignal = mean(data_plot);
-    plot(x,ySignal,"Color",color{1,:},'LineWidth',2)
-    hold on
     color = cell2mat(color_cell);
-    shadedErrorBar(x,ySignal,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
+    shadedErrorBar(x, ySignal, std(data_plot)./sqrt(num_subjs), {'LineWidth', 2, "Color", color(1,:)}, 1)
 
     % PLOT PERMUTATION TEST
-    disp_perm = 1;
-    if disp_perm == 1
-        ylim_axes = [ylim_lower(a),ylim_upper(a)];
-        [pval_pos] = create_pvalpos(ylim_axes);
-        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), (pval_position(a))*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
-            [119, 119, 119]./255, 'markersize', 4);
-        p_val = min(unique(perm.prob(ncoeffs(a),perm.mask(ncoeffs(a),:) == 1)));
-    end
+    ylim_axes = [ylim_lower(a),ylim_upper(a)];
+    [pval_pos] = create_pvalpos(ylim_axes);
+    plot(x(find(perm.mask(ncoeffs(a),:) == 1)), (pval_position(a))*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
+        [119, 119, 119]./255, 'markersize', 4);
+    p_val = min(unique(perm.prob(ncoeffs(a),perm.mask(ncoeffs(a),:) == 1)));
+
     if p_val < 0.001
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),"\itp\rm < 0.001","FontSize",font_size,"FontName",font_name,"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.01
-            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",font_size,"FontName",font_name,"VerticalAlignment","middle","HorizontalAlignment","center")
     elseif p_val < 0.05 & p_val > 0.01
-            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
+            text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",font_size,"FontName",font_name,"VerticalAlignment","middle","HorizontalAlignment","center")
     end
 
     % ADJUST FIGURE PROPERTIES
-    adjust_figprops(axes_new(a),'Arial',7,0.5)
-    xlim([-300,2700])
+    adjust_figprops(axes_new(a), font_name, font_size, 0.5)
+    xlim([-300, 2700])
     xline(0,'--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')
-    ylabel(ylabel_strings(:,a))
+    ylabel(ylabel_strings(:, a))
 end
 
 %% ADD SUBPLOT LABELS
 
 ax1_pos = axes_new(a).Position;
-adjust_x = -0.07; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.03; % adjusted y-position for subplot label
+adjust_x = -0.06; % adjusted x-position for subplot label
+adjust_y = ax1_pos(4)+0.02; % adjusted y-position for subplot label
 [label_x,label_y] = change_plotlabel(axes_new(1),adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
@@ -154,6 +185,18 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 %% SAVE AS PNG
 
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'mdl_regressedRT1_linearInt1.png', '-dpng', '-r600')
+fig = gcf;
+fig.PaperPositionMode = 'auto'; 
+% print(fig, 'mdl_regressedRT1_linearInt1.png', '-dpng', '-r600')
+% exportgraphics(gcf, 'Figure_SM9.pdf', 'ContentType', 'vector')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none'; 
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM9.pdf', style);
+

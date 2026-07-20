@@ -22,7 +22,7 @@ else
 end
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses');
 
-data_subjs = readtable(strcat(behv_dir,filesep,"preprocessed_lr_pupil_no_zerope.xlsx"));
+data_subjs = readtable(strcat(behv_dir,filesep, "preprocessed_lr_pupil_no_zerope.xlsx"));
 id_subjs = unique(data_subjs.id);
 font_name = 'Arial'; % font name
 font_size = 7; % font size
@@ -53,14 +53,11 @@ for b = 1:nbins
         avg_ydata_bins(b,n) = mean(y_data_subj(bins_subj == b));
     end
 end
-avg_ydata = mean(avg_ydata_bins,2);
-sem_ydata = std(avg_ydata_bins,0,2)./sqrt(num_subjs);
-y = [avg_ydata_bins(1,:).';avg_ydata_bins(2,:).'];
-set(gca,'color','none','FontName',font_name,'FontSize',font_size,'YLim',[0,0.5], ...
-    'LineWidth',linewidth_axes,'YTick',[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1], ...
-    'YTickLabels',{'0','0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1'})
+avg_ydata = mean(avg_ydata_bins, 2);
+sem_ydata = std(avg_ydata_bins, 0, 2)./sqrt(num_subjs);
+y = [avg_ydata_bins(1, :).'; avg_ydata_bins(2, :).'];
 
-[h,p] = ttest(avg_ydata_bins(1,:).',avg_ydata_bins(2,:).');
+[h,p] = ttest(avg_ydata_bins(1, :).',avg_ydata_bins(2, :).');
 if p < 0.001
     pval_str = "\itp\rm < 0.001";
 else
@@ -68,15 +65,36 @@ else
 end
 
 % PLOT
-figure("Position",[100,100,200,200])
-hold on
-bar_plots_pval(y,avg_ydata,sem_ydata,num_subjs,2,1,{'',''},[1,2],{'High','Low'},'', ...
-    'State uncertainty','Mean absolute prediction error',0,1,10,1,7,0.5,'Arial',0,darkblue_muted,pval_str,0.55)
-hold on
-plot([1.1, 1.9], [0.5 0.5], '-','LineWidth', 0.3,'Color','k');
-text(1.5, 0.5, pval_str, 'horizontalalignment', 'center','BackgroundColor','w','FontSize', ...
-    5,'FontWeight','normal','FontName',font_name);
+fig = figure; 
+set(fig, 'Visible', 'on'); 
+ 
+% Size in CM 
+width_cm = 6;  
+height_cm = 6; 
+set(fig, 'Units', 'centimeters'); 
+set(fig, 'Position', [10, 10, width_cm, height_cm]); 
+set(fig, 'PaperUnits', 'centimeters'); 
+set(fig, 'PaperSize', [width_cm, height_cm]); 
+set(fig, 'PaperPosition', [0, 0, width_cm, height_cm]); 
 
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'PE_condiffbins.png', '-dpng', '-r600')
+hold on
+bar_plots_pval(y, avg_ydata, sem_ydata, num_subjs, 2, 1,{'',''}, [1, 2], {'High','Low'}, '', ...
+    'State uncertainty','Mean absolute prediction error', 0, 1, 10, 1, font_size, 0.5, font_name, 0, darkblue_muted, pval_str, 0.55)
+plot([1.1, 1.9], [0.5 0.5], '-', 'LineWidth', 0.3,'Color', 'k');
+text(1.5, 0.5, pval_str, 'horizontalalignment', 'center', 'BackgroundColor', 'w', 'FontSize', ...
+    5, 'FontWeight', 'normal', 'FontName', font_name);
+
+fig = gcf; 
+fig.PaperPositionMode = 'auto'; 
+% print(fig, 'PE_condiffbins.png', '-dpng', '-r600')
+% exportgraphics(gcf, 'Figures/PDF_Versions/Figure_SM7.pdf', 'ContentType', 'vector')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none'; 
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM7.pdf', style);

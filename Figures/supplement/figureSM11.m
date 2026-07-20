@@ -140,3 +140,4 @@ end
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
 print(fig, 'coeffs_HeteroSkedasticModel_linearInt20SP.png', '-dpng', '-r600')
+exportgraphics(gcf, 'Figure_SM11.pdf', 'ContentType', 'vector')

@@ -1,4 +1,4 @@
-% Figure S3: Illustrate linearity assumption of key variables of interest s
+% Figure S3: Illustrate linearity assumption of key variables of interest
 
 clc
 clearvars

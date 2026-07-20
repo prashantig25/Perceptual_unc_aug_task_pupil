@@ -7,7 +7,7 @@ clearvars
     ~,~,~,~,~] = colors_rgb(); % colors
 subj_ids = importdata("subj_ids.mat");
 num_subjs = length(subj_ids); % number of subjects
-save_csv = 1; % save stats for 1(d) in CSV file for overleaf
+save_csv = 1; % save stats for 2(d) in CSV file for overleaf
 
 % Path setup
 currentDir = cd;
@@ -40,8 +40,17 @@ font_size = 7;
 
 %% INITIALISE TILE LAYOUT
 
-figure
-set(gcf,'Position',[100 100 500 300])
+fig = figure;
+
+% Size in CM
+width_cm = 17; 
+height_cm = 10.5; 
+set(fig, 'Units', 'centimeters');
+set(fig, 'Position', [10, 10, width_cm, height_cm]);
+set(fig, 'PaperUnits', 'centimeters');
+set(fig, 'PaperSize', [width_cm, height_cm]);
+set(fig, 'PaperPosition', [0, 0, width_cm, height_cm]);
+
 t = tiledlayout(3,8);
 t.Padding = 'compact';
 t.TileSpacing = 'compact';
@@ -59,6 +68,8 @@ ax1 = nexttile(1,[2,4]);
 position_change = [0, 0.03, -0.05, 0]; % change in position
 new_pos = change_position(ax1,position_change);
 ax1_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
+set(ax1_new, 'FontSizeMode', 'manual');
+set(ax1_new, 'ActivePositionProperty', 'position');
 box(ax1_new, 'on'); % box on
 delete(ax1); % delete old axis
 
@@ -75,8 +86,8 @@ screen_height = 1;
 dyn_xpos = start_x;
 dyn_ypos = start_y;
 for n = 1:num_screens
-    rectangle('Position',[dyn_xpos dyn_ypos screen_width screen_height], 'LineWidth', 0.7, ...
-        'FaceColor',[200,200,200]./255)
+    rectangle('Position', [dyn_xpos dyn_ypos screen_width screen_height], 'LineWidth', 0.7, ...
+        'FaceColor', [200, 200, 200]./255)
     dyn_xpos = dyn_xpos + adjust_x;
     dyn_ypos = dyn_ypos - adjust_y;
     axis([0 11 0 11]);
@@ -92,9 +103,9 @@ dyn_xpos = start_x + screen_width/2;
 dyn_ypos = start_y + screen_height/2;
 for n = 1:num_screens
     if n == 4
-        rectangle('Position',[dyn_xpos - radius dyn_ypos - radius, 2 * radius, 2 * radius],...
+        rectangle('Position', [dyn_xpos - radius dyn_ypos - radius, 2 * radius, 2 * radius],...
             'EdgeColor', 'k', 'FaceColor', 'k')
-    else
+    elseif ~(n==6)
         rectangle('Position', [dyn_xpos - radius dyn_ypos - radius, 2 * radius, 2 * radius], ...
             'Curvature', [1, 1], 'EdgeColor', 'k', 'FaceColor', 'k');
     end
@@ -105,84 +116,11 @@ for n = 1:num_screens
     end
 end
 
-% HEPLTER FUNCTION FOR PATCHES
-function plotPatches(ax, pos_x, pos_y, image_png, adjust_x, image_size)
-    %PLOTPATCHES Utility to plot patches for task illustrations
-    %
-    % INPUT
-    %   ax: Axis
-    %   pos_x: Initial x-position
-    %   pos_y: Initial y-position
-    %   image_png: Image file
-    %   adjust_x: How much to shift on y-axis for second image
-    %   image_size: Scale image factor
-    %
-    % OUTPUT
-    %   None
-    
-    hold(ax, 'on');
-    
-    % Cycle over images
-    for n = 1:2
-        
-        % X- and y-postion
-        x_range = [pos_x - (image_size/2), pos_x + (image_size/2)];
-        y_range = [pos_y - (image_size/2), pos_y + (image_size/2)];
-    
-        % Load and plot image
-        img_data = imread(image_png{n});
-        image(x_range, y_range, img_data, 'Parent', ax);
-        set(ax, 'YDir', 'normal');
-        axis(ax, 'image');
-        pos_x = pos_x + adjust_x;
-    end
-end
-
-% Define coordinates for plotted patches (choice phase)
-image_size = 0.5;
-pos_x = start_x +... % initial x
-    adjust_x +... % second screen
-    screen_width/2 -... % half screen for centering the second screen
-    0.75/2; % present first patch to the left of center
-pos_y = start_y +... % inital y
-    screen_height/2 -... half of screen for centering
-    adjust_y; % y-center second screen
-image_png = {'lowcon.png','highcon.png'};
-adjust_x = screen_width/2;
-
-% Plot patches
-plotPatches(ax1_new, pos_x, pos_y, image_png, adjust_x, image_size)
-
-% Define coordinates for plotted patches (slider phase)
-image_size = 0.5;
-pos_x = dyn_xpos - screen_width/4;
-pos_y = dyn_ypos;
-image_png = {'lowcon_02.png','highcon.png'};
-
-% Plot patches
-plotPatches(ax1_new, pos_x, pos_y, image_png, adjust_x, image_size)
-
-% PLOT AUDITORY FEEDBACK
-
-% Define coordinates for feedback image
-image_size = 0.5;
-pos_x = start_x + screen_width/2 + 1.2 * 5;
-pos_y = start_y + 0.5 - 0.9 * 5;
-x_range = [pos_x - (image_size/2), pos_x + (image_size/2)];
-y_range = [pos_y - (image_size/2), pos_y + (image_size/2)];
-
-% Load and plot image
-[img, ~, tr] = imread('audio_fb.png');
-im = image(x_range, y_range, img, 'Parent', ax1_new);
-im.AlphaData = tr;
-set(ax1_new, 'YDir', 'normal');
-axis(ax1_new, 'image');
-
 % PLOT SLIDER
-center_X = dyn_xpos; % X-coordinate of the center
-center_Y = 1.85; % Y-coordinate of the center
+center_X = dyn_xpos; % x-coordinate of the center
+center_Y = 1.85; % y-coordinate of the center
 line([dyn_xpos-0.6,dyn_xpos+0.6],[center_Y,center_Y],'color','k','LineWidth',1)
-radius = 0.17./2; % Radius of the circle
+radius = 0.17./2; % radius of the circle
 rectangle('Position', [center_X - radius, center_Y - radius, 2 * radius, 2 * radius], ...
     'Curvature', [1, 1], 'EdgeColor', 'k', 'FaceColor', 'w', 'LineWidth', 0.5);
 
@@ -225,29 +163,28 @@ bar_width = 0.08; % width for bar plot
 bar_height = 0.1; % height for bar plot
 xpos = 0.35; % x-position
 ypos = 0.8; % y-position
-bar_data = [70,90]; % bar data
+bar_data = [70, 90]; % bar data
 ylabel_strings = {'','Value'}; % strings for y
-num_plots = 1;
-for n = 1:num_plots
-    axes('pos',[xpos ypos(n) bar_width bar_height])
-    set(gca,'XColor', 'none', 'YColor', 'none')
-    b = bar(bar_data(n,:), 'BarWidth', 0.5, 'FaceAlpha', 0.7, 'LineWidth', 0.5);
-    b.FaceColor = 'flat';
-    b.CData(1,:) = [0.5, 0.5, 0.5];
-    b.CData(2,:) = [0.5, 0.5, 0.5];
-    ylim([50, 100])
-    yticks([50, 100])
-    ylabel('Probability (%)')
-    xlim([-0.05, 3.05])
-    xticks([1,2])
-    set(gca,'color', 'none', 'LineWidth', linewidth_axes, 'FontName', font_name)
-    set(gca,'Xticklabel',["High","Low"], 'FontSize', font_size, 'Yticklabel', ["50","100"])
 
-    % Rotate x-axis labels by 45 degrees
-    xtickangle(45)
-    title(["Reward", "uncertainty"], "FontWeight", "normal", "FontSize", font_size)
-    box off
-end
+% Plot bars with reward probabilities
+axes('pos',[xpos ypos bar_width bar_height])
+set(gca,'XColor', 'none', 'YColor', 'none')
+b = bar(bar_data(1,:), 'BarWidth', 0.5, 'FaceAlpha', 0.7, 'LineWidth', 0.5);
+b.FaceColor = 'flat';
+b.CData(1,:) = darkblue_muted;
+b.CData(2,:) = darkblue_muted;
+ylim([50, 100])
+yticks([50, 100])
+ylabel('Probability (%)')
+xlim([-0.05, 3.05])
+xticks([1,2])
+set(gca,'color', 'none', 'LineWidth', linewidth_axes, 'FontName', font_name)
+set(gca,'Xticklabel',["High","Low"], 'FontSize', font_size, 'Yticklabel', ["50","100"])
+
+% Rotate x-axis labels by 45 degrees
+xtickangle(45)
+title(["Reward", "uncertainty"], "FontWeight", "normal", "FontSize", font_size)
+box off
 
 % ADD TEXT ON BARS
 groupOffset = [0, 0];
@@ -289,9 +226,9 @@ bg_gray = [200, 200, 200]./255; % light gray color matrix
 grid_matrix = {
     0.870, 'State 0',           'State 1',           'none', 'none', 'none',  face_alpha_text;       
     0.800, 'Right stronger',    'Left stronger',     'none', 'none', 'none',  face_alpha_text;       
-    0.730, {'lowcon_02.png', 'highcon.png'}, {'highcon.png', 'lowcon_02.png'}, 'k', 'k', bg_gray, face_alpha_img;
+    0.730, {'', ''}, {'', ''},  'k', 'k',            bg_gray,                 face_alpha_img;
     0.500, {'Left', 'Right'},   {'Left', 'Right'},   'k',        'k',        'none',  face_alpha_text;              
-    0.335, '\mu = 0.7',         '\mu = 0.7',         'none',     'none',     'none',  face_alpha_text;           
+    0.34, '\mu = 0.7',         '\mu = 0.7',         'none',     'none',     'none',  face_alpha_text;           
     0.270, {'0.7', '0.3'},      {'0.3', '0.7'},      'k',        'k',        'none',  face_alpha_text               
 };
 
@@ -304,7 +241,7 @@ line_style = '-';
 % LOOP OVER ALL ELEMENTS
 hold(ax3_new, 'on');
 for r = 1:size(grid_matrix, 1)
-    
+
     y_pos = grid_matrix{r, 1};
     content_L = grid_matrix{r, 2};
     content_R = grid_matrix{r, 3};
@@ -374,9 +311,10 @@ new_pos = change_position(ax5, position_change);
 ax5_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax5_new, 'on');
 delete(ax5);
+adjust_figprops(ax5_new, font_name, font_size, linewidth_axes);
 
 % PLOT SLIDER DATA
-colors_name = [mix;perc]; % colors for plot lines
+colors_name = [mix; perc]; % colors for plot lines
 legend_names = {'High reward uncertainty','Low reward uncertainty'}; % legend names
 title_name = {''}; % figure title
 xlabelname = {'Trial'}; % x-axis label name
@@ -393,7 +331,7 @@ ylim([0.5, 1])
 annotation("textbox", [1, 0.95, 0.2, 0.04], 'LineWidth', linewidth_box,'String', ...
     ' Actual reward probability', 'FontSize', font_size, 'LineStyle', 'none', 'Color', 'k','FontName', font_name, ...
     'HorizontalAlignment', 'left', Parent=gca)
-new_pos = change_position(ax10,position_change);
+new_pos = change_position(ax10, position_change);
 ax10_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax10_new, 'off');
 delete(ax10);
@@ -414,8 +352,8 @@ ylim([-0.02,0.18])
 % Save data for manuscript
 if save_csv == 1
     save_figures = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'stats','behavior');
-    save_table = table("subplot_d",round(rho,2),round(pval,3),8,'VariableNames',{'name','rho','pval','df'});
-    safe_saveall(strcat(save_figures,filesep,'figure1d.csv'),save_table);
+    save_table = table("subplot_d", round(rho,2), round(pval,3), 8, 'VariableNames', {'name','rho','pval','df'});
+    safe_saveall(strcat(save_figures, filesep, 'figure1d.csv'), save_table);
     disp("Single-trial LR");
     display(save_table);
 end
@@ -453,32 +391,37 @@ weight_y_n = 0; % weighted regression
 
 % PLOT
 for r = 1:length(regressors)
-
+    
     % CHANGE AXES POSITION
-    new_pos = change_position(axes_old(r),position_change);
+    new_pos = change_position(axes_old(r), position_change);
     axes_new(r) = axes('Units', 'Normalized', 'Position', new_pos);
     box(axes_new(r), 'off');
     delete(axes_old(r));
-
+    
+    set(axes_new(r), 'FontSizeMode', 'manual');
+    set(axes_new(r), 'ActivePositionProperty', 'position');
+    
     % GET MEAN AND SEM FOR BETAS
     selected_regressors = regressors(r);
-    [mean_avg,mean_sd,coeffs_subjs] = prepare_betas(betas_all,selected_regressors,num_subjs);
-
+    [mean_avg, mean_sd, coeffs_subjs] = prepare_betas(betas_all, selected_regressors, num_subjs);
+    
     % GET STARS FOR CORRESPONDING REGRESSOR'S P-VALUES
     bar_labels = {'*'};
-    pstars = pvals_stars(p_vals,selected_regressors,bar_labels,0);
+    pstars = pvals_stars(p_vals, selected_regressors, bar_labels, 0);
     title_name = string(pstars) + newline + " ";
     colors_name = darkblue_muted;
-
-    hold on
-    h = bar_plots_pval(coeffs_subjs,mean_avg,mean_sd,num_subjs, ...
+    
+    hold on    
+    h = bar_plots_pval(coeffs_subjs, mean_avg, mean_sd, num_subjs, ...
         length(selected_regressors), 1, {'Data', 'Example participant'}, ...
-        xticks, xticklabs, title_name, xlabelname, ylabelname(r), disp_pval, scatter_dots, ...
+        [], xticklabs, title_name, xlabelname, ylabelname(r), disp_pval, scatter_dots, ...
         dot_size, plot_err, font_size, line_width, font_name, disp_legend(r), colors_name, ...
         bar_labels, y_label, [NaN,NaN], [0.5,1.5], example_participant, [0.5, 0.025, 0.25, 0.05]);
+        
     h.BarWidth = 0.4;
     ylim_vals = [ylim_lower(r) ylim_upper(r)];
     xlim_vals = [0.5 1.5];
+    
     adjust_figprops(axes_new(r), font_name, font_size, line_width, xlim_vals, ylim_vals);
 end
 
@@ -504,14 +447,14 @@ end
 
 % POSITION CHANGE
 position_change = [0, 0.05, -0.03, 0];
-new_pos = change_position(ax15,position_change);
+new_pos = change_position(ax15, position_change);
 ax15_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax15_new, 'off');
 delete(ax15);
 
 % INTERACTION PLOT
 hold on
-h = plotInteraction(lm,'contrast_diff','pe','predictions');
+h = plotInteraction(lm, 'contrast_diff', 'pe', 'predictions');
 h(3).Color = low_PU;
 h(2).Color = mid_PU;
 h(1).Color = high_PU;
@@ -520,9 +463,9 @@ ylabel('Update')
 
 title('')
 adjust_figprops(ax15_new,font_name,font_size,line_width);
-l = legend('Contrast difference', '0', '0.5', '1', 'Location', 'northeast', 'AutoUpdate',...
-    'off', 'FontSize', font_size); % 'Location', 'best',
-l.Position = [0.7760, 0.1700, 0.2710, 0.0400];
+l = legend('Contrast diff.', '0', '0.5', '1', 'Location', 'northeast', 'AutoUpdate',...
+    'off', 'FontSize', font_size);
+l.Position = [0.76, 0.1700, 0.2710, 0.0400];
 
 l.EdgeColor = 'none';
 l.Color = 'none';
@@ -565,7 +508,16 @@ annotation("textbox",[label_x label_y .05 .05], 'String', ...
 
 %% SAVE AS PNG
 
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
+fig = gcf; 
+fig.PaperPositionMode = 'auto';
 % print(fig, 'task_behavior_ReviewerResponse1.png', '-dpng', '-r600')
-print(fig, 'Figure_2.png', '-dpng', '-r600')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none';
+hgexport(fig, 'Figures/PDF_Versions/Figure_2.pdf', style);

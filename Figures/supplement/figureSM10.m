@@ -36,7 +36,7 @@ line_style = '-'; % line style
 
 %% TILED LAYOUT
 
-figure(Position=[200,200,450,300])
+figure(Position=[200, 200, 450, 300])
 hold on
 tiledlayout(2,4);
 ax1 = nexttile(1,[1,1]);
@@ -58,13 +58,13 @@ axes_old = [ax1,ax2,ax3,ax4,ax5,ax6,ax7];
 
 %% PLOT COEFFICIENT CURVES
 
-ylabel_strings = [{"Uncertainty-modulated";"pupil"},{"PE-modulated";"pupil"},{"Uncertainty-weighted PE";"pupil"},{"UP-modulated";"pupil"},{"RT-modulated";"pupil"},{"x-gaze-modulated";"pupil"},{"y-gaze-modulated";"pupil"}];
-ncoeffs = [condiff_idx,pe_idx,peCondiff_idx,up_idx,rt_idx,xgaze_idx,ygaze_idx]; % order of coefficients
+ylabel_strings = [{"Uncertainty-modulated pupil";""}, {"PE-modulated pupil";""}, {"Uncertainty-weighted PE";""}, {"UP-modulated pupil";""}, {"RT-modulated pupil";""}, {"x-gaze-modulated pupil";""}, {"y-gaze-modulated pupil";""}];
+ncoeffs = [condiff_idx, pe_idx, peCondiff_idx, up_idx, rt_idx, xgaze_idx, ygaze_idx]; % order of coefficients
 
-xpos_change = [-0.05,-0.02,0.02,0.05,-0.05,-0.02,0.02]; % position change for axes
-pval_position = [NaN,0.025,0.0125,0.04,0.12,0.1,0.01] * 100; % position to plot p-values
-ylim_lower = [-0.02,-0.04,-0.02,-0.025,-0.17,-0.1,-0.1]; % lower limit for y-axis
-ylim_upper = [0.01,0.07,0.025,0.05,0.15,0.15,0.05,-0.1]; % upper limit for y-axis
+xpos_change = [-0.05, -0.02, 0.02, 0.05, -0.05, -0.02, 0.02]; % position change for axes
+pval_position = [NaN, 0.025, 0.0125, 0.04, 0.12, 0.1, 0.01] * 100; % position to plot p-values
+ylim_lower = [-0.02, -0.04, -0.02, -0.025, -0.17, -0.1, -0.1]; % lower limit for y-axis
+ylim_upper = [0.01, 0.07, 0.025, 0.05, 0.15, 0.15, 0.05, -0.1]; % upper limit for y-axis
 
 for a = 1:length(ncoeffs)
 
@@ -84,14 +84,14 @@ for a = 1:length(ncoeffs)
             data_plot(s,c) = betas_struct.with_intercept(1,ncoeffs(a),s,c);
         end
     end
-    hold on
-    color = color_cell;
+    %hold on
+    %color = color_cell;
     ySmoothed = mean(data_plot);
-    plot(x,ySmoothed,"Color",color{1,:},'LineWidth',2)
+    %plot(x,ySmoothed,"Color",color{1,:},'LineWidth',2)
     hold on
     color = cell2mat(color_cell);
     shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
-    hold on
+    %hold on
 
     % PLOT PERMUTATION TEST
     disp_perm = 1;
@@ -111,12 +111,12 @@ for a = 1:length(ncoeffs)
     end
 
     % ADJUST FIGURE PROPERTIES
-    adjust_figprops(axes_new(a),'Arial',7,0.5)
-    xlim([-300,2700])
-    xline(0,'--')
+    adjust_figprops(axes_new(a), font_name, font_size, 0.5)
+    xlim([-300, 2700])
+    xline(0,  '--')
     yline(0,'--')
     xlabel('Time since feedback (ms)')
-    ylabel(ylabel_strings(:,a))
+    ylabel(ylabel_strings(:, a))
 end
 
 %% ADD SUBPLOT LABELS
@@ -157,3 +157,4 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
 print(fig, 'mdl_NBC_linearInt1.png', '-dpng', '-r600')
+exportgraphics(gcf, 'Figure_SM10.pdf', 'ContentType', 'vector')

@@ -105,7 +105,7 @@ function h = bar_plots_pval(y, mean_all, SEM_all, n,x_groups,bars,...
         groupwidth = min(0.8, nbars/(nbars + 1.5));
         for i = 1:nbars
             a = (1:ngroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*nbars);
-            errorbar(a, mean_all(:,i),SEM_all(:,i),  'k', 'linestyle', 'none','LineWidth',1);
+            errorbar(a, mean_all(:,i), SEM_all(:,i), 'k', 'linestyle', 'none','LineWidth',1);
         end
         hold on
     end

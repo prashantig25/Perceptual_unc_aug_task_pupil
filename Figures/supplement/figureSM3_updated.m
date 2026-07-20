@@ -4,7 +4,7 @@ clc
 clearvars
 
 % Create figure with specified dimensions
-figure(Position=[200,200,400,125])
+figure(Position=[200, 200, 400, 125])
 binnedDotsColor = [159, 210, 235]./255; % bluish green color for binned analysis data
 
 % USER-BASED PATH
@@ -127,7 +127,7 @@ bins = createCondiffBins(agent_data.contrast_diff);
 [avg_ydataLR, sem_ydataLR] = computeMeanLR(agent_data, bins, nbins, numSims, simID);
 
 % Plot average LRs
-plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (Agent)')
+plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (Agent)');
 
 % Add subplot label B
 text(-0.03, 1.11, 'b', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
@@ -151,7 +151,7 @@ data_subjs = renamevars(data_subjs, "id", "ID"); % rename ID to use same functio
 [avg_ydataLR, sem_ydataLR] = computeMeanLR(data_subjs, bins, nbins, num_subjs, id_subjs);
 
 % Plot average LRs
-plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (Participant)')
+plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (Participant)');
 
 % Add subplot label C
 text(-0.03, 1.11, 'c', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
@@ -163,5 +163,5 @@ set(gcf, 'PaperPositionMode', 'auto');
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'LRcondiff_BS.png', '-dpng', '-r600')
-
+% print(fig, 'LRcondiff_BS.png', '-dpng', '-r600')
+exportgraphics(gcf, 'Figures/PDF_Versions/Figure_SM3.pdf', 'ContentType', 'vector')

@@ -119,7 +119,21 @@ end
 safe_saveall(strcat(save_dir, filesep, "posteriorCurves_regression.mat"),posterior);
 
 %% INITIALIZE TILE LAYOUT
-figure(Position=[200,200,450,175])
+
+fig = figure; 
+set(fig, 'Visible', 'on');
+
+% Size in CM
+width_cm = 15; 
+height_cm = 7;
+set(fig, 'Units', 'centimeters');
+set(fig, 'Position', [10, 10, width_cm, height_cm]);
+set(fig, 'Units', 'centimeters');
+set(fig, 'Position', [10, 10, width_cm, height_cm]);
+set(fig, 'PaperUnits', 'centimeters');
+set(fig, 'PaperSize', [width_cm, height_cm]);
+set(fig, 'PaperPosition', [0, 0, width_cm, height_cm]);
+
 hold on
 t = tiledlayout(1,3,"Padding","compact","TileSpacing","compact");
 ax1 = nexttile(1,[1,1]);
@@ -132,7 +146,8 @@ sg = sgtitle('Pupil dilation = \beta_0 + \beta_1 \cdot |\delta| + \beta_2 \cdot 
 %% PLOT MAIN EFFECT OF PE
 
 % POSITION CHANGE
-new_pos = change_position(ax1,[0,0,0,0]);
+position_change = [0.0, 0.0, 0.0, -0.05];
+new_pos = change_position(ax1, position_change);
 ax1_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax1);
 
@@ -142,21 +157,17 @@ ylim_axes = [-0.04,0.05];
 
 % PLOT
 hold on
-plot(xaxis,mean(coeffs.pe),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
-hold on
-shadedErrorBar(xaxis,mean(coeffs.pe),std(coeffs.pe)./sqrt(num_subs), ...
-    {'Color',neutral,'LineWidth',linewidth_curves},1);
-hold on
+plot(xaxis,mean(coeffs.pe), "Color", neutral, "LineStyle", "-", "LineWidth", linewidth_curves);
+shadedErrorBar(xaxis, mean(coeffs.pe), std(coeffs.pe)./sqrt(num_subs), ...
+    {'Color', neutral, 'LineWidth', linewidth_curves}, 1);
 xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax1_new,fontname,fontsize,linewidth_plot);
-hold on
 plot(xaxis(find(pe_pval==1)),pval_pos + ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
-xlim([-300,2700])
-% ylim(ylim_axes)
+xlim([-300, 2700])
 xlabel('Time since feedback onset (ms)')
 ylabel('Absolute PE-modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
@@ -166,29 +177,29 @@ text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
 %% PLOT UNCERTAINTY-WEIGHTED PE
 
 % POSITION CHANGE
-new_pos = change_position(ax2,[-0.005,0,0,0]);
+new_pos = change_position(ax2, position_change);
 ax2_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax2);
-ylim_axes = [-0.01,0.023];
+ylim_axes = [-0.01, 0.023];
 [pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
 hold on
-plot(xaxis,mean(coeffs.pe_condiff),"Color",neutral,"LineStyle","-","LineWidth",linewidth_curves);
-shadedErrorBar(xaxis,mean(coeffs.pe_condiff),std(coeffs.pe_condiff)./sqrt(num_subs), ...
-    {'Color',neutral,'LineWidth',linewidth_curves},1);
+plot(xaxis, mean(coeffs.pe_condiff), "Color", neutral, "LineStyle", "-", "LineWidth", linewidth_curves);
+shadedErrorBar(xaxis, mean(coeffs.pe_condiff), std(coeffs.pe_condiff)./sqrt(num_subs), ...
+    {'Color', neutral, 'LineWidth', linewidth_curves},1);
 
 % ADJUST FIGURE PROPERTIES
-xline(0,'LineStyle','--','LineWidth',0.5);
-yline(0,'LineStyle','--','LineWidth',0.5);
+xline(0, 'LineStyle', '--', 'LineWidth', 0.5);
+yline(0, 'LineStyle', '--', 'LineWidth', 0.5);
 adjust_figprops(ax2_new,fontname,fontsize,linewidth_plot);
 hold on
 plot(xaxis(find(pecondiff_pval < 0.05)), pval_pos + ones(1,length(pecondiff_pval(pecondiff_pval < 0.05))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
-xlim([-300,2700])
+xlim([-300, 2700])
 
 xlabel('Time since feedback onset (ms)')
-ylabel('Uncertainty-weighted-PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
+ylabel('Uncertainty-weighted PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
 text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + 1.1, pecondiff_pval_str, ...
     "FontName", fontname, "FontSize", fontsize, ...
     "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
@@ -202,15 +213,15 @@ sem_diff1 = std(diff1)./sqrt(num_subs);
 sem_diff2 = std(diff2)./sqrt(num_subs);
 
 % Calculate the difference waves for the pupil (interaction) data
-pupil_diff1 = mean(interaction.subj_pupil(1,2).signal) - mean(interaction.subj_pupil(1,1).signal);
-pupil_diff2 = mean(interaction.subj_pupil(2,2).signal) - mean(interaction.subj_pupil(2,1).signal);
+pupil_diff1 = mean(interaction.subj_pupil(1, 2).signal) - mean(interaction.subj_pupil(1,1).signal);
+pupil_diff2 = mean(interaction.subj_pupil(2, 2).signal) - mean(interaction.subj_pupil(2,1).signal);
 
 % Calculate the difference waves for the posterior data
 post_diff1 = mean(posterior.highPU_highPE) - mean(posterior.highPU_lowPE);
 post_diff2 = mean(posterior.lowPU_highPE) - mean(posterior.lowPU_lowPE);
 
 % POSITION CHANGE
-new_pos = change_position(ax3,[0.015,0,0.01,0]);
+new_pos = change_position(ax3, [0.02, 0.0, 0.0, -0.05]);
 ax3_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax3);
 
@@ -226,27 +237,26 @@ p1 = plot(xaxis, post_diff1, 'Color', high_PU_col, 'LineWidth', linewidth_curves
 p2 = plot(xaxis, post_diff2, 'Color', low_PU_col, 'LineWidth', linewidth_curves, 'LineStyle', ':');
 
 % Legend text
-highPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(highPU_val,3)),")");
-lowPU_str = strcat("Prediction (Contrast difference = ", " ", num2str(round(lowPU_val,3)),")");
+highPU_str = "Model: low difference";
+lowPU_str = "Model: high difference";
+set(gca,'Color', 'none', 'FontName', 'Arial', 'FontSize', fontsize)
+xline(0, '--', 'LineWidth', 0.5)
+yline(0, '--', 'LineWidth', 0.5)
+xlim([-300, 2700])
+ylim([-30, 120])
 
-% Arrange them in an order that makes sense (e.g., Data then Model)
-l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
-    {'Empirical (contrast difference: [0 - 0.05))', 'Empirical (contrast difference: [0.05 - 0.1])', ...
-     highPU_str, lowPU_str'}, ...
-    'Location', 'best', 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
-    'FontSize', fontsize-1.25, 'FontName', fontname, 'Color', 'none');
-
-l.ItemTokenSize = [7 7]; % Adjusted first value so the line segment is visible
-set(gca,'Color','none','FontName','Arial','FontSize',fontsize)
-xline(0,'--','LineWidth',0.5)
-yline(0,'--','LineWidth',0.5)
-xlim([-300,2700])
-ylim([-30,120])
 xlabel('Time from feedback onset (ms)')
-ylabel({'Pupil-difference curves', '(high - low PE)'}, 'FontSize', fontsize);
-hold on
-a1 = annotation("arrow",[0.78,0.78],[0.52,0.62],'LineWidth',0.5,'Color',low_PU_col);
-a2 = annotation("arrow",[0.78,0.78],[0.49,0.39],'LineWidth',0.5,'Color',high_PU_col);
+ylabel('Pupil difference (high - low PE)', 'FontSize', fontsize);
+
+l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
+    {'Data: low contrast difference', 'Data: high difference', ...
+     highPU_str, lowPU_str'}, 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
+    'FontSize', fontsize, 'FontName', fontname, 'Color', 'none');
+l.Position = [0.72, 0.78, 0.2710, 0.0400];
+l.ItemTokenSize = [7 7];
+
+a1 = annotation("arrow", [0.78, 0.78], [0.52, 0.62], 'LineWidth', 0.5, 'Color', low_PU_col);
+a2 = annotation("arrow", [0.78, 0.78], [0.49, 0.39], 'LineWidth', 0.5, 'Color', high_PU_col);
 a1.HeadLength = 5; a2.HeadLength = 5;
 adjust_figprops(ax3_new,fontname,fontsize,linewidth_plot);
 
@@ -270,6 +280,16 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 
 %% SAVE
 
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'regression_pupil_linearInt1New_3panels.png', '-dpng', '-r600')
+fig = gcf; 
+fig.PaperPositionMode = 'auto'; 
+%print(fig, 'regression_pupil_linearInt1New_3panels.png', '-dpng', '-r600')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters'; 
+style.FontMode = 'none';
+hgexport(fig, 'Figures/PDF_Versions/Figure_4.pdf', style);

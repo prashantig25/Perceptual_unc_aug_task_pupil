@@ -4,8 +4,8 @@ clc
 clearvars
 
 currentDir = cd;
-reqPath    = 'Perceptual_unc_aug_task_pupil';
-pathParts  = strsplit(currentDir, filesep);
+reqPath = 'Perceptual_unc_aug_task_pupil-main';
+pathParts = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
@@ -49,7 +49,7 @@ for s = 1:length(subj_ids)
         % Delete trial 1 within this block
         blockData = blockData(blockData.trial ~= 1, :);
 
-        % Todo: comment on this
+        % Todo: comment on this 
         if height(blockData) < 2
             continue
         end
@@ -81,13 +81,13 @@ end
 
 % STATISTICAL ANALYSIS AND PLOTTING
 
-% 1. Calculate Mean and SEM
+% Calculate Mean and SEM
 mean_betas = mean(betas_RT, 1);
 SEM_betas  = std(betas_RT, 0, 1) / sqrt(numSubjs);
 
-% 2. One-Sample T-tests against 0
+% One-Sample T-tests against 0
 p_values = NaN(1, size(betas_RT, 2));
-t_stats  = NaN(1, size(betas_RT, 2));
+t_stats = NaN(1, size(betas_RT, 2));
 
 for i = 1:size(betas_RT, 2)
     [~, p_values(i), ~, stats] = ttest(betas_RT(:, i));
@@ -97,7 +97,7 @@ for i = 1:size(betas_RT, 2)
     end
 end
 
-% 3. Prepare data for bar_plots_pval
+% Prepare data for bar_plots_pval
 y = [betas_RT(:,1); betas_RT(:,2); betas_RT(:,3)];
 mean_all = mean_betas';
 SEM_all = SEM_betas';
@@ -124,9 +124,21 @@ max_vals = repelem(max(max_vals),3);
 [~,high_PU,mid_PU,low_PU,color_screen,fb_green,darkblue_muted,mix,perc,rew,~,~,binned_dots,~,...
     ~,~,~,~,~] = colors_rgb();
 
-% 4. Bar Plot
+% Bar Plot
 xticklabs = {'', '', ''};
-figure('Position',[100,100,250,250])
+
+fig = figure; 
+set(fig, 'Visible', 'on'); 
+ 
+% Size in CM 
+width_cm = 6;  
+height_cm = 7; 
+set(fig, 'Units', 'centimeters'); 
+set(fig, 'Position', [10, 10, width_cm, height_cm]); 
+set(fig, 'PaperUnits', 'centimeters'); 
+set(fig, 'PaperSize', [width_cm, height_cm]); 
+set(fig, 'PaperPosition', [0, 0, width_cm, height_cm]); 
+
 h = bar_plots_pval(y, mean_all, SEM_all, numSubjs, 3, 1, {''}, ...
     [1,2,3], xticklabs, '', '', ...
     'Regression coefficient', 1, 1, 10, 1, 7, 0.5, 'Arial', 0, ...
@@ -145,7 +157,6 @@ multiline_labs = {
     sprintf('Absolute PE\n(previous trial)')
     };
 
-% set(gcf, 'XTickLabels', {});   % clear any residual labels
 yl = ylim(gca);
 label_y = yl(1) - 0.02 * diff(yl); % adjust vertical offset as needed
 
@@ -158,18 +169,12 @@ for i = 1:3
 end
 
 % Save statistics
-% termString = {"condition"; "condiff"; "PE_prevTrial"};
-% T = table(termString, round(p_values,3).', 'VariableNames', {'term', 'pValuesRT'});
-% saveStat = fullfile(desiredPath,"data","GB data two pipelines","pupil","stats");
-% safe_saveall(strcat(saveStat, filesep, 'RTRegression_previousTrial.csv'), T);
-
-% Save statistics
 termString = {"condition"; "condiff"; "PE_prevTrial"};
 
-% Compute 95% CI
+% Compute 95% CI: used?
 df = numSubjs - 1;
 t_crit = tinv(0.975, df);
-CI_low  = mean_betas' - t_crit * SEM_betas';
+CI_low = mean_betas' - t_crit * SEM_betas';
 CI_high = mean_betas' + t_crit * SEM_betas';
 
 T = table(termString, ...
@@ -185,8 +190,18 @@ T = table(termString, ...
 saveStat = fullfile(desiredPath,"data","GB data two pipelines","pupil","stats");
 safe_saveall(strcat(saveStat, filesep, 'RTRegression_previousTrial.csv'), T);
 
-
 % Save figure
 fig = gcf;
 fig.PaperPositionMode = 'auto';
-print(fig, 'coeffs_logRT_previousTrial.png', '-dpng', '-r600')
+%print(fig, 'coeffs_logRT_previousTrial.png', '-dpng', '-r600')
+%exportgraphics(gcf, 'Figures/PDF_Versions/Figure_SM2.pdf', 'ContentType', 'vector')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none'; 
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM2.pdf', style);

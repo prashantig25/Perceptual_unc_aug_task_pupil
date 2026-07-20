@@ -48,8 +48,8 @@ function lg_curves(x, mean_curves, sem_curves, colors_name, legend_names, title_
     title(title_name)
     xlabel(xlabelname)
     ylabel(ylabelname)
-    set(gca,'LineWidth',linewidth)
-    set(gca,'fontname',fontname) 
+    set(gca,'LineWidth', linewidth)
+    set(gca,'fontname', fontname) 
     pl = gca;
     pl.FontSize = fontsize;
 end
