@@ -49,7 +49,8 @@ for s = 1:length(subj_ids)
         % Delete trial 1 within this block
         blockData = blockData(blockData.trial ~= 1, :);
 
-        % Todo: comment on this
+        % Skip any block that has fewer than 2 trials, because there isn't
+        % enough data to shift PE for the analysis
         if height(blockData) < 2
             continue
         end
