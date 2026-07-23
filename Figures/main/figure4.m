@@ -4,8 +4,8 @@ clc
 clearvars
 
 % INITIALIZE VARS
-fontname = 'Arial'; % font name
-fontsize = 7; % font size
+font_name = 'Arial'; % font name
+font_size = 7; % font size
 linewidth_plot = 0.5; % line width for plot
 linewidth_curves = 2; % line width for curves
 xaxis = linspace(-300,2700,300); % x-axis
@@ -141,7 +141,7 @@ ax2 = nexttile(2,[1,1]);
 ax3 = nexttile(3,[1,1]);
 
 sg = sgtitle('Pupil dilation = \beta_0 + \beta_1 \cdot |\delta| + \beta_2 \cdot |\delta| \cdot |Contrast difference| + \beta_3 \cdot |Update| + ... + \epsilon', ...
-    'Interpreter','Tex','FontSize',8,'FontName','Arial');
+    'Interpreter','Tex','FontSize',8,'FontName',font_name);
 
 %% PLOT MAIN EFFECT OF PE
 
@@ -151,28 +151,24 @@ new_pos = change_position(ax1, position_change);
 ax1_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax1);
 
-% GET POSITION TO PLOT P-VALUE
-ylim_axes = [-0.04,0.05];
-[pval_pos] = create_pvalpos(ylim_axes);
-
 % PLOT
 hold on
-plot(xaxis,mean(coeffs.pe), "Color", neutral, "LineStyle", "-", "LineWidth", linewidth_curves);
 shadedErrorBar(xaxis, mean(coeffs.pe), std(coeffs.pe)./sqrt(num_subs), ...
     {'Color', neutral, 'LineWidth', linewidth_curves}, 1);
 xline(0,'LineStyle','--','LineWidth',0.5);
 yline(0,'LineStyle','--','LineWidth',0.5);
 
 % ADJUST FIGURE PROPERTIES
-adjust_figprops(ax1_new,fontname,fontsize,linewidth_plot);
-plot(xaxis(find(pe_pval==1)), pval_pos + ones(1, length(pe_pval(pe_pval == 1))), '.', 'color', ...
-    [119, 119, 119]./255, 'markersize', 4);
+adjust_figprops(ax1_new,font_name,font_size,linewidth_plot);
 xlim([-300, 2700])
 xlabel('Time since feedback onset (ms)')
-ylabel('Absolute PE-modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
-    "FontName", fontname, "FontSize", fontsize, ...
-    "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
+ylabel('PE-modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
+
+% DISPLAY PERMUTATION TEST RESULTS
+pval_position = 1;
+pval_sign = 1;
+pval_text_dist = 0.05;
+printPermTest(perm, xaxis, pe_idx, pval_position, pval_sign, pval_text_dist, font_size, font_name)
 
 %% PLOT UNCERTAINTY-WEIGHTED PE
 
@@ -180,29 +176,26 @@ text(mean(xaxis(pe_pval == 1)), pval_pos + 1.5, pe_pval_str, ...
 new_pos = change_position(ax2, position_change);
 ax2_new = axes('Units', 'Normalized', 'Position', new_pos); % new position
 delete(ax2);
-ylim_axes = [-0.01, 0.023];
-[pval_pos] = create_pvalpos(ylim_axes);
 
 % PLOT
 hold on
-plot(xaxis, mean(coeffs.pe_condiff), "Color", neutral, "LineStyle", "-", "LineWidth", linewidth_curves);
 shadedErrorBar(xaxis, mean(coeffs.pe_condiff), std(coeffs.pe_condiff)./sqrt(num_subs), ...
     {'Color', neutral, 'LineWidth', linewidth_curves},1);
 
 % ADJUST FIGURE PROPERTIES
 xline(0, 'LineStyle', '--', 'LineWidth', 0.5);
 yline(0, 'LineStyle', '--', 'LineWidth', 0.5);
-adjust_figprops(ax2_new,fontname,fontsize,linewidth_plot);
-hold on
-plot(xaxis(find(pecondiff_pval < 0.05)), pval_pos + ones(1,length(pecondiff_pval(pecondiff_pval < 0.05))), '.', 'color', ...
-    [119, 119, 119]./255, 'markersize', 4);
-xlim([-300, 2700])
-
+adjust_figprops(ax2_new,font_name,font_size,linewidth_plot);
 xlabel('Time since feedback onset (ms)')
-ylabel('Uncertainty-weighted PE ({\bf\beta_2})','FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-text(mean(xaxis(pecondiff_pval < 0.05)), pval_pos + 1.1, pecondiff_pval_str, ...
-    "FontName", fontname, "FontSize", fontsize, ...
-    "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
+ylabel('Uncertainty-weighted PE ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
+hold on
+
+% DISPLAY PERMUTATION TEST RESULTS
+pval_position = 1;
+pval_sign = 1;
+pval_text_dist = 0.05;
+printPermTest(perm, xaxis, peCondiff_idx, pval_position, pval_sign, pval_text_dist, font_size, font_name)
+xlim([-300, 2700])
 
 %% ADD POSTERIOR-PREDICTED CURVES
 
@@ -239,26 +232,26 @@ p2 = plot(xaxis, post_diff2, 'Color', low_PU_col, 'LineWidth', linewidth_curves,
 % Legend text
 highPU_str = "Model: low difference";
 lowPU_str = "Model: high difference";
-set(gca,'Color', 'none', 'FontName', 'Arial', 'FontSize', fontsize)
+set(gca,'Color', 'none', 'FontName', font_name, 'FontSize', font_size)
 xline(0, '--', 'LineWidth', 0.5)
 yline(0, '--', 'LineWidth', 0.5)
 xlim([-300, 2700])
 ylim([-30, 120])
 
 xlabel('Time from feedback onset (ms)')
-ylabel('Pupil difference (high - low PE)', 'FontSize', fontsize);
+ylabel('Pupil difference (high - low PE)', 'FontSize', font_size);
 
 l = legend([h1.mainLine, h2.mainLine, p1, p2], ...
     {'Data: low contrast difference', 'Data: high difference', ...
      highPU_str, lowPU_str'}, 'EdgeColor', 'none', 'AutoUpdate', 'off', ...
-    'FontSize', fontsize, 'FontName', fontname, 'Color', 'none');
+    'FontSize', font_size, 'FontName', font_name, 'Color', 'none');
 l.Position = [0.72, 0.78, 0.2710, 0.0400];
 l.ItemTokenSize = [7 7];
 
 a1 = annotation("arrow", [0.78, 0.78], [0.52, 0.62], 'LineWidth', 0.5, 'Color', low_PU_col);
 a2 = annotation("arrow", [0.78, 0.78], [0.49, 0.39], 'LineWidth', 0.5, 'Color', high_PU_col);
 a1.HeadLength = 5; a2.HeadLength = 5;
-adjust_figprops(ax3_new,fontname,fontsize,linewidth_plot);
+adjust_figprops(ax3_new,font_name,font_size,linewidth_plot);
 
 
 %% ADD SUBPLOT LABELS

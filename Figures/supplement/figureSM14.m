@@ -68,10 +68,9 @@ up_idx = find(strcmp(coeff_names, 'zsc_up'));
 rt_idx = find(strcmp(coeff_names, 'rt'));
 ncoeffs = [condiff_idx, pe_idx, xgaze_idx, ygaze_idx, up_idx, rt_idx]; % order of coefficients
 xpos_change = [-0.05, -0.02, 0.02, 0.05, -0.05, -0.02]; % position change for axes
-pval_position = [NaN, -10, 10, 10, -0.12, -0.01]; % position to plot p-values
-pval_position_pos = [NaN, 3, 4, 4, 2, 2, 2, 2]; % position to plot p-values
-ylim_lower = [-0.02, -0.04, -0.02, -0.1, -0.17, -0.025]; % lower limit for y-axis
-ylim_upper = [0.01, 0.07, 0.05, 0.05, 0.15, 0.15, 0.025]; % upper limit for y-axis
+pval_position = [0, -10, 10, 10, -0.12, -0.01]; % position to plot p-values
+pval_sign = [1, 1, 1, 1, 1, 1, ];
+pval_text_dist = 0.05;
 
 % Read out the positions calculated by tiledlayout
 first_plot_pos = axes_old(1).Position;
@@ -85,6 +84,9 @@ plot_height = first_plot_pos(4); % keep the precise height of the tile
 
 % Define your fixed horizontal gap
 horizontal_gap = 0.08;
+
+% 6 subplots
+letters = 'a':'f';
 
 for a = 1:length(ncoeffs)
 
@@ -118,31 +120,11 @@ for a = 1:length(ncoeffs)
             data_plot(s,c) = betas_struct.with_intercept(1, ncoeffs(a), s, c);
         end
     end
-    hold on
-    color = color_cell;
+
     ySignal = mean(data_plot);
-    plot(x,ySignal, "Color", color{1,:}, 'LineWidth',2)
     hold on
     color = cell2mat(color_cell);
     shadedErrorBar(x, ySignal, std(data_plot,0)./sqrt(num_subjs), {'LineWidth', 2, "Color", color(1,:)}, 1)
-    hold on
-
-    % PLOT PERMUTATION TEST
-    disp_perm = 1;
-    if disp_perm == 1
-        ylim_axes = [ylim_lower(a),ylim_upper(a)];
-        [pval_pos] = create_pvalpos(ylim_axes);
-        plot(x(find(perm.mask(ncoeffs(a),:) == 1)), (pval_position(a))*ones(1, length(find(perm.mask(ncoeffs(a),:) == 1))), '.', 'color', ...
-            [119, 119, 119]./255, 'markersize', 4);
-        p_val = min(unique(perm.prob(ncoeffs(a),perm.mask(ncoeffs(a),:) == 1)));
-    end
-    if p_val < 0.001
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),"\itp\rm < 0.001","FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
-    elseif p_val < 0.01
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
-    elseif p_val < 0.05 & p_val > 0.01
-        text(mean(x(perm.mask(ncoeffs(a),:) == 1)),pval_position(a) + pval_pos + pval_position_pos(a),strcat("\itp\rm = ",num2str(round(p_val,3))),"FontSize",7,"FontName",'Arial',"VerticalAlignment","middle","HorizontalAlignment","center")
-    end
 
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a), font_name, font_size, 0.5)
@@ -151,37 +133,18 @@ for a = 1:length(ncoeffs)
     yline(0, '--')
     xlabel('Time since feedback (ms)')
     ylabel(ylabel_strings(:,a))
+
+    % PLOT PERMUTATION TEST
+    printPermTest(perm, x, ncoeffs(a), pval_position(a), pval_sign(a), pval_text_dist, font_size, font_name)
+    
+        hold on
+    % Subplot label (a, b, c, ...)
+    text(-0.4, 1.05, letters(a), ...
+        'Units', 'normalized', ...
+        'FontSize', 12, ...
+        'FontWeight', 'normal');
+    box off;
 end
-
-%% ADD SUBPLOT LABELS
-
-ax1_pos = axes_new(a).Position;
-adjust_x = -0.06; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4)+0.02; % adjusted y-position for subplot label
-[label_x,label_y] = change_plotlabel(axes_new(1),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'a','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
-
-[label_x,label_y] = change_plotlabel(axes_new(2),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'b','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
-
-[label_x,label_y] = change_plotlabel(axes_new(3),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'c','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
-
-[label_x,label_y] = change_plotlabel(axes_new(4),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'd','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
-
-[label_x,label_y] = change_plotlabel(axes_new(5),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'e','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
-
-[label_x,label_y] = change_plotlabel(axes_new(6),adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'f','FontSize',12,'LineStyle','none','HorizontalAlignment','center')
-
 
 %% SAVE AS PNG
 

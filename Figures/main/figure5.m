@@ -134,21 +134,19 @@ ylim_axes = [-0.02,0.07];
 coeffs = squeeze(betas_pupil.with_intercept(1, pupil_idx, :, :));
 
 % PLOT
-hold on 
-plot(xaxis, mean(coeffs), "Color", neutral, "LineStyle", "-", "LineWidth", linewidth_curves);
 hold on
 shadedErrorBar(xaxis, mean(coeffs), std(coeffs)./sqrt(num_subjs), ...
     {'Color', neutral, 'LineWidth', linewidth_curves}, 1);
-hold on
 xline(0, 'LineStyle','--','LineWidth', 0.5);
 yline(0, 'LineStyle','--','LineWidth', 0.5);
 adjust_figprops(ax2_new, font_name, font_size, linewidth_plot);
+
 hold on
-plot(xaxis(find(perm.mask(3,:)==1)), 0.01 * ones(1,length(xaxis(find(perm.mask(3,:)==1)))), '.', 'color', ...
-    [119, 119, 119]./255, 'markersize', 4);
 xlim([-300,2700])
 xlabel('Time since feedback onset (ms)')
 ylabel('Pupil ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
+plot(xaxis(find(perm.mask(3,:)==1)), 0.01 * ones(1,length(xaxis(find(perm.mask(3,:)==1)))), '.', 'color', ...
+    [119, 119, 119]./255, 'markersize', 4);
 text(mean(xaxis(perm.mask(pupil_idx,:) == 1)), 0.0115, pval_str, ...
     "FontName", font_name, "FontSize", font_size, "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 

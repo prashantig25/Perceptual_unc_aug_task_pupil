@@ -57,37 +57,17 @@ t = tiledlayout(2,2,"TileSpacing","compact");
 
 ax1 = nexttile(1);
 
-% GET POSITION TO PLOT P-VALUE
-ylim_axes = [-0.05,0.01];
-[pval_pos] = create_pvalpos(ylim_axes);
-
+data_plot = NaN(num_subjs, col);
 for s = 1:num_subjs
     for c = 1:col
         data_plot(s,c) = betas_pupil.with_intercept(1,pupil_condiff_idx,s,c);
     end
 end
-coeffs = data_plot;
 
 % PLOT
-hold on 
-plot(xaxis, mean(coeffs), "Color", neutral, "LineStyle", "-", "LineWidth", linewidth_curves);
 hold on
-shadedErrorBar(xaxis, mean(coeffs), std(coeffs)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis, mean(data_plot), std(data_plot)./sqrt(num_subjs), ...
     {'Color', neutral, 'LineWidth', linewidth_curves}, 1);
-
-hold on
-plot(xaxis(find(perm.mask(pupil_condiff_idx,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(pupil_condiff_idx,:)==1)))), '.', 'color', ...
-    [119, 119, 119]./255, 'markersize', 4);
-if any(perm.mask(pupil_condiff_idx,:) == 1)
-    pval_a = min(perm.prob(pupil_condiff_idx, perm.mask(pupil_condiff_idx,:) == 1));
-    if pval_a < 0.001
-        pval_str_a = "\itp\rm < 0.001";
-    else
-        pval_str_a = sprintf("\\itp\\rm = %.3f", pval_a);
-    end
-    text(mean(xaxis(perm.mask(pupil_condiff_idx,:) == 1)),pval_pos + 0.004, pval_str_a, ...
-        "FontName",font_name,"FontSize",font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
-end
 
 % ADJUST FIGURE PROPERTIES
 xline(0, 'LineStyle', '--', 'LineWidth', 0.5);
@@ -97,6 +77,11 @@ hold on
 xlim([-300, 2700])
 xlabel('Time since feedback (ms)')
 ylabel('Uncertainty-modulated pupil', 'FontWeight', 'normal', 'FontName', font_name, 'FontSize', font_size)
+
+pval_position = -0.003;
+pval_text_dist = 0.05;
+pval_sign = -1;
+printPermTest(perm, xaxis, pupil_condiff_idx, pval_position, pval_sign, pval_text_dist, font_size, font_name)
 
 %% PLOT INTERACTIONS
 
@@ -128,32 +113,17 @@ l.Position = legend_pos + [0.01, 0.1, 0.0, 0.0];
 % POSITION CHANGE
 ax3 = nexttile(3);
 
+data_plot = NaN(num_subjs, col);
 for s = 1:num_subjs
     for c = 1:col
         data_plot(s,c) = betas_pupil.with_intercept(1, pe_pupil_idx, s, c);
     end
 end
-coeffs = data_plot;
 
 % PLOT
-hold on 
-plot(xaxis, mean(coeffs), "Color", neutral, "LineStyle", "-", "LineWidth", linewidth_curves);
 hold on
-shadedErrorBar(xaxis, mean(coeffs), std(coeffs)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis, mean(data_plot), std(data_plot)./sqrt(num_subjs), ...
     {'Color', neutral, 'LineWidth', linewidth_curves}, 1);
-hold on
-plot(xaxis(find(perm.mask(pe_pupil_idx,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(pe_pupil_idx,:)==1)))), '.', 'color', ...
-    [119, 119, 119]./255, 'markersize', 4);
-if any(perm.mask(pe_pupil_idx,:) == 1)
-    pval_b = min(perm.prob(pe_pupil_idx, perm.mask(pe_pupil_idx,:) == 1));
-    if pval_b < 0.001
-        pval_str_b = "\itp\rm < 0.001";
-    else
-        pval_str_b = sprintf("\\itp\\rm = %.3f", pval_b);
-    end
-    text(mean(xaxis(perm.mask(pe_pupil_idx,:) == 1)),-0.011, pval_str_b, ...
-        "FontName", font_name, "FontSize", font_size, "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
-end
 
 % ADJUST FIGURE PROPERTIES
 xline(0, 'LineStyle','--','LineWidth', 0.5);
@@ -164,36 +134,23 @@ xlim([-300, 2700])
 xlabel('Time since feedback (ms)')
 ylabel('PE-modulated pupil', 'FontWeight', 'normal', 'FontName', font_name, 'FontSize', font_size)
 
+printPermTest(perm, xaxis, pe_pupil_idx, pval_position, pval_text_dist, font_size, font_name)
+
 %% PLOT COEFFICIENTS - pe:pupil:con_diff
 
 ax4 = nexttile(4);
 
+data_plot = NaN(num_subjs, col);
 for s = 1:num_subjs
     for c = 1:col
         data_plot(s,c) = betas_pupil.with_intercept(1,pe_pupil_condiff_idx,s,c);
     end
 end
-coeffs = data_plot;
 
 % PLOT
-hold on 
-plot(xaxis, mean(coeffs), "Color", neutral, "LineStyle", "-", "LineWidth", linewidth_curves);
 hold on
-shadedErrorBar(xaxis, mean(coeffs), std(coeffs)./sqrt(num_subjs), ...
+shadedErrorBar(xaxis, mean(data_plot), std(data_plot)./sqrt(num_subjs), ...
     {'Color', neutral, 'LineWidth', linewidth_curves},1);
-hold on
-plot(xaxis(find(perm.mask(pe_pupil_condiff_idx,:)==1)), -0.003*ones(1,length(xaxis(find(perm.mask(pe_pupil_condiff_idx,:)==1)))), '.', 'color', ...
-    [119, 119, 119]./255, 'markersize', 4);
-if any(perm.mask(pe_pupil_condiff_idx,:) == 1)
-    pval_c = min(perm.prob(pe_pupil_condiff_idx, perm.mask(pe_pupil_condiff_idx,:) == 1));
-    if pval_c < 0.001
-        pval_str_c = "\itp\rm < 0.001";
-    else
-        pval_str_c = sprintf("\\itp\\rm = %.3f", pval_c);
-    end
-    text(mean(xaxis(perm.mask(pe_pupil_condiff_idx,:) == 1)),-0.008, pval_str_c, ...
-        "FontName",font_name,"FontSize",font_size,"VerticalAlignment","bottom","HorizontalAlignment","center")
-end
 
 % ADJUST FIGURE PROPERTIES
 xline(0, 'LineStyle', '--', 'LineWidth', 0.5);
@@ -203,6 +160,8 @@ hold on
 xlim([-300, 2700])
 xlabel('Time since feedback (ms)')
 ylabel('Uncertainty- and PE-modulated pupil', 'FontWeight', 'normal', 'FontName',font_name, 'FontSize', font_size)
+
+printPermTest(perm, xaxis, pe_pupil_condiff_idx, pval_position, pval_text_dist, font_size, font_name)
 
 %% ADD SUBPLOT LABELS
 
@@ -225,8 +184,6 @@ annotation("textbox",[label_x label_y .05 .05],'String', ...
 [label_x,label_y] = change_plotlabel(ax4,adjust_x,adjust_y);
 annotation("textbox",[label_x label_y .05 .05],'String', ...
     'd','FontSize',12,'LineStyle','none','HorizontalAlignment','center','VerticalAlignment','top')
-
-
 
 %% SAVE AS PNG
 

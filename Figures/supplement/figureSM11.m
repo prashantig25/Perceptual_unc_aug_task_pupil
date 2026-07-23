@@ -55,8 +55,8 @@ ylabel_strings = [ ...
     "Residual intercept", ...
     "Residual slope"];
 
-pval_position = [2 0.5 -1 -1 -5 3 3 10 3];
-pval_sign = [1 ,1, 1, -1, 1, 1, 1, 1, 1];
+pval_position = [2 0.5 -1 -1 0.5 3 3 10 3];
+pval_sign = [1, 1, 1, -1, 1, 1, 1, 1, 1];
 pval_text_dist = 0.05;
 
 %% TILED LAYOUT
@@ -114,7 +114,7 @@ horizontal_gap = 0.08;
 
 % 9 subplots
 letters = 'a':'i';   
-data_plot = NaN(num_subjs,col);
+data_plot = NaN(num_subjs, col);
 
 for a = 1:length(ncoeffs)
 
@@ -170,20 +170,8 @@ for a = 1:length(ncoeffs)
     set(gca, 'FontName', font_name, 'FontSize', font_size);
 
     % PLOT PERMUTATION TEST
-    plot(x(find(perm.prob(ncoeffs(a),:) < 0.05)), (pval_position(a))*ones(1, length(find(perm.prob(ncoeffs(a),:) < 0.05))), '.', 'color', ...
-        [119, 119, 119]./255, 'markersize', 4);
-    p_val = min(unique(perm.prob(ncoeffs(a), perm.prob(ncoeffs(a),:) < 0.05)));
-    y_limits = ylim;
-    y_norm = (pval_position(a) - y_limits(1)) / (y_limits(2) - y_limits(1));
-    x_limits = xlim;
-    x_pos = mean(x(perm.prob(ncoeffs(a), :) < 0.05));
-    x_norm = (x_pos - x_limits(1)) / (x_limits(2) - x_limits(1));
-    if p_val < 0.001
-        text(x_norm, y_norm + pval_sign(a) * pval_text_dist, "\itp\rm < 0.001","FontSize", font_size, "FontName", font_name, "VerticalAlignment","middle", "HorizontalAlignment", "center", "Units", "normalized"); % 
-    elseif p_val < 0.05
-        text(x_norm, y_norm + pval_sign(a) * pval_text_dist, strcat("\itp\rm = ", num2str(round(p_val, 3))), "FontSize", font_size, "FontName", font_name, "VerticalAlignment", "middle", "HorizontalAlignment", "center",  "Units", "normalized");
-    end
-    
+    printPermTest(perm, x, ncoeffs(a), pval_position(a), pval_sign(a), pval_text_dist, font_size, font_name)
+
     hold on
     % Subplot label (a, b, c, ...)
     text(-0.4, 1.05, letters(a), ...

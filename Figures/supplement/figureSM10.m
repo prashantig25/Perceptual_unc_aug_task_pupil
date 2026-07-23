@@ -71,8 +71,8 @@ axes_old = [ax1,ax2,ax3,ax4,ax5,ax6,ax7];
 ylabel_strings = [{"Uncertainty-modulated pupil"}, {"PE-modulated pupil"}, {"Uncertainty-weighted PE"}, {"UP-modulated pupil"}, {"RT-modulated pupil"}, {"x-gaze-modulated pupil"}, {"y-gaze-modulated pupil"}];
 ncoeffs = [condiff_idx, pe_idx, peCondiff_idx, up_idx, rt_idx, xgaze_idx, ygaze_idx]; % order of coefficients
 
-pval_position = [NaN 2.5 1.25 4 12 10 1];
-pval_sign = [1 ,1, 1, 1, 1, 1, 1];
+pval_position = [0 2.5 1.25 4 12 -30 1];
+pval_sign = [1, 1, 1, 1, 1, 1, 1];
 pval_text_dist = 0.06;
 
 % Read out the positions calculated by tiledlayout
@@ -139,24 +139,8 @@ for a = 1:length(ncoeffs)
     ylabel(ylabel_strings(:, a))
     
     % PLOT PERMUTATION TEST
-    disp_perm = 1;
-    if disp_perm == 1
-
-        plot(x(find(perm.prob(ncoeffs(a),:) < 0.05)), (pval_position(a))*ones(1, length(find(perm.prob(ncoeffs(a),:) < 0.05))), '.', 'color', ...
-            [119, 119, 119]./255, 'markersize', 4);
-        p_val = min(unique(perm.prob(ncoeffs(a), perm.prob(ncoeffs(a),:) < 0.05)));
-    end
-    
-    y_limits = ylim;
-    y_norm = (pval_position(a) - y_limits(1)) / (y_limits(2) - y_limits(1));
-    x_limits = xlim;
-    x_pos = mean(x(perm.prob(ncoeffs(a), :) < 0.05));
-    x_norm = (x_pos - x_limits(1)) / (x_limits(2) - x_limits(1));
-    if p_val < 0.001
-        text(x_norm, y_norm + pval_sign(a) * pval_text_dist, "\itp\rm < 0.001", "FontSize", font_size, "FontName", font_name, "VerticalAlignment","middle", "HorizontalAlignment", "center", "Units", "normalized"); % 
-    elseif p_val < 0.05
-        text(x_norm, y_norm + pval_sign(a) * pval_text_dist, strcat("\itp\rm = ", num2str(round(p_val, 3))), "FontSize", font_size, "FontName", font_name, "VerticalAlignment", "middle", "HorizontalAlignment", "center",  "Units", "normalized");
-    end
+    two_sided = false;
+    printPermTest(perm, x, ncoeffs(a), pval_position(a), pval_sign(a), pval_text_dist, font_size, font_name, two_sided)
 
     hold on
     % Subplot label (a, b, c, ...)
@@ -183,4 +167,3 @@ style.Units = 'centimeters';
 style.Renderer = 'painters';
 style.FontMode = 'none'; 
 hgexport(fig, 'Figures/PDF_Versions/Figure_SM10.pdf', style);
-

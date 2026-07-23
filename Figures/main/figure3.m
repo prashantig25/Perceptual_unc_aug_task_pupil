@@ -256,19 +256,8 @@ ax5_new = axes('Units', 'Normalized', 'Position', new_pos); % update
 box(ax5_new, 'off'); % remove box
 delete(ax3); % delete old axis
 
-% GET POSITION FOR P-VALUE
-ylim_axes = [-0.05, 0.1];
-[pval_pos] = create_pvalpos(ylim_axes);
-
 ncoeffs  = find(strcmp(coeff_names, 'pe'));
-permPE_prob = perm.prob(ncoeffs,:);
-permPE_mask = perm.mask(ncoeffs,:);
-pval = min(permPE_prob(1, permPE_mask == 1));
-if pval < 0.001
-    pval_str = "\itp\rm < 0.001";
-else
-    pval_str = sprintf("\\itp\\rm = %.3f", pval);
-end
+
 ncats = repelem(2, 1, 9);
 xlabel_name = 'Time since feedback onset';
 cats = [1, 2];
@@ -307,16 +296,6 @@ for j = cats
     hold on
 end
 
-% DISPLAY PERMUTATION TEST RESULTS
-disp_perm = 1;
-if disp_perm == 1
-    plot(x(find(perm.mask(ncoeffs,:) == 1)), ones(1, length(find(perm.mask(ncoeffs,:) == 1))) + 1, '.', 'color', ...
-        [119, 119, 119]./255, 'markersize', 4);
-end
-text(mean(x(perm.mask(ncoeffs,:) == 1)),pval_pos + 2.5,pval_str, ...
-    "FontSize", font_size, "FontName", font_name, "VerticalAlignment", "bottom",...
-    "HorizontalAlignment", "center")
-
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax5_new, font_name, font_size, 0.5)
 xlim([-300, 2700])
@@ -330,6 +309,12 @@ xline(0,'--')
 yline(0,'--')
 xlabel('Time since feedback onset (ms)')
 ylh_c = ylabel(ax5_new, 'PE-modulated pupil');
+
+% DISPLAY PERMUTATION TEST RESULTS
+pval_position = 3;
+pval_sign = 1;
+pval_text_dist = 0.05;
+printPermTest(perm, x, ncoeffs, pval_position, pval_sign, pval_text_dist, font_size, font_name)
 
 % Forces MATLAB to process the font bounding boxes first
 drawnow; 
