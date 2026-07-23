@@ -24,16 +24,16 @@ descriptive_path = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behav
 regression_path  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses');
 
 % Load all required data
-mix_curve = importdata(fullfile(descriptive_path,"mix_curve.mat")); % learning curves
-perc_curve = importdata(fullfile(descriptive_path,"perc_curve.mat"));
+mix_curve = importdata(fullfile(descriptive_path, "mix_curve.mat")); % learning curves
+perc_curve = importdata(fullfile(descriptive_path, "perc_curve.mat"));
 mean_curves(1,:) = mean(mix_curve);
 mean_curves(2,:) = mean(perc_curve);
 sem_curves(1,:) = std(mix_curve)./sqrt(num_subjs);
 sem_curves(2,:) = std(perc_curve)./sqrt(num_subjs);
-data_subjs = readtable(fullfile(regression_path,"preprocessed_lr_pupil_no_zerope.xlsx")); % preprocessed LR data
-betas_all = importdata(fullfile(regression_path,"betas_signed.mat")); % betas from signed analysis
+data_subjs = readtable(fullfile(regression_path, "preprocessed_lr_pupil_no_zerope.xlsx")); % preprocessed LR data
+betas_all = importdata(fullfile(regression_path, "betas_signed.mat")); % betas from signed analysis
 [~, p_vals] = ttest(betas_all);
-id_subjs = unique(data_subjs.id); % subject IDs
+id_subjs = unique(data_subjs.id);
 
 % General font size
 font_size = 7;

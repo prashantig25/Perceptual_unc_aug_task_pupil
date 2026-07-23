@@ -103,11 +103,11 @@ ylabel('Uncertainty-modulated pupil', 'FontWeight', 'normal', 'FontName', font_n
 ax2 = nexttile(2);
 
 % PLOT
-hold on 
-a = shadedErrorBar(xaxis, mean(posterior.lowarousal_lowcondiff), std(posterior.lowarousal_lowcondiff)./sqrt(num_subjs), {'LineWidth', 2, "Color", high_PU, 'LineStyle','--'}, 1);
-b = shadedErrorBar(xaxis, mean(posterior.lowarousal_highcondiff), std(posterior.lowarousal_highcondiff)./sqrt(num_subjs), {'LineWidth', 2, "Color", low_PU, 'LineStyle','--'}, 1);
-c = shadedErrorBar(xaxis, mean(posterior.higharousal_lowcondiff), std(posterior.higharousal_lowcondiff)./sqrt(num_subjs), {'LineWidth', 2, "Color", high_PU}, 1);
-d = shadedErrorBar(xaxis, mean(posterior.higharousal_highcondiff), std(posterior.higharousal_highcondiff)./sqrt(num_subjs), {'LineWidth', 2, "Color", low_PU}, 1);
+hold on
+a = shadedErrorBar(xaxis, mean(posterior.higharousal_lowcondiff), std(posterior.higharousal_lowcondiff)./sqrt(num_subjs), {'LineWidth', 2, "Color", high_PU}, 1);
+b = shadedErrorBar(xaxis, mean(posterior.higharousal_highcondiff), std(posterior.higharousal_highcondiff)./sqrt(num_subjs), {'LineWidth', 2, "Color", low_PU}, 1);
+c = shadedErrorBar(xaxis, mean(posterior.lowarousal_lowcondiff), std(posterior.lowarousal_lowcondiff)./sqrt(num_subjs), {'LineWidth', 2, "Color", high_PU, 'LineStyle','--'}, 1);
+d = shadedErrorBar(xaxis, mean(posterior.lowarousal_highcondiff), std(posterior.lowarousal_highcondiff)./sqrt(num_subjs), {'LineWidth', 2, "Color", low_PU, 'LineStyle','--'}, 1);
 
 % ADJUST FIGURE PROPERTIES
 l = legend([a.mainLine, b.mainLine, c.mainLine, d.mainLine],...
@@ -115,7 +115,7 @@ l = legend([a.mainLine, b.mainLine, c.mainLine, d.mainLine],...
     'Location', 'NorthEast', 'EdgeColor', 'none', 'AutoUpdate', 'off', 'Color', 'none', 'FontName', font_name, 'FontSize', font_size);
 l.ItemTokenSize = [20, 20];
 xlabel('Time since feedback (ms)')
-ylabel('Model-predicted absolute UP')
+ylabel('Model-predicted absolute UP', 'FontWeight', 'normal', 'FontName', font_name, 'FontSize', font_size)
 adjust_figprops(ax2, font_name, font_size, linewidth_plot);
 
 hold on
@@ -207,7 +207,7 @@ ylabel('Uncertainty- and PE-modulated pupil', 'FontWeight', 'normal', 'FontName'
 %% ADD SUBPLOT LABELS
 
 ax1_pos = ax1.Position;
-adjust_x = -0.11; % adjusted x-position for subplot label
+adjust_x = -0.085; % adjusted x-position for subplot label
 adjust_y = ax1_pos(4); % adjusted y-position for subplot label
 
 [label_x,label_y] = change_plotlabel(ax1,adjust_x,adjust_y);

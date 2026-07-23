@@ -4,7 +4,20 @@ clc
 clearvars
 
 % Create figure with specified dimensions
-figure(Position=[200,200,400,125])
+%figure(Position=[200,200,400,125])
+
+fig = figure; 
+set(fig, 'Visible', 'on'); 
+ 
+% Size in CM 
+width_cm = 15;  
+height_cm = 6; 
+set(fig, 'Units', 'centimeters'); 
+set(fig, 'Position', [10, 10, width_cm, height_cm]); 
+set(fig, 'PaperUnits', 'centimeters'); 
+set(fig, 'PaperSize', [width_cm, height_cm]); 
+set(fig, 'PaperPosition', [0, 0, width_cm, height_cm]); 
+
 binnedDotsColor = [159, 210, 235]./255; % bluish green color for binned analysis data
 
 % USER-BASED PATH
@@ -97,7 +110,7 @@ y_data_a = mean(BS_diff_binned);
 [rho_a, pval_a] = corr(x_data_a', y_data_a', 'rows', 'pairwise');
 
 xlabel('Contrast-difference bins');
-ylabel('Belief-state difference (Agent)');
+ylabel('Belief-state difference (agent)');
 if pval_a < 0.001
     pval_str_a = "\itp\rm < 0.001";
 else
@@ -107,7 +120,7 @@ title(strcat("\itr\rm =",{' '},num2str(round(rho_a,2)),{' '}) + newline + pval_s
     'FontWeight','normal','Interpreter','tex');
 
 % Add subplot label A
-text(-0.03, 1.11, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
+text(-0.2, 1.11, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 box off
 hold off
 set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
@@ -128,10 +141,10 @@ bins = createCondiffBins(agent_data.contrast_diff);
 [avg_ydataLR, sem_ydataLR] = computeMeanLR(agent_data, bins, nbins, numSims, simID);
 
 % Plot average LRs
-plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (Agent)')
+plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (agent)')
 
 % Add subplot label B
-text(-0.03, 1.11, 'b', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
+text(-0.2, 1.11, 'b', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 
 %% SUBPLOT C - Human Data Learning Rate Analysis
 subplot(1,3,3)
@@ -152,10 +165,10 @@ data_subjs = renamevars(data_subjs, "id", "ID"); % rename ID to use same functio
 [avg_ydataLR, sem_ydataLR] = computeMeanLR(data_subjs, bins, nbins, num_subjs, id_subjs);
 
 % Plot average LRs
-plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (Participant)')
+plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (participant)')
 
 % Add subplot label C
-text(-0.03, 1.11, 'c', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
+text(-0.2, 1.11, 'c', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 
 % Make sure subplots are properly spaced
 set(gcf, 'PaperPositionMode', 'auto');
@@ -164,5 +177,14 @@ set(gcf, 'PaperPositionMode', 'auto');
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'LRcondiff_BS.png', '-dpng', '-r600')
+%print(fig, 'LRcondiff_BS.png', '-dpng', '-r600')
 
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none'; 
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM3.pdf', style);

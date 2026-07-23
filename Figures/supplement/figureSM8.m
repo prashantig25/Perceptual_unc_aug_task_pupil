@@ -113,8 +113,8 @@ for a = 1:length(ncoeffs)
             data_plot(s,c) = betas_struct.with_intercept(1,ncoeffs(a),s,c);
         end
     end
+
     hold on
-    color = color_cell;
     ySignal = mean(data_plot);
     color = cell2mat(color_cell);
     shadedErrorBar(x, ySignal, std(data_plot, 0)./sqrt(num_subjs), {'LineWidth', 2, "Color", color(1,:)},1)

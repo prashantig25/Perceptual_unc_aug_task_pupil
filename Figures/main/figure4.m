@@ -165,7 +165,7 @@ yline(0,'LineStyle','--','LineWidth',0.5);
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax1_new,fontname,fontsize,linewidth_plot);
-plot(xaxis(find(pe_pval==1)),pval_pos + ones(1,length(pe_pval(pe_pval == 1))), '.', 'color', ...
+plot(xaxis(find(pe_pval==1)), pval_pos + ones(1, length(pe_pval(pe_pval == 1))), '.', 'color', ...
     [119, 119, 119]./255, 'markersize', 4);
 xlim([-300, 2700])
 xlabel('Time since feedback onset (ms)')

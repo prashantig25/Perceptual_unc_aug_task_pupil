@@ -31,7 +31,20 @@ xaxisMax = 1000;
 xaxis = linspace(-0.3, 9.7, xaxisMax);
 
 % LOOP OVER SUBJECTS
-figure("Position",[100,100,400,400],"Visible","on")
+%figure("Position",[100,100,400,400],"Visible","on")
+
+f1 = figure;
+set(f1, 'Visible', 'on');
+
+% Size in CM
+width_cm = 12; 
+height_cm = 10.5;
+set(f1, 'Units', 'centimeters');
+set(f1, 'Position', [10, 10, width_cm, height_cm]);
+set(f1, 'PaperUnits', 'centimeters');
+set(f1, 'PaperSize', [width_cm, height_cm]);
+set(f1, 'PaperPosition', [0, 0, width_cm, height_cm]);
+
 participants = [1,26,31,35,15,43];
 for i = 1:length(participants)
 
@@ -48,11 +61,21 @@ for i = 1:length(participants)
     plot(xaxis,trial_subj,"Color",'k','LineWidth',2)
     xlim([-0.3,6])
     xline(0,'LineStyle','--','LineWidth',0.5)
-    xlabel('Time from feedback onset (s)')
+    xlabel('Time since feedback (s)')
     title(strcat("Participant"," ",subj_ids{participants(i)}),'FontWeight','Normal')
     set(gca,'FontName','Arial','FontSize',7)
 end
 
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'fb_singleSubj_fullDuration_linearInt1.png', '-dpng', '-r600') 
+fig = gcf; 
+fig.PaperPositionMode = 'auto';
+% print(fig, 'fb_singleSubj_fullDuration_linearInt1.png', '-dpng', '-r600') 
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none'; 
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM5.pdf', style);
