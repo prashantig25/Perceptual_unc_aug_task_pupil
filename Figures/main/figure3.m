@@ -126,12 +126,9 @@ line(ax1_new, [pos_x_data(2), pos_x_data(2)], ylims, 'Color', 'k', 'LineStyle', 
 line(ax1_new, [pos_x_data(3), pos_x_data(3)], ylims, 'Color', 'k', 'LineStyle', '-', 'LineWidth', 0.5);
 
 % Axis info
-tick_len = (ylims(2) - ylims(1)) * 0.0225;
-text(ax1_new, xl(1) + diff(xl)*0.5, ylims(1) - tick_len * 6.0, "Time since event onset (ms)", ...
-     'FontName', font_name, 'FontSize', font_size, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
 ylh_a = ylabel(ax1_new, "Pupil dilation", FontSize=font_size);% 1. Set the tick label font size
 adjust_figprops(ax1_new, font_name, font_size, linewidth_plot);
-
+xlabel("Time since event (ms)")
 set(gca,'LineWidth',0.5)
 set(gca,'Color','none')
 box off
@@ -197,7 +194,7 @@ box(ax4_new, 'off'); % remove box
 delete(ax2); % delete old axis
 
 % GET POSITION FOR P-VALUE
-x = linspace(-300,2700,300); % x-axis
+x = linspace(-300, 2700, 300); % x-axis
 
 avg_bin1= mean(condiffbin.pebin1);
 sem_bin1 = std(condiffbin.pebin1)./sqrt(num_subjs);
@@ -215,7 +212,7 @@ shadedErrorBar(x, avg_bin2, sem_bin2,{'LineWidth', 2, 'Color', mid_violet},1)
 % ADJUST PLOT PROPERTIES
 xline(0,'--')
 yline(0,'--')
-xlabel('Time since feedback onset (ms)')
+xlabel('Time since feedback (ms)')
 ylh_b = ylabel(ax4_new, 'Pupil dilation');
 adjust_figprops(ax4_new, font_name, font_size, 0.5)
 xlim([-300, 2700])
@@ -257,14 +254,13 @@ box(ax5_new, 'off'); % remove box
 delete(ax3); % delete old axis
 
 ncoeffs  = find(strcmp(coeff_names, 'pe'));
-
 ncats = repelem(2, 1, 9);
-xlabel_name = 'Time since feedback onset';
 cats = [1, 2];
 color_cell = {high_PU; low_PU}; % colors for low and high perceptual uncertainty data
 col = 300; 
-m = 0; 
-start = 0;
+
+% Initialize plot handle for legend
+plotHandle = cell(2);
 
 % PLOT
 for j = cats
@@ -277,10 +273,8 @@ for j = cats
     hold on
     color = color_cell;
     ySmoothed = mean(data_plot, 1);
-    plot(x, ySmoothed, "Color", color{j,:}, 'LineWidth',2)
+    plotHandle{j} = plot(x, ySmoothed, "Color", color{j,:}, 'LineWidth',2);
     hold on
-    m = m + num_subjs;
-    start = start + m;
 end
 
 for j = cats
@@ -292,22 +286,21 @@ for j = cats
     end
     ySmoothed = mean(data_plot, 1);
     color = cell2mat(color_cell);
-    shadedErrorBar(x, ySmoothed,std(data_plot)./sqrt(num_subjs), {'LineWidth',2,"Color",color(j,:)},1)
+    shadedErrorBar(x, ySmoothed, std(data_plot)./sqrt(num_subjs), {'LineWidth',2,"Color",color(j,:)},1)
     hold on
 end
 
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax5_new, font_name, font_size, 0.5)
 xlim([-300, 2700])
-% ylim(ylim_axes)
-l = legend('High state uncertainty', 'Low state uncertainty', 'Location', 'best', 'EdgeColor', ...
+l = legend([plotHandle{2}, plotHandle{1}], 'Low state uncertainty', 'High state uncertainty', 'Location', 'best', 'EdgeColor', ...
     'none', 'AutoUpdate', 'off', 'FontSize', font_size, 'FontName', font_name, 'Color', 'none');
 l.ItemTokenSize = [7 7];
 l.Position = [0.75, 0.2100, 0.2710, 0.0400];
 
 xline(0,'--')
 yline(0,'--')
-xlabel('Time since feedback onset (ms)')
+xlabel('Time since feedback (ms)')
 ylh_c = ylabel(ax5_new, 'PE-modulated pupil');
 
 % DISPLAY PERMUTATION TEST RESULTS
@@ -326,20 +319,40 @@ set(ylh_c, 'Units', 'Normalized');
 
 %% ADD SUBPLOT LABELS
 
-ax1_pos = ax5_new.Position;
-adjust_x = -0.06; % adjusted x-position for subplot label
-adjust_y = ax1_pos(4) + 0.06; % adjusted y-position for subplot label
-[label_x,label_y] = change_plotlabel(ax1_new,adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'a', 'FontSize' ,12, 'LineStyle', 'none', 'HorizontalAlignment', 'center')
+function t = add_panel_label(ax, label_str, x_label_pos, y_label_pos)
+    % ADD_PANEL_LABELS This is a helper function for improved label
+    % placement. In the future, it could replace the label code in
+    % other plots.
+    %
+    %   Input:
+    %       ax: Axis
+    %       label_str: a,b,c...
+    %       x_label_pos: label x axis 
+    %       y_label_pos: label y axis
+    %   Output:
+    %       t: Text object
 
-[label_x,label_y] = change_plotlabel(ax4_new, adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05], 'String', ...
-    'b', 'FontSize', 12, 'LineStyle', 'none', 'HorizontalAlignment', 'center')
+    % Default offsets if not provided
+    if nargin < 3, x_label_pos = -0.15; end
+    if nargin < 4, y_label_pos = 1.08;  end
 
-[label_x,label_y] = change_plotlabel(ax5_new, adjust_x,adjust_y);
-annotation("textbox",[label_x label_y .05 .05],'String', ...
-    'c', 'FontSize', 12, 'LineStyle', 'none', 'HorizontalAlignment','center')
+    t = text(ax, x_label_pos, y_label_pos, label_str, ...
+        'Units', 'normalized', ...
+        'FontSize', 12, ...
+        'FontWeight', 'normal', ...
+        'HorizontalAlignment', 'center', ...
+        'VerticalAlignment', 'middle');
+    
+    t.Clipping = 'off';
+end
+
+%% ADD SUBPLOT LABELS
+
+x_pos = -0.17;
+y_pos = 1.06;
+add_panel_label(ax1_new, 'a', x_pos, y_pos)
+add_panel_label(ax4_new, 'b', x_pos, y_pos)
+add_panel_label(ax5_new, 'c', x_pos, y_pos)
 
 %% SAVE 
 
@@ -353,6 +366,6 @@ style.Format = 'pdf';
 style.Width = width_cm;
 style.Height = height_cm;
 style.Units = 'centimeters';
-style.Renderer = 'painters'; % <--- FORCE VECTOR RENDERING (No rasterization!)
-style.FontMode = 'none'; % Tells hgexport NOT to touch your font sizes
+style.Renderer = 'painters'; 
+style.FontMode = 'none';
 hgexport(fig, 'Figures/PDF_Versions/Figure_3.pdf', style);

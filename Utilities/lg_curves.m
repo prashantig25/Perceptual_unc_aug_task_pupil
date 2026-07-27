@@ -32,7 +32,9 @@ function lg_curves(x, mean_curves, sem_curves, colors_name, legend_names, title_
     end
 
     % ADD/EDIT FIGURE PROPERTIES
-    [lgd, hobjs] = legend(hLines, legend_names, "AutoUpdate", "off", 'Location', 'best',...
+    % Note: hLines(2) and legend_names{2} come first to have low
+    % uncertainty first, then high uncertainty
+    [lgd, hobjs] = legend([hLines(2), hLines(1)], legend_names{2}, legend_names{1}, "AutoUpdate", "off", 'Location', 'best',...
         'Box', 'off', 'Color', 'none', 'EdgeColor', 'none', 'FontSize', fontsize);
 
     % Check if legend position was provided

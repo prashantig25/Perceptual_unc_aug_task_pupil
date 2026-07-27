@@ -4,8 +4,6 @@ clc
 clearvars
 
 % Create figure with specified dimensions
-%figure(Position=[200,200,400,125])
-
 fig = figure; 
 set(fig, 'Visible', 'on'); 
  

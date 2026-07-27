@@ -154,7 +154,7 @@ for a = 1:length(ncoeffs)
     ylabel(ylabel_strings(:,a))
 end
 
-l = legend([handle{1}, handle{2}], 'High state uncertainty', 'Low state uncertainty', 'Location', 'NorthEast', 'EdgeColor', ...
+l = legend([handle{2}, handle{1}], 'Low state uncertainty', 'High state uncertainty', 'Location', 'NorthEast', 'EdgeColor', ...
     'none', 'AutoUpdate', 'off', 'FontSize', font_size,'FontName', font_name,'Color', 'none');
 l.ItemTokenSize = [7 7];
 legend_pos = l.Position;

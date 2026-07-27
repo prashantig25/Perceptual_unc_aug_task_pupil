@@ -166,7 +166,7 @@ for a = 1:length(ncoeffs)
     xlim([-300, 2700]);
     xline(0, '--k', 'HandleVisibility', 'off');
     yline(0, '--k', 'HandleVisibility', 'off');
-    xlabel('Time from feedback (ms)', 'FontName', font_name, 'FontSize', font_size);
+    xlabel('Time since feedback (ms)', 'FontName', font_name, 'FontSize', font_size);
     set(gca, 'FontName', font_name, 'FontSize', font_size);
 
     % PLOT PERMUTATION TEST

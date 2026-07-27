@@ -1,4 +1,4 @@
-% figure1 creates a hypothesis illustration figure.
+% Figure1 creates a hypothesis illustration figure.
 
 clc
 clearvars
@@ -46,15 +46,15 @@ t.Padding = 'compact';
 
 ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color','k','HeadWidth',10);
 ar1.X = [0.47 0.54];
-ar1.Y = [0.5,0.5];
+ar1.Y = [0.5075, 0.5075];
 
 ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color',low_PU,'HeadWidth',10);
 ar1.X = [0.7 0.7];
-ar1.Y = [0.58,0.77];
+ar1.Y = [0.58, 0.77];
 
 ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color',high_PU,'HeadWidth',10);
 ar1.X = [0.7 0.7];
-ar1.Y = [0.49,0.3];
+ar1.Y = [0.49, 0.3];
 
 %% PLOT LEARNING RATES
 

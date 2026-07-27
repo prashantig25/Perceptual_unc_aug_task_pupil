@@ -227,12 +227,13 @@ xlim(xlim_axes)
 xline(0,'LineStyle','--','LineWidth',1,'Color',[0.5 0.5 0.5],'HandleVisibility','off');
 yline(0,'LineStyle','--','LineWidth',1,'Color',[0.5 0.5 0.5],'HandleVisibility','off');
 
-xlabel('Time since feedback onset (ms)','FontName',fontname,'FontSize',fontsize)
+adjust_figprops(ax1, fontname, fontsize, linewidth_plot);
+xlabel('Time since feedback (ms)','FontName',fontname,'FontSize',fontsize)
 ylabel(coeff_ylabel, 'FontWeight','normal','FontName',fontname,'FontSize',fontsize)
-lgd = legend('Location','best','FontSize',6,'NumColumns',1,'Color','none','EdgeColor','none');
+lgd = legend('Location', 'best','FontSize', 6, 'NumColumns', 1,'Color', 'none', 'EdgeColor', 'none');
 lgd.ItemTokenSize = [10, 10];
 lgd.Position = lgd.Position + [0.575, 0.0, 0, 0.0];
-adjust_figprops(ax1,fontname,fontsize,linewidth_plot);
+
 
 %% Panel 2: Significant clusters for all 12
 
@@ -256,7 +257,7 @@ plot(xaxis(pecondiff_pval_deconv_het==1), y_positions(1)*ones(1,sum(pecondiff_pv
 
 xlim(xlim_axes)
 ylim([0,1])
-xlabel('Time since feedback onset (ms)','FontName',fontname,'FontSize',fontsize)
+xlabel('Time since feedback (ms)','FontName',fontname,'FontSize',fontsize)
 ylabel("Significant clusters",'FontName',fontname,'FontSize',fontsize)
 yticks(y_positions)
 yticklabels({'','','','','','','','','','','',''})

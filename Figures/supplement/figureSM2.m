@@ -4,8 +4,8 @@ clc
 clearvars
 
 currentDir = cd;
-reqPath    = 'GBSliderPupil_NatComms';
-pathParts  = strsplit(currentDir, filesep);
+reqPath = 'GBSliderPupil_NatComms';
+pathParts = strsplit(currentDir, filesep);
 if strcmp(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
@@ -17,6 +17,8 @@ preds_all  = readtable(preds_file);
 data = readtable(fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil_no_zerope.xlsx'));
 uniqueID = unique(data.id);
 numSubjs = length(uniqueID);
+font_size = 7;
+font_name = 'Arial';
 
 % Load auxiliary data
 subj_ids = importdata("subj_ids.mat");
@@ -50,7 +52,8 @@ for s = 1:length(subj_ids)
         blockData = blockData(blockData.trial ~= 1, :);
 
         % Skip any block that has fewer than 2 trials, because there isn't
-        % enough data to shift PE for the analysis
+        % enough data to shift PE for the analysis. This happend in one
+        % subject because of firealarm at FU.
         if height(blockData) < 2
             continue
         end
@@ -165,8 +168,8 @@ for i = 1:3
     text(gca, i, label_y, multiline_labs{i}, ...
         'HorizontalAlignment', 'center', ...
         'VerticalAlignment', 'top', ...
-        'FontName', 'Arial', ...
-        'FontSize', 7);
+        'FontName', font_name, ...
+        'FontSize', font_size);
 end
 
 % Save statistics

@@ -12,6 +12,8 @@ col_patch = 100; % how long should the patch-related pupil signal
 col_fb = 300; % how long should the patch-related pupil signal
 total = 630; % how long should the entire trial be
 trial_all = NaN(num_subjs,total);
+font_size = 7;
+font_name = 'Arial';
 
 % USER-BASED PATH
 currentDir = cd; % current directory
@@ -63,7 +65,10 @@ for i = 1:length(participants)
     xline(0,'LineStyle','--','LineWidth',0.5)
     xlabel('Time since feedback (s)')
     title(strcat("Participant"," ",subj_ids{participants(i)}),'FontWeight','Normal')
-    set(gca,'FontName','Arial','FontSize',7)
+    if i == 1 || i == 4
+        ylabel("Pupil dilation")
+    end
+    set(gca,'FontName', font_name, 'FontSize', font_size)
 end
 
 fig = gcf; 

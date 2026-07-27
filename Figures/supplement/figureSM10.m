@@ -128,7 +128,7 @@ for a = 1:length(ncoeffs)
     hold on
     ySmoothed = mean(data_plot);
     color = cell2mat(color_cell);
-    shadedErrorBar(x,ySmoothed,std(data_plot,1)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
+    shadedErrorBar(x,ySmoothed,std(data_plot)./sqrt(num_subjs),{'LineWidth',2,"Color",color(1,:)},1)
     
     % ADJUST FIGURE PROPERTIES
     adjust_figprops(axes_new(a), font_name, font_size, 0.5)

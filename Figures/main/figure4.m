@@ -161,7 +161,7 @@ yline(0,'LineStyle','--','LineWidth',0.5);
 % ADJUST FIGURE PROPERTIES
 adjust_figprops(ax1_new,font_name,font_size,linewidth_plot);
 xlim([-300, 2700])
-xlabel('Time since feedback onset (ms)')
+xlabel('Time since feedback (ms)')
 ylabel('PE-modulated pupil ({\bf\beta_1})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
 
 % DISPLAY PERMUTATION TEST RESULTS
@@ -186,7 +186,7 @@ shadedErrorBar(xaxis, mean(coeffs.pe_condiff), std(coeffs.pe_condiff)./sqrt(num_
 xline(0, 'LineStyle', '--', 'LineWidth', 0.5);
 yline(0, 'LineStyle', '--', 'LineWidth', 0.5);
 adjust_figprops(ax2_new,font_name,font_size,linewidth_plot);
-xlabel('Time since feedback onset (ms)')
+xlabel('Time since feedback (ms)')
 ylabel('Uncertainty-weighted PE ({\bf\beta_2})','FontWeight','normal','FontName',font_name,'FontSize',font_size)
 hold on
 
@@ -238,7 +238,7 @@ yline(0, '--', 'LineWidth', 0.5)
 xlim([-300, 2700])
 ylim([-30, 120])
 
-xlabel('Time from feedback onset (ms)')
+xlabel('Time since feedback (ms)')
 ylabel('Pupil difference (high - low PE)', 'FontSize', font_size);
 
 l = legend([h1.mainLine, h2.mainLine, p1, p2], ...

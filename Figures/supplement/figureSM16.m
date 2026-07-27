@@ -205,7 +205,7 @@ plot(xlim, [0 0], 'k--', 'LineWidth', linewidth_plot);
 hold off
 
 % Title
-title('Behavioral predictors', 'FontWeight', 'Normal', 'FontSize', font_size + 1);
+title('Behavioral predictors', 'FontWeight', 'Normal', 'FontSize', font_size);
 
 % Subplot 2: pupil time course
 % ----------------------------
@@ -269,9 +269,9 @@ ylim([-0.165, 0.01])
 adjust_figprops(ax2_new, font_name, font_size, linewidth_plot);
 
 % Labels
-xlabel('Time since patch onset (ms)', 'FontSize', font_size);
+xlabel('Time since patch (ms)', 'FontSize', font_size);
 ylabel('Pupil predictor', 'FontWeight', 'normal', 'FontSize', font_size);
-title('Pupil dilation in choice phase', 'FontWeight', 'Normal', 'FontSize', font_size + 1);
+title('Pupil dilation in choice phase', 'FontWeight', 'Normal', 'FontSize', font_size);
 
 hold off
 

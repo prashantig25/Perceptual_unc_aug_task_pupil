@@ -74,7 +74,7 @@ function bar_plots(y,mean_all,SEM_all,n,x_groups,bars,legend_names,xticks,xtickl
     % PLOTTING ERROR BARS
     for i = 1:nbars
         a = (1:ngroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*nbars);
-        errorbar(a, mean_all(:,i),SEM_all(:,i),  'k', 'linestyle', 'none','LineWidth',1);
+        errorbar(a, mean_all(:,i), SEM_all(:,i), 'k', 'linestyle', 'none','LineWidth',1);
     end
     hold on
 
