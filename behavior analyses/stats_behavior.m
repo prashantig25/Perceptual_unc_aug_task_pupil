@@ -36,7 +36,7 @@ perc_curve = nanmean(perc_curve,2);
 % LR analysis
 betas_all = importdata(fullfile(regression_path,"betas_signed.mat")); % betas from signed analysis 
 
-%% DESCRIPTIVE ANALYSIS FROM STUDY 2
+%% DESCRIPTIVE ANALYSIS
 
 % Comparison to chance performance
 chance_level = 0.5; % Specify the chance level (e.g., 0.5 for a binary task)
