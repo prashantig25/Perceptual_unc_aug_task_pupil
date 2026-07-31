@@ -1,6 +1,5 @@
 % fullTrial saves pupil signal from different events for the entire trial illustration.
 
-% todo: currently no file found
 clc
 clearvars
 
@@ -37,7 +36,11 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+
+% Create directories if they don't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
 % LOOP OVER SUBJECTS
 for i = 1:num_subjs

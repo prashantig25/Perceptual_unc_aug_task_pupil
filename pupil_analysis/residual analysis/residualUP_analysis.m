@@ -33,17 +33,16 @@ end
 posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, "post_absUP_predict.mat")); % posterior update
 pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb linearInt'); % directory to get preprocessed data
 save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
-
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 
-dirs = {
-    'pupil_dir',  pupil_dir;
-};
+dirs = {'pupil_dir',  pupil_dir};
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
 
-mkdir(save_dir);
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
 % todo: ideally ID is included somewhere here for easier verification
@@ -58,37 +57,28 @@ for n = 1:length(subj_ids)
     array_index = [array_index;find(str2num(subj_ids{n}) == subj_ids_num_sorted)];  % get index
 end
 
+% Initialize object instance
+PupilDescriptive = PupilDescriptive();
+PupilDescriptive.num_sess = num_sess;
+PupilDescriptive.subj_ids = subj_ids;
+PupilDescriptive.behv_dir = behv_dir;
+
 for n = 1:num_subjs
 
-    % GET MISSED TRIALS
-    % todo: use PupilDescriptive class?
-    behv_data = [];
-    data_run = [];
-    for j = 1:num_sess(n)
-        filename = strcat(behv_dir,filesep,subj_ids{n},'_','main',num2str(j),'.xlsx');
-        if strcmp(subj_ids{n},'4672') == 1
-            filename = strcat(behv_dir,filesep,subj_ids{n},'_','main',num2str(j),'_red.xlsx');
-        end
-        data_run = readtable(filename,'VariableNamingRule','preserve');
-        rt = table(data_run.("choice.rt"),'VariableNames',{'rt'});
-        slider = table(data_run.("slider_respond.response"),'VariableNames',{'slider'});
-        data_run = [data_run(:,[1:16]),rt,slider];
-        behv_data = [behv_data; data_run];
-    end
-    missedtrials_rt = isnan(behv_data.rt);
-    behv_data(missedtrials_rt==1,:) = []; % remove missed trials
-    missedtrials = isnan(behv_data.slider);
+    % GET BEHAVIORAL DATA
+    behvData = PupilDescriptive.loadBehavioralData(n);
+
+    % MISSED TRIALS
+    missed_trials = find(isnan(behvData.rt));
+    behvData(missed_trials,:) = [];
+    missed_trials = isnan(behvData.slider);
 
     % LOAD PUPIL SIGNAL
     filename = strcat(pupil_dir,filesep,subj_ids{n},'.mat');
     pupil = importdata(filename);
     size_pupil = size(pupil);
-    if strcmp(timewindow,'patch') == 1
-        pupil_signal = pupil;
-    elseif strcmp(timewindow,'feedback') == 1 
-        pupil_signal = pupil(:,1:col);
-    end
-    pupil_signal(missedtrials == 1,:) = [];
+    pupil_signal = pupil(:,1:col);
+    pupil_signal(missed_trials == 1,:) = [];
 
     % GET BEHAVIORAL REGRESSORS
     preds = preds_all(preds_all.id == str2num(subj_ids{n}),:);

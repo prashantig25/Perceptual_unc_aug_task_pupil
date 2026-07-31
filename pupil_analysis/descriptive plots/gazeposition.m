@@ -1,10 +1,6 @@
 % gazeposition saves single trial x-gaze and y-gaze data for each
 % participant.
 
-% todo: 
-% check if we can delete all other cases than "feedback" in get_gazepos (still used after update?)
-% check consistency with main branch due to previously inconsistent initialization
-
 clc
 clearvars
 
@@ -49,7 +45,6 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelin
 PupilDescriptive.preproc_dir = preproc_dir;
 
 time_pupil = 1000; % time duration of the pupil
-time_base = 10; % time duration of the base
 
 dirs = {
     'save_xgaze',  save_xgaze;
@@ -91,7 +86,6 @@ PupilDescriptive.preproc_dir = preproc_dir;
 % Re-initialize in case one wants to get the gaze data independently for
 % this pipeline
 time_pupil = 1000; % time duration of the pupil
-time_base = 10; % time duration of the base
 
 dirs = {
     'save_xgaze',  save_xgaze;
@@ -132,7 +126,6 @@ preproc_dir = strcat(desiredPath, filesep, 'data', filesep, ...
     'preprocessing', filesep, 'alternate pipeline', filesep, ...
     'preprocessed trials and events added deconv');
 PupilDescriptive.preproc_dir = preproc_dir;
-% behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 
 % Re-initialize in case one wants to get the gaze data independently for
 % this pipeline

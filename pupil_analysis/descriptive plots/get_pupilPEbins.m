@@ -52,11 +52,6 @@ PupilDescriptive.behv_dir = behv_dir;
 % Cycle over subjects
 for i = 1:num_subs
 
-    % GET PUPIL DATA
-    filename = strcat(pupil_dir,filesep,subj_ids{i},'.mat');
-    pupil = importdata(filename);
-    size_pupil = size(pupil);
-
     % GET BEHAVIORAL DATA
     behvData = PupilDescriptive.loadBehavioralData(i);
 

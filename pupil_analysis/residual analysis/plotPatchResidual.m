@@ -91,6 +91,7 @@ end
 % Permutation test
 var1 = reshape(betas_pupil, [1, numSubjs, col_patch]); % [num_vars x num_subjs x col]
 perm_results = get_permtest_updated(1, numSubjs, col_patch, var1);
+
 % Plot results
 % ------------
 

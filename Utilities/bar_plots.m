@@ -82,7 +82,7 @@ function bar_plots(y,mean_all,SEM_all,n,x_groups,bars,legend_names,xticks,xtickl
     set(gca,'XTick',xticks)
     set(gca,'XTicklabels',xticklabs)
     box off
-    title(title_name)
+    title(title_name, 'fontweight', 'normal')
     xlabel(xlabelname)
     ylabel(ylabelname)
     set(gca,'LineWidth',linewidth)

@@ -65,8 +65,8 @@ t_vals(2,:) = stats_perc.tstat;
 df_vals(1,:) = stats_mix.df;
 df_vals(2,:) = stats_perc.df;
 
-ci_l = [ci_vals_mix(1)+chance_level; ci_vals_perc(1)+chance_level];
-ci_u = [ci_vals_mix(2)+chance_level; ci_vals_perc(2)+chance_level];
+ci_l = [ci_vals_mix(1); ci_vals_perc(1)];
+ci_u = [ci_vals_mix(2); ci_vals_perc(2)];
 
 [mean_ecoperf(1,:),sem_ecoperf(1,:)] = compute_mean_sem(ecoperf_mix_avg);
 [mean_ecoperf(2,:),sem_ecoperf(2,:)] = compute_mean_sem(ecoperf_perc_avg);
@@ -141,8 +141,8 @@ chance_level = 0.5;
 [~, p1, ci_m, s1] = ttest(mix_avg, chance_level); 
 [~, p2, ci_p, s2] = ttest(perc_avg, chance_level); 
 
-ci_l = [ci_m(1)+chance_level; ci_p(1)+chance_level];
-ci_u = [ci_m(2)+chance_level; ci_p(2)+chance_level];
+ci_l = [ci_m(1); ci_p(1)];
+ci_u = [ci_m(2); ci_p(2)];
 
 ttestResults = table(cond_names, round([p1; p2],3), round([s1.tstat; s2.tstat],3), round([s1.df; s2.df],3), round(mean_mu,3), round(sem_mu,3), round(ci_l,3), round(ci_u,3), ...
     'VariableNames', {'Condition', 'PValue', 'TStat', 'df', 'mean', 'sem', 'CI_Lower', 'CI_Upper'});

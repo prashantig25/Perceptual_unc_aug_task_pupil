@@ -305,7 +305,6 @@ classdef unit_tests < matlab.mock.TestCase
                 2, ... % zsc_pupil
                 3, ... % xgaze_signal
                 4, ... % ygaze_signal
-                6, ... % zsc_base
                 1, ... % subj_idx
                 1));   % binnedAnalysiss
         end
@@ -487,19 +486,17 @@ classdef unit_tests < matlab.mock.TestCase
 
             % Input variables and attributes
             subj_idx = 1;
-            zsc_base = [];
             analyzer.preds_all = preds_all; % defined in config file
             analyzer.subj_ids = {"001"; "002"; "003"; "004"; "005"};
 
-            [preds, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base]...
-                = analyzer.getBehavioralPredictors(subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base);
+            [preds, zsc_pupil, xgaze_signal, ygaze_signal]...
+                = analyzer.getBehavioralPredictors(subj_idx, zsc_pupil, xgaze_signal, ygaze_signal);
 
             % We expect 4 rows left (PE = 0)
             verifyTrue(testCase, all(size(preds) == [4,5]));
             verifyTrue(testCase, all(size(zsc_pupil) == [4,5]));
             verifyTrue(testCase, all(size(xgaze_signal) == [4,5]));
             verifyTrue(testCase, all(size(ygaze_signal) == [4,5]));
-            testCase.verifyEmpty(zsc_base);
         end
 
 
@@ -521,7 +518,7 @@ classdef unit_tests < matlab.mock.TestCase
             mockPupilRegression.subj_ids = repmat({'1'}, 10, 1); ones(10,1);
 
             % Call the function
-            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 6, 7, true);
+            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 7, true);
             
             % Verify input to fitModelAtTimepoint, where regression
             % model is implemented
@@ -531,7 +528,6 @@ classdef unit_tests < matlab.mock.TestCase
                 2, ... % xgaze_signal_bins
                 3, ... % ygaze_signal_bins
                 4, ... % preds_bins
-                6, ... % zsc_base
                 1, ... % r
                 7));   % % subj_idx
         end
@@ -554,7 +550,7 @@ classdef unit_tests < matlab.mock.TestCase
             mockPupilRegression.subj_ids = repmat({'1'}, 10, 1); ones(10,1);
 
             % Call the function
-            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 6, 7, false);
+            mockPupilRegression.processBinsAndTimepoints(1, 2, 3, 4, 7, false);
            
             % Verify input to fitModelAtTimepoint, where regression
             % model is implemented
@@ -564,7 +560,6 @@ classdef unit_tests < matlab.mock.TestCase
                 3, ... % xgaze_signal_bins
                 4, ... % ygaze_signal_bins
                 1, ... % preds_bins
-                6, ... % zsc_base
                 1, ... % r
                 7));   % % subj_idx
         end
@@ -673,7 +668,7 @@ classdef unit_tests < matlab.mock.TestCase
             analyzer.betas_save = 'unit_test';
             
             % Run function
-            analyzer.fitModelAtTimepoint(c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx);
+            analyzer.fitModelAtTimepoint(c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, r, subj_idx);
            
             % Expected properties
             expected_betas_struct = nan(n_bins, analyzer.num_vars+1, analyzer.num_subs, analyzer.col);

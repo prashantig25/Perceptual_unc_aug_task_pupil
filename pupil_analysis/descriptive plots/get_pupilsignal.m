@@ -4,10 +4,6 @@
 clc
 clearvars
 
-% where do we used saved "sliderOnset"?
-% For each file: indicate which figure/code uses this
-% improve the "main" variable
-t
 %% ========================================================================
 %  SHARED INITIALIZATION - USED BY BOTH PIPELINES
 %  ========================================================================
@@ -18,7 +14,6 @@ num_sess = importdata("num_sess.mat");
 num_subs = length(subj_ids);
 
 % Shared parameters
-% samp_rate = 100; % sampling rate in Hz after down-sampling
 pre_duration = 29; % duration for start of pre-event signal
 base_duration = 9; % duration for baseline signal
 
@@ -82,10 +77,6 @@ dirs = {
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
 
-% mkdir(save_dir);
-% mkdir(save_sliderOnset);
-% main = 1; % running analyses based on the main pipeline
-
 % Create directories if they don't exist yet
 if ~exist(save_dir, 'dir')
     mkdir(save_dir);
@@ -125,8 +116,6 @@ dirs = {
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
 
-%mkdir(save_dir);
-
 % Create directories if they don't exist yet
 if ~exist(save_dir, 'dir')
     mkdir(save_dir);
@@ -157,7 +146,6 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-%mkdir(save_dir);
 
 % Create directory if it don't exist yet
 if ~exist(save_dir, 'dir')
@@ -190,7 +178,6 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -221,7 +208,6 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -253,7 +239,6 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -284,7 +269,6 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -327,7 +311,6 @@ dirs = {
 };
 keywords = {'cubic spline', 'CS'};
 checkPathKeywords(dirs, keywords);
-%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -356,7 +339,6 @@ dirs = {
 };
 keywords = {'cubic spline', 'CS'};
 checkPathKeywords(dirs, keywords);
-%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
@@ -400,8 +382,6 @@ dirs = {
 keywords = {'deconv', 'deconvolution'};
 checkPathKeywords(dirs, keywords);
 
-%mkdir(save_dir);
-
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')
     mkdir(save_dir);
@@ -429,8 +409,6 @@ dirs = {
 };
 keywords = {'deconv', 'deconvolution'};
 checkPathKeywords(dirs, keywords);
-
-%mkdir(save_dir);
 
 % Create directory if it doesn't exist yet
 if ~exist(save_dir, 'dir')

@@ -35,13 +35,13 @@ save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'preprocessed');
 betas_field = betas_pupil.with_intercept;
 
-dirs = {
-    'pupil_dir',  pupil_dir;
-};
+dirs = {'pupil_dir',  pupil_dir;};
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
 
-mkdir(save_dir)
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
 subj_ids_num = [];

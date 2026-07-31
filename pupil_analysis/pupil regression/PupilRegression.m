@@ -245,7 +245,7 @@ classdef PupilRegression < pupilReg_Vars
             zsc_base = obj.loadBaselineData(subj_idx);
 
             % Extract behavioral predictors and align with pupil data
-            [preds, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base] = ...
+            [preds, zsc_pupil, xgaze_signal, ygaze_signal] = ...
                 obj.getBehavioralPredictors(subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base);
 
             % Apply binning to continuous variables if requested
@@ -254,7 +254,7 @@ classdef PupilRegression < pupilReg_Vars
             end
 
             % Process data through bins and timepoints to fit regression models
-            obj.processBinsAndTimepoints(preds, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base, subj_idx, binnedAnalysis);
+            obj.processBinsAndTimepoints(preds, zsc_pupil, xgaze_signal, ygaze_signal, subj_idx, binnedAnalysis);
 
         end
 
@@ -427,7 +427,7 @@ classdef PupilRegression < pupilReg_Vars
             end
         end
 
-        function [preds, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base] = getBehavioralPredictors(obj, subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base)
+        function [preds, zsc_pupil, xgaze_signal, ygaze_signal] = getBehavioralPredictors(obj, subj_idx, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base)
             % GETBEHAVIORALPREDICTORS  Extract and align predictor variables for
             % one subject, removing invalid rows.
             %
@@ -464,7 +464,7 @@ classdef PupilRegression < pupilReg_Vars
             end
         end
 
-        function processBinsAndTimepoints(obj, preds, zsc_pupil, xgaze_signal, ygaze_signal, zsc_base, subj_idx, binnedAnalysis)
+        function processBinsAndTimepoints(obj, preds, zsc_pupil, xgaze_signal, ygaze_signal, subj_idx, binnedAnalysis)
             % PROCESSBINSANDTIMEPOINTS  Fit the regression model across all bins
             %   and timepoints for one subject.
             %
@@ -474,7 +474,6 @@ classdef PupilRegression < pupilReg_Vars
             %   xgaze_signal - Horizontal gaze data
             %   ygaze_signal - Vertical gaze data
             %   behv_data - Behavioral data
-            %   zsc_base - Baseline data
             %   subj_idx - Current subject index
             %   binnedAnalysis - Boolean indicating whether we run binned
             %       or regular analysis 
@@ -516,7 +515,7 @@ classdef PupilRegression < pupilReg_Vars
                     for c = 1:obj.col
                         obj.updateProgress(sprintf('%s | t %d/%d', binLabel, c, obj.col));
                         obj.fitModelAtTimepoint(c, ...
-                            pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx);
+                            pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, r, subj_idx);
                     end
                 end
             end
@@ -556,7 +555,7 @@ classdef PupilRegression < pupilReg_Vars
             preds_bins  = preds(idx, :);
         end
 
-        function fitModelAtTimepoint(obj, c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, zsc_base, r, subj_idx)
+        function fitModelAtTimepoint(obj, c, pupil_signal_bins, xgaze_signal_bins, ygaze_signal_bins, preds_bins, r, subj_idx)
             % FITMODELATTIMEPOINT Fit regression model at a specific timepoint
             % Creates predictor matrix and fits linear model to pupil data
             %
@@ -566,7 +565,6 @@ classdef PupilRegression < pupilReg_Vars
             %   xgaze_signal_bins - Horizontal gaze data for current bin
             %   ygaze_signal_bins - Vertical gaze data for current bin
             %   preds_bins - Predictors for current bin
-            %   zsc_base - Baseline data
             %   r - Current bin index
             %   subj_idx - Current subject index
 
