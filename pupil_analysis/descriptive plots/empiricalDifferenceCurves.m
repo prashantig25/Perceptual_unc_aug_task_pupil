@@ -30,7 +30,7 @@ end
 
 % USER-BASED PATH
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil';
+reqPath = 'GBSliderPupil_NatComms';
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -40,7 +40,7 @@ else
 end
 
 save_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'descriptive');
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb linearInt');
 behv_dir  = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'raw data');
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
 

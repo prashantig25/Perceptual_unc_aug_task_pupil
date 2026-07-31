@@ -8,7 +8,7 @@ xaxis = linspace(-0.3, 9.7, 1000); % Time axis for 1000 samples
 
 % --- 2. PATH SETUP ---
 currentDir = cd; 
-reqPath = 'Perceptual_unc_aug_task_pupil'; 
+reqPath = 'GBSliderPupil_NatComms';
 
 % Determine paths
 pathParts = strsplit(currentDir, filesep);
@@ -20,7 +20,7 @@ else
 end
 
 % Directory definitions for both pipelines
-main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
+main_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
 alt_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'non-baseline corrected fb linearInt');
 
 % --- 3. GENERATE COMPARISON FIGURE ---

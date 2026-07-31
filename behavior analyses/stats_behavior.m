@@ -65,6 +65,9 @@ t_vals(2,:) = stats_perc.tstat;
 df_vals(1,:) = stats_mix.df;
 df_vals(2,:) = stats_perc.df;
 
+% FIX: ci_vals_mix/ci_vals_perc are already CIs for the mean in original
+% units (ttest's second argument only affects the p-value/t-stat, not
+% the returned CI) -- do NOT add chance_level again.
 ci_l = [ci_vals_mix(1); ci_vals_perc(1)];
 ci_u = [ci_vals_mix(2); ci_vals_perc(2)];
 
