@@ -78,11 +78,11 @@ set(fig, 'PaperSize', [width_cm, height_cm]);
 set(fig, 'PaperPosition', [0, 0, width_cm, height_cm]); 
 
 hold on
-bar_plots_pval(y, avg_ydata, sem_ydata, num_subjs, 2, 1,{'',''}, [1, 2], {'High','Low'}, '', ...
-    'State uncertainty','Mean absolute prediction error', 0, 1, 10, 1, font_size, 0.5, font_name, 0, darkblue_muted, pval_str, 0.55)
+bar_plots(y, avg_ydata, sem_ydata, num_subjs, 2, 1, ...
+    {'',''}, [1, 2], {'High','Low'}, '', 'State uncertainty', 'Mean absolute prediction error', font_size, 0.5, font_name, darkblue_muted)
 plot([1.1, 1.9], [0.5 0.5], '-', 'LineWidth', 0.3,'Color', 'k');
 text(1.5, 0.5, pval_str, 'horizontalalignment', 'center', 'BackgroundColor', 'w', 'FontSize', ...
-    5, 'FontWeight', 'normal', 'FontName', font_name);
+   5, 'FontWeight', 'normal', 'FontName', font_name);
 
 fig = gcf; 
 fig.PaperPositionMode = 'auto'; 

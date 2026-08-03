@@ -140,7 +140,7 @@ ax1 = nexttile(1,[1,1]);
 ax2 = nexttile(2,[1,1]);
 ax3 = nexttile(3,[1,1]);
 
-sg = sgtitle('Pupil dilation = \beta_0 + \beta_1 \cdot |\delta| + \beta_2 \cdot |\delta| \cdot |Contrast difference| + \beta_3 \cdot |Update| + ... + \epsilon', ...
+sg = sgtitle('Pupil dilation = \beta_0 + \beta_1 \cdot |PE| + \beta_2 \cdot |PE| \cdot |Contrast difference| + \beta_3 \cdot |Update| + ... + \epsilon', ...
     'Interpreter','Tex','FontSize',8,'FontName',font_name);
 
 %% PLOT MAIN EFFECT OF PE

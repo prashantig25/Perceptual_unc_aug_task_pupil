@@ -224,12 +224,13 @@ bg_gray = [200, 200, 200]./255; % light gray color matrix
 % MAIN GRID MATRIX
 % Columns: { Y, LeftContent, RightContent, LeftBorder, RightBorder, BGColor, BGAlpha }
 grid_matrix = {
-    0.870, 'State 0',           'State 1',           'none', 'none', 'none',  face_alpha_text;       
-    0.800, 'Right stronger',    'Left stronger',     'none', 'none', 'none',  face_alpha_text;       
-    0.730, {'', ''}, {'', ''},  'k', 'k',            bg_gray,                 face_alpha_img;
-    0.500, {'Left', 'Right'},   {'Left', 'Right'},   'k',        'k',        'none',  face_alpha_text;              
-    0.34, '\mu = 0.7',         '\mu = 0.7',         'none',     'none',     'none',  face_alpha_text;           
-    0.270, {'0.7', '0.3'},      {'0.3', '0.7'},      'k',        'k',        'none',  face_alpha_text               
+    0.87, 'State 0',           'State 1',           'none', 'none', 'none',  face_alpha_text;       
+    0.80, 'Right stronger',    'Left stronger',     'none', 'none', 'none',  face_alpha_text;       
+    0.73, {'', ''},            {'', ''},            'k',    'k',    bg_gray, face_alpha_img;
+    0.57, 'Patch choice',      'Patch choice',      'none', 'none', 'none',  face_alpha_text;       
+    0.50, {'Left', 'Right'},   {'Left', 'Right'},   'k',    'k',    'none',  face_alpha_text;              
+    0.34, '\mu = 0.7',         '\mu = 0.7',         'none',  'none', 'none',  face_alpha_text;           
+    0.27, {'0.7', '0.3'},      {'0.3', '0.7'},      'k',    'k',    'none',  face_alpha_text               
 };
 
 % Alignment and style
@@ -271,7 +272,7 @@ end
 % SIDEBAR LABELS
 xpos_rotated = 0.06; 
 
-row_mapping = [4, 6, 3];
+row_mapping = [5, 7, 3];
 strings_rotated = {{'Economic', 'choice'}, {'Contingency', 'parameter'}, 'Stimulus'};
 
 for n = 1:length(row_mapping)
@@ -460,12 +461,26 @@ h(2).Color = mid_PU;
 h(1).Color = high_PU;
 xlabel('Prediction error')
 ylabel('Update')
-
 title('')
 adjust_figprops(ax15_new,font_name,font_size,line_width);
-l = legend('Contrast diff.', '0', '0.5', '1', 'Location', 'northeast', 'AutoUpdate',...
-    'off', 'FontSize', font_size);
-l.Position = [0.76, 0.1700, 0.2710, 0.0400];
+
+% Create legend with ONLY data entries
+l = legend('', '0', '0.5', '1', ...
+    'Location', 'northeast', ...
+    'AutoUpdate', 'off', ...
+    'FontSize', font_size);
+l.Position = [0.66, 0.38, 0.2710, 0.0400];
+
+% Attach a text header directly to the legend's container
+text('Parent', l.DecorationContainer, ...
+    'String', 'Contrast difference', ...
+    'Units', 'normalized', ...
+    'Position', [0.42, 1.0, 0], ... 
+    'HorizontalAlignment', 'left', ...
+    'VerticalAlignment', 'bottom', ...
+    'FontName', font_name, ...
+    'FontSize', font_size, ...
+    'FontWeight', 'normal');
 
 l.EdgeColor = 'none';
 l.Color = 'none';

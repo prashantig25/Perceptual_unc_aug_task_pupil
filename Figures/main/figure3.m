@@ -243,7 +243,7 @@ else
     pval_str = sprintf("\\itp\\rm = %.3f", pval);
 end
 
-text(mean(x(condiffbin.stat == 1)), -39, pval_str, "FontSize", font_size, "FontName", font_name, "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
+text(mean(x(condiffbin.stat == 1)), -37, pval_str, "FontSize", font_size, "FontName", font_name, "VerticalAlignment", "bottom", "HorizontalAlignment", "center")
 
 %% PLOT BINNED REGRESSION RESULTS
 
@@ -306,7 +306,7 @@ ylh_c = ylabel(ax5_new, 'PE-modulated pupil');
 % DISPLAY PERMUTATION TEST RESULTS
 pval_position = 3;
 pval_sign = 1;
-pval_text_dist = 0.05;
+pval_text_dist = 0.0525;
 printPermTest(perm, x, ncoeffs, pval_position, pval_sign, pval_text_dist, font_size, font_name)
 
 % Forces MATLAB to process the font bounding boxes first

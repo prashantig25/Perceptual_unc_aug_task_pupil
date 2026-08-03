@@ -91,11 +91,18 @@ SEM_betas  = std(betas_RT, 0, 1) / sqrt(numSubjs);
 
 % One-Sample T-tests against 0
 p_values = NaN(1, size(betas_RT, 2));
+ci = NaN(1, size(betas_RT, 2));
+CI_low = NaN(1, size(betas_RT, 2));
+CI_high = NaN(1, size(betas_RT, 2));
 t_stats = NaN(1, size(betas_RT, 2));
+df = NaN(1, size(betas_RT, 2));
 
 for i = 1:size(betas_RT, 2)
-    [~, p_values(i), ~, stats] = ttest(betas_RT(:, i));
+    [~, p_values(i), ci, stats] = ttest(betas_RT(:, i));
+    CI_low(i) = ci(1);
+    CI_high(i) = ci(2);
     t_stats(i) = stats.tstat;
+    df(i) = stats.df;
     if p_values(i) < 0.001
         p_values(i) = 0.001;
     end
@@ -174,25 +181,21 @@ end
 
 % Save statistics
 termString = {"condition"; "condiff"; "PE_prevTrial"};
-
-% Compute 95% CI: used?
-df = numSubjs - 1;
-t_crit = tinv(0.975, df);
-CI_low = mean_betas' - t_crit * SEM_betas';
-CI_high = mean_betas' + t_crit * SEM_betas';
-
 T = table(termString, ...
     round(t_stats,3).', ...
-    repmat(df, 3, 1), ...
+    df.', ...
     round(mean_betas,3).', ...
     round(SEM_betas,3).', ...
-    round(CI_low,3), ...
-    round(CI_high,3), ...
+    round(CI_low,3).', ...
+    round(CI_high,3).', ...
     round(p_values,3).', ...
     'VariableNames', {'term','t_stat','df','mean','SEM','CI_low','CI_high','pValuesRT'});
 
 saveStat = fullfile(desiredPath,"data","GB data two pipelines","pupil","stats");
 safe_saveall(strcat(saveStat, filesep, 'RTRegression_previousTrial.csv'), T);
+
+% Print for stat check
+display(T);
 
 % Save figure
 fig = gcf;
