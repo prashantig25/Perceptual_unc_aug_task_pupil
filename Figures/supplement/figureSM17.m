@@ -61,7 +61,7 @@ axes_old = [ax1, ax2, ax3, ax4];
 
 %% PLOT COEFFICIENT CURVES
 
-ylabel_strings = ["Uncertainty-modulated pupil", "Low reward uncertainty", "x-gaze-modulated pupil", "x-gaze-modulated pupil"];
+ylabel_strings = ["Uncertainty-modulated pupil", "Experimental condition", "x-gaze-modulated pupil", "y-gaze-modulated pupil"];
 ncoeffs = [condiff_idx, condition_idx, xgaze_idx, ygaze_idx]; % order in which coefficients are to be plotted
 pval_position = [0, 0, 5, 5]; % position to plot p-value
 pval_sign = [1, 1, 1, 1];
