@@ -14,7 +14,7 @@ trial_all = NaN(num_subjs,total);
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -60,16 +60,11 @@ safe_saveall(strcat(save_dir,filesep,"full_trial non-baseline corrected_linearIn
 %% Figure for rebuttal ...
 
 % --- 1. SETUP PATHS & DATA ---
-% (Assuming desiredPath is already defined or found via your createSavePaths function)
-currentDir = cd; 
-reqPath = 'Perceptual_unc_aug_task_pupil-main'; 
-desiredPath = currentDir; % Placeholder
-
 % Load Alternate Pipeline Data (Non-baseline corrected)
-data_alt = importdata('full_trial non-baseline corrected_linearInt.mat');
+data_alt = importdata(fullfile(save_dir, 'full_trial non-baseline corrected_linearInt.mat'));
 
 % Load Main Pipeline Data (Baseline corrected / Processed)
-data_main = importdata('full_trial.mat');
+data_main = importdata(fullfile(save_dir, 'full_trial_linearInt.mat'));
 
 % Parameters
 num_subjs = size(data_main, 1);
