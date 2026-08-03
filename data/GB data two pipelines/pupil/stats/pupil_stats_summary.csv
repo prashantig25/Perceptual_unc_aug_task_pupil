@@ -1,0 +1,50 @@
+order,figure,analysis,term,pval,tStat,df,mean,sem,cohenD,CILower,CIUpper
+1,Fig. 3,"PE bin high vs. low",peBinned,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+2,Fig. 3,"Binned regression PE x condiff",peBinned_condiff,0.016,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+3,Fig. 3,"Binned PE x condiff (cubic spline)",peBinned_condiff_cubicSpline,0.06,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+4,Fig. 3,"Binned PE x condiff (deconvolution)",peBinned_condiff_deconv,0.014,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+5,Fig. 4,"PE main effect",pe_main,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+6,Fig. 4,"Uncertainty-weighted PE",peCondiff_main,0.01,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+7,Fig. 5a,"Posterior-predicted update",post_up,0.001,12.845,46,0.37,0.029,1.874,0.312,0.428
+8,Fig. 5b,"Pupil predicts residual update",pupil,0.006,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+9,SM Fig. 2,"RT regression",condition,0.748,0.324,46,0.005,0.016,NaN,-0.027,0.038
+10,SM Fig. 2,"RT regression",condiff,0.001,-5.886,46,-0.039,0.007,NaN,-0.052,-0.025
+11,SM Fig. 2,"RT regression",PE_prevTrial,0.568,0.575,46,0.004,0.007,NaN,-0.01,0.018
+12,SM Fig. 6,"UP-modulated pupil (binned, low vs. high uncertainty)",NotSaved,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+13,SM Fig. 8,"UP/RT/x-gaze/y-gaze regressors (main model)",NotSaved,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+14,SM Fig. 9,"PE main effect (RT regressed out)",pe_regressedRT,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+15,SM Fig. 9,"Uncertainty-weighted PE (RT regressed out)",peCondiff_regressedRT,0.01,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+16,SM Fig. 10,"PE main effect (no baseline correction)",pe_NBC,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+17,SM Fig. 10,"Uncertainty-weighted PE (no baseline correction)",peCondiff_NBC,0.03,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+18,SM Fig. 11,"PE main effect (het., linear int.)",pe_het_linearInt,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+19,SM Fig. 11,"Uncertainty-weighted PE (het., linear int.)",peCondiff_het_linearInt,0.016,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+20,SM Fig. 11,"PE main effect (het., cubic spline)",pe_het_cubicSpline,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+21,SM Fig. 11,"Uncertainty-weighted PE (het., cubic spline)",peCondiff_het_cubicSpline,0.021,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+22,SM Fig. 11,"PE main effect (het., deconvolution)",pe_het_deconvolution,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+23,SM Fig. 11,"Uncertainty-weighted PE (het., deconvolution)",peCondiff_het_deconvolution,0.03,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+24,SM Fig. 12/13,"Multiverse specification",pe_main,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+25,SM Fig. 12/13,"Multiverse specification",peCondiff_main,0.01,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+26,SM Fig. 12/13,"Multiverse specification",pe_mainCS,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+27,SM Fig. 12/13,"Multiverse specification",peCondiff_mainCS,0.018,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+28,SM Fig. 12/13,"Multiverse specification",pe_mainDeconv,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+29,SM Fig. 12/13,"Multiverse specification",peCondiff_mainDeconv,0.025,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+30,SM Fig. 12/13,"Multiverse specification",pe_NBC,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+31,SM Fig. 12/13,"Multiverse specification",peCondiff_NBC,0.03,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+32,SM Fig. 12/13,"Multiverse specification",pe_NBC_CS,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+33,SM Fig. 12/13,"Multiverse specification",peCondiff_NBC_CS,0.028,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+34,SM Fig. 12/13,"Multiverse specification",pe_NBC_deconv,0.002,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+35,SM Fig. 12/13,"Multiverse specification",peCondiff_NBC_deconv,0.023,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+36,SM Fig. 12/13,"Multiverse specification",pe_regressedRT,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+37,SM Fig. 12/13,"Multiverse specification",peCondiff_regressedRT,0.01,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+38,SM Fig. 12/13,"Multiverse specification",pe_regressedRT_CS,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+39,SM Fig. 12/13,"Multiverse specification",peCondiff_regressedRT_CS,0.018,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+40,SM Fig. 12/13,"Multiverse specification",pe_regressedRT_deconv,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+41,SM Fig. 12/13,"Multiverse specification",peCondiff_regressedRT_deconv,0.025,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+42,SM Fig. 14,"PE main effect (additive model)",pe_additiveMdl,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+43,SM Fig. 15,"Uncertainty-modulated pupil (residual learning)",NotSaved,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+44,SM Fig. 16,"Choice-phase regression",condition_choicePhase,0.105,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+45,SM Fig. 16,"Choice-phase regression",condiff_choicePhase,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+46,SM Fig. 16,"Choice-phase regression",muZsc_choicePhase,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+47,SM Fig. 16,"Choice-phase regression",ppc,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+48,SM Fig. 16,"Choice-phase regression",pupil_choicePhase,0.005,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+49,SM Fig. 17,"Contrast diff / condition / x-gaze / y-gaze (patch phase)",NotSaved,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN

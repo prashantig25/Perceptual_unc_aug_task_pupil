@@ -1,0 +1,6 @@
+order,analysis,condition,mean,sem,TStat,df,PValue,cohenD,CILower,CIUpper
+1,Economic-choice performance vs. chance (SM Fig. 1),mix,0.719,0.022,10.15,46,0,1.481,0.676,0.763
+2,Economic-choice performance vs. chance (SM Fig. 1),perc,0.762,0.017,15.61,46,0,2.277,0.728,0.796
+3,Absolute PE by state uncertainty (SM Fig. 7),high,0.41,0.009,NaN,NaN,NaN,NaN,NaN,NaN
+4,Absolute PE by state uncertainty (SM Fig. 7),low,0.397,0.009,NaN,NaN,NaN,NaN,NaN,NaN
+5,Absolute PE: high vs. low state uncertainty (SM Fig. 7),highLow,NaN,NaN,2.206,46,0.032,0.322,0.001,0.026

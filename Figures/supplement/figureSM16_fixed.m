@@ -1,5 +1,19 @@
-% This script runs logistic regressions on the patch phase to examine how much
+% Figure S16 (FIXED): This script runs a logistic regressions on the patch phase to examine how much
 % residual variance pupil data can explain
+%
+% FIX vs. figureSM16.m: SM Eq. 1 defines the behavioral model's third
+% regressor as the subjective reward probability from the PREVIOUS trial
+% (mu_hat_{t-1}). The original script instead used the current trial's own
+% recoded slider report (mu_hat_t) at the same row index as the outcome
+% being predicted, which is non-causal. Here, mu_congruence is shifted by
+% one trial within each block (no cross-block lag), following the same
+% within-block lag convention used for PE in figureSM2.m. Each block's
+% first trial (no previous-trial mu available) is dropped from that
+% subject's data, and the pupil-signal rows are trimmed identically to
+% keep everything aligned.
+%
+% Outputs are saved under distinct filenames so the original figureSM16.m
+% outputs (patchResidual_stats.csv, Figure_SM16.pdf) are left untouched.
 
 clc
 clearvars
@@ -8,6 +22,7 @@ clearvars
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 numSubjs = length(num_sess);
+num_blocks = 8; % total number of blocks per subject
 
 currentDir = cd; % current directory
 reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
@@ -53,17 +68,36 @@ for n = 1:numSubjs
     % Load preprocessed behavioral data
     preds = preds_all(preds_all.id == str2double(subj_ids{n}), :);
 
-    % Add variables for regression model
-    preds.mu_congruence = NaN(height(preds), 1);
-    preds.mu_congruence(preds.congruence == 1) = preds.mu(preds.congruence == 1);
-    preds.mu_congruence(preds.congruence == 0) = 1-preds.mu(preds.congruence == 0);
-    preds.condiffZsc = zscore(preds.con_diff);
-    preds.muZsc = zscore(preds.mu_congruence);
-
     % Load pupil data
     filename = strcat(pupil_dir,filesep,subj_ids{n},'.mat');
     pupilSignal = importdata(filename);
     pupilSignal(missedTrials_slider == 1,:) = [];
+
+    % Add variables for regression model
+    preds.mu_congruence = NaN(height(preds), 1);
+    preds.mu_congruence(preds.congruence == 1) = preds.mu(preds.congruence == 1);
+    preds.mu_congruence(preds.congruence == 0) = 1-preds.mu(preds.congruence == 0);
+
+    % FIX: shift mu_congruence by one trial within each block to obtain
+    % mu_hat_{t-1} (SM Eq. 1), instead of using the same-trial mu_hat_t
+    preds.mu_prev = NaN(height(preds), 1);
+    for b = 1:num_blocks
+        blockIdx = find(preds.blocks == b);
+        if numel(blockIdx) < 2
+            continue
+        end
+        preds.mu_prev(blockIdx(2:end)) = preds.mu_congruence(blockIdx(1:end-1));
+    end
+
+    % Drop each block's first trial (no previous-trial mu available), and
+    % remove the corresponding rows from the pupil signal to keep the two
+    % aligned
+    validRow = ~isnan(preds.mu_prev);
+    preds = preds(validRow, :);
+    pupilSignal = pupilSignal(validRow, :);
+
+    preds.condiffZsc = zscore(preds.con_diff);
+    preds.muZsc = zscore(preds.mu_prev);
 
     % Behavioral model
     mdlBehv = fitglm(preds,'ecoperf','ecoperf ~ 1 + condiffZsc + condition + muZsc','CategoricalVars','condition','Distribution','binomial','Link','logit');
@@ -113,7 +147,18 @@ num_subjs = size(betas_pupil, 1);
 neutral = [7, 53, 94]/255;
 
 % Tile layout
-figure('Position', [200, 200, 450, 200])
+f1 = figure;
+set(f1, 'Visible', 'on');
+
+% Size in CM
+width_cm = 13;
+height_cm = 6;
+set(f1, 'Units', 'centimeters');
+set(f1, 'Position', [10, 10, width_cm, height_cm]);
+set(f1, 'PaperUnits', 'centimeters');
+set(f1, 'PaperSize', [width_cm, height_cm]);
+set(f1, 'PaperPosition', [0, 0, width_cm, height_cm]);
+
 t = tiledlayout(1, 2, 'Padding', 'compact', 'TileSpacing', 'compact');
 ax1 = nexttile(1);
 ax2 = nexttile(2);
@@ -173,7 +218,7 @@ adjust_figprops(ax1_new, font_name, font_size, line_width, xlim_vals, ylim_vals)
 multiline_labs = {
     sprintf('Perceptual\ncondition'), ...
     sprintf('Contrast\ndifference'), ...
-    sprintf('Reward prob.\n(previous trial)')
+    sprintf('Reward prob.\n(prev. trial)')
     };
 
 set(ax1_new, 'XTickLabels', {}); % clear any residual labels
@@ -194,7 +239,7 @@ plot(xlim, [0 0], 'k--', 'LineWidth', linewidth_plot);
 hold off
 
 % Title
-title('Behavioral Predictors', 'FontWeight', 'Normal', 'FontSize', font_size + 1);
+title('Behavioral predictors', 'FontWeight', 'Normal', 'FontSize', font_size);
 
 % Subplot 2: pupil time course
 % ----------------------------
@@ -209,7 +254,7 @@ delete(ax2);
 % Prepare pupil time series data
 data_ts = squeeze(betas_pupil);
 perm = perm_results;
-safe_saveall(fullfile(save_dir, "perm_residualPatch.mat"), perm);
+safe_saveall(fullfile(save_dir, "perm_residualPatch_fixed.mat"), perm);
 
 col_len = size(data_ts, 2);
 time_points = linspace(-300, 1000, 130);
@@ -254,12 +299,13 @@ end
 
 % Adjust figure properties
 xlim([-300, 1000]);
+ylim([-0.165, 0.01])
 adjust_figprops(ax2_new, font_name, font_size, linewidth_plot);
 
 % Labels
-xlabel('Time since patch onset (ms)', 'FontSize', font_size);
-ylabel('Mean beta coefficient', 'FontWeight', 'normal', 'FontSize', font_size);
-title('Pupil dilation in choice phase', 'FontWeight', 'Normal', 'FontSize', font_size + 1);
+xlabel('Time since patch (ms)', 'FontSize', font_size);
+ylabel('Pupil predictor', 'FontWeight', 'normal', 'FontSize', font_size);
+title('Pupil dilation in choice phase', 'FontWeight', 'Normal', 'FontSize', font_size);
 
 hold off
 
@@ -269,7 +315,7 @@ hold off
 % Label for subplot 1
 ax1_pos = ax1_new.Position;
 adjust_x = -0.09;
-adjust_y = ax1_pos(4); % + 0.04;
+adjust_y = ax1_pos(4);
 [label_x, label_y] = change_plotlabel(ax1_new, adjust_x, adjust_y);
 annotation('textbox', [label_x label_y .05 .05], 'String', 'a', ...
     'FontSize', 12, 'LineStyle', 'none', ...
@@ -281,23 +327,34 @@ annotation('textbox', [label_x label_y .05 .05], 'String', 'b', ...
     'FontSize', 12, 'LineStyle', 'none', ...
     'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
 
-% Do a ttest on PPC 
-ppcMean = mean(betas_ppc,2);
-[h,p] = ttest(ppcMean);
+% Do a ttest on PPC
+ppcMean = mean(betas_ppc, 2);
+[h, p] = ttest(ppcMean);
 if p < 0.001
     p = 0.001; % for the sake of MS
 end
 
 % Save figure
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'coeffs_logRegModel_pupil.png', '-dpng', '-r600')
+fig = gcf;
+fig.PaperPositionMode = 'auto';
+% print(fig, 'coeffs_logRegModel_pupil.png', '-dpng', '-r600')
+% exportgraphics(gcf, 'Figure_SM16.pdf', 'ContentType', 'vector')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none';
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM16_fixed.pdf', style);
 
 % Save stats
 results = table({}, [], 'VariableNames', {'term', 'pval'});
 results = [results; table({'pupil_choicePhase'}, round(min(perm_results.prob(1, perm_results.mask(1,:) == 1)), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'ppc'}, round(p, 3), 'VariableNames', {'term', 'pval'})];
-results = [results; table({'condiff_choicePhase'}, round(pVals(1), 3), 'VariableNames', {'term', 'pval'})];
-results = [results; table({'condition_choicePhase'}, round(pVals(2), 3), 'VariableNames', {'term', 'pval'})];
+results = [results; table({'condition_choicePhase'}, round(pVals(1), 3), 'VariableNames', {'term', 'pval'})];
+results = [results; table({'condiff_choicePhase'}, round(pVals(2), 3), 'VariableNames', {'term', 'pval'})];
 results = [results; table({'muZsc_choicePhase'}, round(pVals(3), 3), 'VariableNames', {'term', 'pval'})];
-safe_saveall(fullfile(save_dir, 'patchResidual_stats.csv'),results);
+safe_saveall(fullfile(save_dir, 'patchResidual_stats_fixed.csv'),results);

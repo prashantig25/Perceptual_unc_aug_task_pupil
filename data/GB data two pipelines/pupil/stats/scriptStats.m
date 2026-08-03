@@ -146,3 +146,99 @@ results = [results; table({'peCondiff_het_deconvolution'}, round(min(perm.prob(p
 
 safe_saveall(fullfile(save_dir,filesep,"allStats.csv"),results)
 
+%% CONSOLIDATED SUMMARY OF ALL PUPIL STATS (FOR MANUSCRIPT REFERENCE)
+
+% Reads back every pupil-stats CSV in the repo and stitches them into one
+% ordered table. Sources store different levels of detail (some only a
+% p-value, some the full t/df/mean/SEM/CI/Cohen's d), so missing fields
+% are left as NaN. Figures with no saved stats file (SM6, SM8, SM15,
+% SM17) get an explicit placeholder row so the gap is visible instead of
+% silently omitted. SM7 (behavioral, absolute PE by state uncertainty) is
+% already covered by supplement_stats_summary.csv and is not duplicated
+% here.
+
+pupil_residual_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'residual');
+
+allStatsMulti = readtable(fullfile(save_dir, 'allStats_multiverse.csv'));
+fig5a         = readtable(fullfile(save_dir, 'figure5a_stats.csv'));
+rtPrevTrial   = readtable(fullfile(save_dir, 'RTRegression_previousTrial.csv'));
+patchResid    = readtable(fullfile(pupil_residual_dir, 'patchResidual_stats.csv'));
+
+rowsP = {}; % figure, analysis, term, pval, tStat, df, mean, sem, cohenD, CILower, CIUpper
+
+addPvalRow = @(rowsIn, fig, analysis, T, termName) ...
+    [rowsIn; {fig, analysis, termName, T.pval(strcmp(string(T.term), termName)), NaN, NaN, NaN, NaN, NaN, NaN, NaN}]; %#ok<*NASGU>
+
+% --- Figure 3 (main): descriptive/binned regression ---
+rowsP = addPvalRow(rowsP, "Fig. 3", "PE bin high vs. low", results, 'peBinned');
+rowsP = addPvalRow(rowsP, "Fig. 3", "Binned regression PE x condiff", results, 'peBinned_condiff');
+rowsP = addPvalRow(rowsP, "Fig. 3", "Binned PE x condiff (cubic spline)", results, 'peBinned_condiff_cubicSpline');
+rowsP = addPvalRow(rowsP, "Fig. 3", "Binned PE x condiff (deconvolution)", results, 'peBinned_condiff_deconv');
+
+% --- Figure 4 (main): main regression model ---
+rowsP = addPvalRow(rowsP, "Fig. 4", "PE main effect", results, 'pe_main');
+rowsP = addPvalRow(rowsP, "Fig. 4", "Uncertainty-weighted PE", results, 'peCondiff_main');
+
+% --- Figure 5 (main): residual learning analysis ---
+r = fig5a(strcmp(string(fig5a.term), 'Predicted update (beta1)'), :);
+rowsP = [rowsP; {"Fig. 5a", "Posterior-predicted update", "post_up", r.p_value, r.t_stat, r.df, r.mean, r.SEM, r.cohen_d, r.CI_low, r.CI_high}];
+rowsP = addPvalRow(rowsP, "Fig. 5b", "Pupil predicts residual update", results, 'pupil');
+
+% --- SM2: reaction-time regression ---
+for term = ["condition","condiff","PE_prevTrial"]
+    r = rtPrevTrial(strcmp(string(rtPrevTrial.term), term), :);
+    rowsP = [rowsP; {"SM Fig. 2", "RT regression", term, r.pValuesRT, r.t_stat, r.df, r.mean, r.SEM, NaN, r.CI_low, r.CI_high}];
+end
+
+% --- SM6: not saved as a stats CSV ---
+rowsP = [rowsP; {"SM Fig. 6", "UP-modulated pupil (binned, low vs. high uncertainty)", "NotSaved", NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN}];
+
+% --- SM8: not saved as a stats CSV ---
+rowsP = [rowsP; {"SM Fig. 8", "UP/RT/x-gaze/y-gaze regressors (main model)", "NotSaved", NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN}];
+
+% --- SM9: removing RT prior to analysis ---
+rowsP = addPvalRow(rowsP, "SM Fig. 9", "PE main effect (RT regressed out)", results, 'pe_regressedRT');
+rowsP = addPvalRow(rowsP, "SM Fig. 9", "Uncertainty-weighted PE (RT regressed out)", results, 'peCondiff_regressedRT');
+
+% --- SM10: excluding high-pass filtering and baseline correction ---
+rowsP = addPvalRow(rowsP, "SM Fig. 10", "PE main effect (no baseline correction)", results, 'pe_NBC');
+rowsP = addPvalRow(rowsP, "SM Fig. 10", "Uncertainty-weighted PE (no baseline correction)", results, 'peCondiff_NBC');
+
+% --- SM11: heteroskedasticity model ---
+rowsP = addPvalRow(rowsP, "SM Fig. 11", "PE main effect (het., linear int.)", results, 'pe_het_linearInt');
+rowsP = addPvalRow(rowsP, "SM Fig. 11", "Uncertainty-weighted PE (het., linear int.)", results, 'peCondiff_het_linearInt');
+rowsP = addPvalRow(rowsP, "SM Fig. 11", "PE main effect (het., cubic spline)", results, 'pe_het_cubicSpline');
+rowsP = addPvalRow(rowsP, "SM Fig. 11", "Uncertainty-weighted PE (het., cubic spline)", results, 'peCondiff_het_cubicSpline');
+rowsP = addPvalRow(rowsP, "SM Fig. 11", "PE main effect (het., deconvolution)", results, 'pe_het_deconvolution');
+rowsP = addPvalRow(rowsP, "SM Fig. 11", "Uncertainty-weighted PE (het., deconvolution)", results, 'peCondiff_het_deconvolution');
+
+% --- SM12/13: multiverse (all specifications) ---
+for i = 1:height(allStatsMulti)
+    rowsP = [rowsP; {"SM Fig. 12/13", "Multiverse specification", char(string(allStatsMulti.term(i))), allStatsMulti.pval(i), NaN, NaN, NaN, NaN, NaN, NaN, NaN}];
+end
+
+% --- SM14: additive regression model ---
+rowsP = addPvalRow(rowsP, "SM Fig. 14", "PE main effect (additive model)", results, 'pe_additiveMdl');
+
+% --- SM15: not saved as a stats CSV ---
+rowsP = [rowsP; {"SM Fig. 15", "Uncertainty-modulated pupil (residual learning)", "NotSaved", NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN}];
+
+% --- SM16: choice-phase logistic regression + pupil ---
+for term = ["condition_choicePhase","condiff_choicePhase","muZsc_choicePhase","ppc","pupil_choicePhase"]
+    rowsP = addPvalRow(rowsP, "SM Fig. 16", "Choice-phase regression", patchResid, term);
+end
+
+% --- SM17: not saved as a stats CSV ---
+rowsP = [rowsP; {"SM Fig. 17", "Contrast diff / condition / x-gaze / y-gaze (patch phase)", "NotSaved", NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN}];
+
+orderP = (1:size(rowsP,1)).';
+pupilSummaryTable = table(orderP, string(rowsP(:,1)), string(rowsP(:,2)), string(rowsP(:,3)), ...
+    round(cell2mat(rowsP(:,4)),3), round(cell2mat(rowsP(:,5)),3), round(cell2mat(rowsP(:,6)),3), ...
+    round(cell2mat(rowsP(:,7)),3), round(cell2mat(rowsP(:,8)),3), round(cell2mat(rowsP(:,9)),3), ...
+    round(cell2mat(rowsP(:,10)),3), round(cell2mat(rowsP(:,11)),3), ...
+    'VariableNames', {'order','figure','analysis','term','pval','tStat','df','mean','sem','cohenD','CILower','CIUpper'});
+
+safe_saveall(fullfile(save_dir, 'pupil_stats_summary.csv'), pupilSummaryTable);
+disp("Consolidated pupil stats summary");
+display(pupilSummaryTable);
+
