@@ -76,7 +76,7 @@ adjust_figprops(ax1, font_name, font_size, linewidth_plot);
 hold on
 xlim([-300, 2700])
 xlabel('Time since feedback (ms)')
-ylabel('Uncertainty-modulated pupil', 'FontWeight', 'normal', 'FontName', font_name, 'FontSize', font_size)
+ylabel('Uncertainty-modulated pupil')
 
 pval_position = -0.003;
 pval_text_dist = 0.05;
@@ -99,9 +99,9 @@ l = legend([a.mainLine, b.mainLine, c.mainLine, d.mainLine],...
     'High arousal & high uncertainty', 'High arousal & low uncertainty', 'Low arousal & high uncertainty', 'Low arousal & low uncertainty', font_name, ...
     'Location', 'NorthEast', 'EdgeColor', 'none', 'AutoUpdate', 'off', 'Color', 'none', 'FontName', font_name, 'FontSize', font_size);
 l.ItemTokenSize = [20, 20];
-xlabel('Time since feedback (ms)')
-ylabel('Model-predicted absolute UP', 'FontWeight', 'normal', 'FontName', font_name, 'FontSize', font_size)
 adjust_figprops(ax2, font_name, font_size, linewidth_plot);
+xlabel('Time since feedback (ms)')
+ylabel('Model-predicted absolute UP')
 
 hold on
 xlim([-300, 2700])
@@ -132,7 +132,7 @@ adjust_figprops(ax3, font_name, font_size, linewidth_plot);
 hold on
 xlim([-300, 2700])
 xlabel('Time since feedback (ms)')
-ylabel('PE-modulated pupil', 'FontWeight', 'normal', 'FontName', font_name, 'FontSize', font_size)
+ylabel('PE-modulated pupil') 
 
 printPermTest(perm, xaxis, pe_pupil_idx, pval_position, pval_text_dist, font_size, font_name)
 
@@ -159,7 +159,7 @@ adjust_figprops(ax4, font_name, font_size, linewidth_plot);
 hold on
 xlim([-300, 2700])
 xlabel('Time since feedback (ms)')
-ylabel('Uncertainty- and PE-modulated pupil', 'FontWeight', 'normal', 'FontName',font_name, 'FontSize', font_size)
+ylabel('Uncertainty- and PE-modulated pupil')
 
 printPermTest(perm, xaxis, pe_pupil_condiff_idx, pval_position, pval_text_dist, font_size, font_name)
 

@@ -162,12 +162,12 @@ for a = 1:length(ncoeffs)
     shadedErrorBar(x, yAvg, ySem, {'LineWidth', 2, 'Color', neutral}, 1);
     
     % Adjust Axes
-    ylabel(ylabel_strings(:,a), 'FontName', font_name, 'FontSize', font_size);
+    adjust_figprops(axes_new(a), font_name, font_size, 0.5)
     xlim([-300, 2700]);
     xline(0, '--k', 'HandleVisibility', 'off');
     yline(0, '--k', 'HandleVisibility', 'off');
-    xlabel('Time since feedback (ms)', 'FontName', font_name, 'FontSize', font_size);
-    set(gca, 'FontName', font_name, 'FontSize', font_size);
+    xlabel('Time since feedback (ms)');
+    ylabel(ylabel_strings(:,a));
 
     % PLOT PERMUTATION TEST
     printPermTest(perm, x, ncoeffs(a), pval_position(a), pval_sign(a), pval_text_dist, font_size, font_name)

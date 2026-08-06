@@ -75,7 +75,7 @@ xpos_change = [0, 0, 0, 0, 0, 0, 0]; % position change for axes
 pval_position = [0 2 2 2 -25 10 5]; % position to plot p-values
 pval_position_pos = [0, 3, 1, 2, 3.5, 3.5, 3.5]; % position to plot p-values
 pval_sign = [1, 1, 1, 1, 1, 1, 1];
-pval_text_dist = 0.05;
+pval_text_dist = 0.055;
 
 % Read out the positions calculated by tiledlayout
 first_plot_pos = axes_old(1).Position; 
