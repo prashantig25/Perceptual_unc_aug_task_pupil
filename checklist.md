@@ -24,7 +24,7 @@
 - [ ] **Pregenerate random starting points:** `pregenSP.m` *(for heteroskedastic regression)*
 - [ ] **Run heteroskedastic regressions:** `fitHet_models.m`
 - [ ] **Run main article residual analysis:** `residualUP_analysis.m`
-- [ ] **Task G:** `arousal_variabilityInteractions.m`
+- [ ] **Main residual analysis:** `arousal_variabilityInteractions.m`
 - [ ] **Run supplementary residual analysis:** `plotPatchResidual.m`
 
 ---
