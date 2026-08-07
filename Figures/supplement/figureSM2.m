@@ -154,9 +154,6 @@ h = bar_plots_pval(y, mean_all, SEM_all, numSubjs, 3, 1, {''}, ...
 
 ylim([-0.25, 0.29])
 xlim([0.5, 3.5])
-hold on
-plot(xlim, [0 0], 'k--', 'LineWidth', 1);
-hold off
 
 % Manually draw multiline x-tick labels
 multiline_labs = {

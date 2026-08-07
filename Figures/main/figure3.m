@@ -63,7 +63,7 @@ delete(ax1);
 % TIME POINTS FOR EACH EVENT
 patch_tp = repelem(1, 1, 100);
 pre_resp = zeros(1, 30);
-resp = repelem(2, 1 ,200);
+resp = repelem(2, 1, 200);
 resp_tp = [pre_resp,resp];
 pre_fb = zeros(1, 30);
 fb = repelem(3, 1, 270);

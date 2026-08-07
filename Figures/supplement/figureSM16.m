@@ -206,6 +206,9 @@ multiline_labs = {
     sprintf('Reward prob.\n(prev. trial)')
     };
 
+% Title
+title('Behavioral predictors');
+
 set(ax1_new, 'XTickLabels', {}); % clear any residual labels
 yl = ylim(ax1_new);
 label_y = yl(1) - 0.02 * diff(yl); % adjust vertical offset as needed
@@ -213,18 +216,9 @@ label_y = yl(1) - 0.02 * diff(yl); % adjust vertical offset as needed
 for i = 1:3
     text(ax1_new, i, label_y, multiline_labs{i}, ...
         'HorizontalAlignment', 'center', ...
-        'VerticalAlignment', 'top', ...
-        'FontName', font_name, ...
+        'VerticalAlignment', 'top', 'FontName', font_name, ... 
         'FontSize', font_size);
 end
-
-% Add horizontal line at zero
-hold on
-plot(xlim, [0 0], 'k--', 'LineWidth', linewidth_plot);
-hold off
-
-% Title
-title('Behavioral predictors', 'FontWeight', 'Normal', 'FontSize', font_size);
 
 % Subplot 2: pupil time course
 % ----------------------------
@@ -250,11 +244,7 @@ sem_ts = std(data_ts, 0, 1) ./ sqrt(sum(~isnan(data_ts), 1));
 
 % Plot with shaded error bar
 hold on
-plot(time_points, mean_ts, ...
-    'Color', darkblue_muted, 'LineStyle', '-', 'LineWidth', linewidth_curves);
-shadedErrorBar(time_points, mean_ts, ...
-    sem_ts, ...
-    {'Color', darkblue_muted, 'LineWidth', linewidth_curves}, 1);
+shadedErrorBar(time_points, mean_ts, sem_ts, {'Color', darkblue_muted, 'LineWidth', linewidth_curves}, 1);
 
 % Add reference lines
 xline(0, 'LineStyle', '--', 'LineWidth', linewidth_plot, 'Color', 'k');
@@ -283,14 +273,14 @@ if ~isempty(sig_indices)
 end
 
 % Adjust figure properties
-xlim([-300, 1000]);
-ylim([-0.165, 0.01])
-adjust_figprops(ax2_new, font_name, font_size, linewidth_plot);
+xlim_vals2 = [-300, 1000];
+ylim_vals2 = [-0.165, 0.01];
+adjust_figprops(ax2_new, font_name, font_size, linewidth_plot, xlim_vals2, ylim_vals2);
 
 % Labels
-xlabel('Time since patch (ms)', 'FontSize', font_size);
-ylabel('Pupil predictor', 'FontWeight', 'normal', 'FontSize', font_size);
-title('Pupil dilation in choice phase', 'FontWeight', 'Normal', 'FontSize', font_size);
+xlabel('Time since patch (ms)');
+ylabel('Pupil predictor');
+title('Pupil dilation in choice phase', "FontWeight", "Normal");
 
 hold off
 
@@ -315,9 +305,6 @@ annotation('textbox', [label_x label_y .05 .05], 'String', 'b', ...
 % Do a ttest on PPC 
 ppcMean = mean(betas_ppc, 2);
 [h, p] = ttest(ppcMean);
-if p < 0.001
-    p = 0.001; % for the sake of MS
-end
 
 % Save figure
 fig = gcf;

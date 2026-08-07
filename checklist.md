@@ -36,6 +36,6 @@
 | **Directory Check** | Check `prepoc_dir` and `save_dir` | Verify across all scripts that paths point to the correct preprocessing directory (manually and via `checkPathKeywords`). |
 | **Filter Settings** | `noFiltering = 1`<br>`noFiltering = 0` | Linear and cubic spline<br>Deconvolution-based pipeline |
 | **Interpolation Settings** | `linearInt = 1`<br>`linearInt = 0` | Linear and convolution-based pipeline<br>Cubic spline |
-| **`time_pupil`** | `feedback_locked - 1000`<br>`patch_locked - 300`<br>`response_locked - 230` | Applicable for `get_pupilsignal` and `gazeposition` |
+| **`time_pupil`** | `feedback locked - 1000`<br>`patch locked - 300`<br>`response locked - 230` | Applicable for `get_pupilsignal` and `gazeposition` |
 | **`time_base`** | `time_base = 10` | Standard setting paired with `baseline = "trial-specific"` |
 | **Heteroskedastic Flags** | `reg_het1.use_sp = 1`<br>`reg_het3.use_sp = 0` | Set in `fitHet_models.m`<br>Set in `pregenSP.m` |
