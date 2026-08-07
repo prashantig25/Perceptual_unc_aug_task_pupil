@@ -48,13 +48,13 @@ ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arr
 ar1.X = [0.47 0.54];
 ar1.Y = [0.5075, 0.5075];
 
-ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color',low_PU,'HeadWidth',10);
-ar1.X = [0.7 0.7];
-ar1.Y = [0.58, 0.77];
+ar2 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color',low_PU,'HeadWidth',10);
+ar2.X = [0.7 0.7];
+ar2.Y = [ar1.Y(1) + 0.03, ar1.Y(1) + 0.13];
 
-ar1 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color',high_PU,'HeadWidth',10);
-ar1.X = [0.7 0.7];
-ar1.Y = [0.49, 0.3];
+ar3 = annotation('arrow','LineWidth',linewidth_arrow,'HeadLength',headlength_arrow,'Color',high_PU,'HeadWidth',10);
+ar3.X = [0.7 0.7];
+ar3.Y = [ar1.Y(1) - 0.03, ar1.Y(1) - 0.13];
 
 %% PLOT LEARNING RATES
 

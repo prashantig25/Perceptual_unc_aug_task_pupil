@@ -103,9 +103,6 @@ for i = 1:size(betas_RT, 2)
     CI_high(i) = ci(2);
     t_stats(i) = stats.tstat;
     df(i) = stats.df;
-    if p_values(i) < 0.001
-        p_values(i) = 0.001;
-    end
 end
 
 % Prepare data for bar_plots_pval
@@ -190,6 +187,7 @@ T = table(termString, ...
     round(CI_high,3).', ...
     round(p_values,3).', ...
     'VariableNames', {'term','t_stat','df','mean','SEM','CI_low','CI_high','pValuesRT'});
+display(T)
 
 saveStat = fullfile(desiredPath,"data","GB data two pipelines","pupil","stats");
 safe_saveall(strcat(saveStat, filesep, 'RTRegression_previousTrial.csv'), T);

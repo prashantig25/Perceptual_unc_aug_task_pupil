@@ -8,6 +8,7 @@ clearvars
 subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 numSubjs = length(num_sess);
+num_blocks = 8; % total number of blocks per subject
 
 currentDir = cd; % current directory
 reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
@@ -57,13 +58,31 @@ for n = 1:numSubjs
     preds.mu_congruence = NaN(height(preds), 1);
     preds.mu_congruence(preds.congruence == 1) = preds.mu(preds.congruence == 1);
     preds.mu_congruence(preds.congruence == 0) = 1-preds.mu(preds.congruence == 0);
-    preds.condiffZsc = zscore(preds.con_diff);
-    preds.muZsc = zscore(preds.mu_congruence);
 
     % Load pupil data
     filename = strcat(pupil_dir,filesep,subj_ids{n},'.mat');
     pupilSignal = importdata(filename);
     pupilSignal(missedTrials_slider == 1,:) = [];
+
+    % Shift mu_congruence by one trial within each block to obtain
+    % mu_hat_{t-1}, instead of using the same-trial mu_hat_t
+    preds.mu_prev = NaN(height(preds), 1);
+    for b = 1:num_blocks
+        blockIdx = find(preds.blocks == b);
+        if numel(blockIdx) < 2
+            continue
+        end
+        preds.mu_prev(blockIdx(2:end)) = preds.mu_congruence(blockIdx(1:end-1));
+    end
+
+    % Drop each block's first trial (no previous-trial mu available), and
+    % remove the corresponding rows from the pupil signal to keep the two
+    % aligned
+    validRow = ~isnan(preds.mu_prev);
+    preds = preds(validRow, :);
+    pupilSignal = pupilSignal(validRow, :);
+    preds.condiffZsc = zscore(preds.con_diff);
+    preds.muZsc = zscore(preds.mu_prev);
 
     % Behavioral model
     mdlBehv = fitglm(preds,'ecoperf','ecoperf ~ 1 + condiffZsc + condition + muZsc','CategoricalVars','condition','Distribution','binomial','Link','logit');

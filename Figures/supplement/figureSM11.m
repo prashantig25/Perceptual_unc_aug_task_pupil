@@ -57,7 +57,7 @@ ylabel_strings = [ ...
 
 pval_position = [-1 2 0.5 -1 0.5 3 3 10 3];
 pval_sign = [1, 1, 1, -1, 1, 1, 1, 1, 1];
-pval_text_dist = 0.05;
+pval_text_dist = 0.055;
 
 %% TILED LAYOUT
 

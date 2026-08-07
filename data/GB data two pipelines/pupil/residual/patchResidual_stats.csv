@@ -1,6 +1,6 @@
 term,pval
-pupil_choicePhase,0.005
+pupil_choicePhase,0.004
 ppc,0.001
-condition_choicePhase,0.105
+condition_choicePhase,0.291
 condiff_choicePhase,0
 muZsc_choicePhase,0
