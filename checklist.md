@@ -11,6 +11,7 @@
 ## Behavioral Analysis
 - [ ] **Descriptive behavioral analyses:** `descriptive_behv.m`
 - [ ] **Behavioral regression:** `LR_analysis_pupil.m`
+- [ ] **Reaction-time analysis (supplement):** `figureSM2.m`
 
 ---
 
@@ -25,7 +26,7 @@
 - [ ] **Run heteroskedastic regressions:** `fitHet_models.m`
 - [ ] **Run main article residual analysis:** `residualUP_analysis.m`
 - [ ] **Main residual analysis:** `arousal_variabilityInteractions.m`
-- [ ] **Run supplementary residual analysis:** `plotPatchResidual.m`
+- [ ] **Run supplementary residual analysis:** `figureSM16.m`
 
 ---
 
