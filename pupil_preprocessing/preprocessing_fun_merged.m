@@ -1,7 +1,6 @@
 function preprocessing_fun_merged(subj_ids, num_sess, plot_steps, sampling_rate, freqs, downsample_rate, ...
     event_names, deconv_time, savedir, asc_dir, dat_dir, save_dirASC, using_DAT, noFiltering, linearInt)
-
-% function PREPROCESS_FUNCTION performs the preprocessing of pupillometry
+% PREPROCESSING_FUN_MERGED performs the preprocessing of pupillometry
 % data collected using EyeLink
 %
 % INPUT
@@ -294,7 +293,7 @@ for s = 1:num_subs
             ub_blink = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, 2, 5];
             ub_sacc  = [params.s1.Max, params.s2.Max, params.n1.Max, params.n2.Max, 3, 5];
 
-            options = optimoptions('fmincon','Display','iter', 'Algorithm', 'interior-point');
+            options = optimoptions('fmincon','Display','none', 'Algorithm', 'interior-point');
 
             % PERFORM THE OPTIMIZATION
             rng(42); % set seed for reproducability for fmincon

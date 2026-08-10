@@ -14,7 +14,7 @@ dot_size = 10;
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -40,12 +40,22 @@ num_subjs = length(subj_ids); % number of subjects
 
 %% INITIALISE TILE LAYOUT
 
-figure
-set(gcf,'Position',[100 100 400 200])
+f1 = figure;
+set(f1, 'Visible', 'on');
+
+% Size in CM
+width_cm = 12; 
+height_cm = 6;
+set(f1, 'Units', 'centimeters');
+set(f1, 'Position', [10, 10, width_cm, height_cm]);
+set(f1, 'PaperUnits', 'centimeters');
+set(f1, 'PaperSize', [width_cm, height_cm]);
+set(f1, 'PaperPosition', [0, 0, width_cm, height_cm]);
+
 t = tiledlayout(1,2);
 t.TileSpacing = 'compact';
 t.Padding = 'compact';
-ax1 = nexttile(1,[1,1]);
+ax1 = nexttile(1, [1, 1]);
 
 %% PLOT R-SQUARED VALUES
 
@@ -58,9 +68,9 @@ box(ax2_new, 'off'); % box off
 delete(ax2); % delete old axis
 
 % PLOT
-title_name = {''}; 
-bar_plots_pval([rsquared_full;rsquared_signed],[mean(rsquared_full),mean(rsquared_signed)].',[std(rsquared_full)./sqrt(num_subjs),std(rsquared_signed)./sqrt(num_subjs)].',num_subjs, ...
-    2,1,{''},[1,2],{'Absolute','Signed'},title_name,{'Model'},{''},0,1,dot_size,1,font_size,line_width,font_name,0,darkblue_muted) 
+title_name = {''};
+bar_plots_pval([rsquared_full; rsquared_signed],[mean(rsquared_full), mean(rsquared_signed)].',[std(rsquared_full)./sqrt(num_subjs), std(rsquared_signed)./sqrt(num_subjs)].', num_subjs, ...
+    2, 1, {''}, [1, 2], {'Abs', 'Signed'}, title_name, {'Model'}, {''}, 0, 1, dot_size, 1, font_size, line_width, font_name, 0, darkblue_muted)
 hold on
 
 % PLOT PROPERTIES
@@ -77,20 +87,20 @@ nbins = 75; % number of bins in a distribution
 
 % CHANGE POSITION
 position_change = [0.03, 0, 0.15, 0];
-new_pos = change_position(ax1,position_change);
+new_pos = change_position(ax1, position_change);
 ax1_new = axes('Units', 'Normalized', 'Position', new_pos);
 box(ax1_new, 'off');
 delete(ax1);
 
 y_hat = [];
 for n = 1:num_subjs
-    y_hat = [y_hat;cell2mat(posterior_up_subjs(n,1))];
+    y_hat = [y_hat; cell2mat(posterior_up_subjs(n,1))];
 end
 
 % PLOT
-h1 = histogram(y_hat,nbins);
+h1 = histogram(y_hat, nbins);
 hold on
-h = histogram(y,nbins);
+h = histogram(y, nbins);
 
 h1(1).FaceAlpha = 1; % face alpha for distributions
 h(1).FaceAlpha = 0.7;
@@ -102,20 +112,21 @@ h(1).FaceColor = fits_colors; % face color for bars
 h1(1).FaceColor = [37, 50, 55]/255;
 
 % PLOT PROPERTIES
-set(ax1_new,'Color','none','FontName',font_name,'FontSize',font_size)
-set(ax1_new,'LineWidth',linewidth_axes)
-l = legend('Model predictions','Absolute empirical updates','','EdgeColor','none','Color','none');
+set(ax1_new, 'Color','none', 'FontName', font_name, 'FontSize', font_size)
+set(ax1_new,'LineWidth', linewidth_axes)
+l = legend('Model predictions', 'Absolute empirical updates', '', 'EdgeColor', 'none', 'Color','none');
 l.ItemTokenSize = [7 7];
 xlabel('Update')
 
 ax1_new = gca;
-ticks      = ax1_new.YTick;        % tick positions
-tickLabels = ax1_new.YTickLabel;   % tick labels as cell array
-tickLables = str2double(tickLabels)./100;
-C = num2cell(tickLables.');   % produces an 11x1 cell array
+ticks = ax1_new.YTick; % tick positions
+tickLabels = ax1_new.YTickLabel; % tick labels as cell array
+toThePower = 2;
+tickLabels = str2double(tickLabels)./10^toThePower;
+C = num2cell(tickLabels.');
 yticklabels(C)
-ylabel('Frequency (x 10^2)','Interpreter','tex')
-
+text = ['Frequency (x 10^', num2str(toThePower),')'];
+ylabel(text, 'Interpreter','tex')
 title('Posterior-predicted and empirical distribution','FontWeight','normal')
 set(gca,'Color','none')
 box off
@@ -123,18 +134,29 @@ box off
 %% ADD SUBPLOT LABELS
 
 ax1_pos = ax2_new.Position;
-adjust_x = [- 0.07,-0.075]; % adjusted x-position for subplot label
+adjust_x = [-0.07, -0.075]; % adjusted x-position for subplot label
 adjust_y = ax1_pos(4)+0.02; % adjusted y-position for subplot label
 
 all_axes = [ax1_new,ax2_new];
-subplot_labels = {'a','b'};
+subplot_labels = {'a', 'b'};
 for i = 1:2
-    [label_x,label_y] = change_plotlabel(all_axes(i),adjust_x(i),adjust_y);
-    annotation("textbox",[label_x label_y .05 .05],'String', ...
-        subplot_labels{i},'FontSize',fontsize_label,'LineStyle','none','HorizontalAlignment','center')
+    [label_x,label_y] = change_plotlabel(all_axes(i), adjust_x(i), adjust_y);
+    annotation("textbox",[label_x label_y .05 .05], 'String', ...
+        subplot_labels{i}, 'FontSize', fontsize_label, 'LineStyle', 'none', 'HorizontalAlignment', 'center')
 end
 
 %% Save
-fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
-fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'reg_diagnostics1.png', '-dpng', '-r600') 
+fig = gcf;
+fig.PaperPositionMode = 'auto'; 
+% print(fig, 'reg_diagnostics1.png', '-dpng', '-r600')
+% exportgraphics(gcf, 'Figures/PDF_Versions/Figure_SM4.pdf', 'ContentType', 'vector')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none'; 
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM4.pdf', style);

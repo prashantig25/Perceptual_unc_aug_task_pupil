@@ -1,6 +1,5 @@
 function bar_plots(y,mean_all,SEM_all,n,x_groups,bars,legend_names,xticks,xticklabs,title_name, ...
     xlabelname,ylabelname,fontsize,linewidth,fontname,varargin) 
-    
     % function bar_plots creates bar plots with multiple bars, single data scatter
     % points, and SEM bars.
     %
@@ -75,7 +74,7 @@ function bar_plots(y,mean_all,SEM_all,n,x_groups,bars,legend_names,xticks,xtickl
     % PLOTTING ERROR BARS
     for i = 1:nbars
         a = (1:ngroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*nbars);
-        errorbar(a, mean_all(:,i),SEM_all(:,i),  'k', 'linestyle', 'none','LineWidth',1);
+        errorbar(a, mean_all(:,i), SEM_all(:,i), 'k', 'linestyle', 'none','LineWidth',1);
     end
     hold on
 
@@ -83,7 +82,7 @@ function bar_plots(y,mean_all,SEM_all,n,x_groups,bars,legend_names,xticks,xtickl
     set(gca,'XTick',xticks)
     set(gca,'XTicklabels',xticklabs)
     box off
-    title(title_name)
+    title(title_name, 'fontweight', 'normal')
     xlabel(xlabelname)
     ylabel(ylabelname)
     set(gca,'LineWidth',linewidth)

@@ -1,2 +1,2 @@
-Condition,HValue,PValue,TStat,df,cohen_d
-mix_perc,1,0,-5.85,46,0.85
+Condition,HValue,PValue,TStat,df,cohen_d,CI_Lower,CI_Upper
+mix_perc,1,0,-5.848,46,0.853,-0.105,-0.051

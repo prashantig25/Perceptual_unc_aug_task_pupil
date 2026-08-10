@@ -10,7 +10,7 @@ col_fb = 300;
 total = 630;
 trial_all = NaN(num_subjs, total);
 currentDir = cd;
-reqPath = 'Perceptual_unc_aug_task_pupil';
+reqPath = 'GBSliderPupil_NatComms';
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -26,7 +26,7 @@ preEvent_pupil_subj_all = NaN(num_subjs, x);
 preEvent = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
     filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial linear int');
 preTrial = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', ...
-    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt');
+    filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb linearInt');
 
 % LOOP OVER SUBJECTS
 for i = 1:num_subjs

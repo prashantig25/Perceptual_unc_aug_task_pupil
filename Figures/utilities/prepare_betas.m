@@ -1,5 +1,4 @@
 function [mean_avg,mean_sd,coeffs_subjs] = prepare_betas(betas_all,selected_regressors,num_subjs)
-    
     % function prepare_betas computes mean, sem and prepares for bar-graphs.
     %
     % INPUTS:
@@ -20,7 +19,7 @@ function [mean_avg,mean_sd,coeffs_subjs] = prepare_betas(betas_all,selected_regr
     end
     
     coeffs_avg = nanmean(coeffs,1); % mean of coefficients
-    coeffs_sd = nanstd(coeffs,1); % std of coefficients
+    coeffs_sd = nanstd(coeffs,0); % std of coefficients
     coeffs_sem = coeffs_sd./sqrt(num_subjs); % sem of coefficients
     
     mean_avg = coeffs_avg.';

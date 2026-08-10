@@ -16,7 +16,7 @@ num_subjs = length(subj_ids); % number of subjects
 % USER-BASED PATH
 currentDir = cd; % current directory
 pathParts = strsplit(currentDir, filesep);
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
     desiredPath = currentDir;
@@ -31,19 +31,20 @@ mkdir(save_dir);
 save_file = strcat(save_dir,filesep,'pupilbehv_allNEW','.xlsx');
 safe_saveall(save_file,data_all);
 
-% SCRIPT TO RUN MODEL BASED ANALYSIS OF LEARNING RATES
+% PREPROCESS FOR LEARNING-RATE ANALYSIS
 preprocess_obj = preprocess_LR(); % initialise object with all required variables and functions
+preprocess_obj.get_data(); % get all relevant data
 preprocess_obj.flip_mu(); % compute reported contingency parameter, after correcting for congruence
-preprocess_obj.compute_action_dep_rew(); % compute action dependent rewardend
+preprocess_obj.compute_action_dep_rew(); % compute action dependent reward
 preprocess_obj.compute_mu(); % recode mu, contingent on if actual mu < 0.5 or not
-preprocess_obj.compute_state_dep_pe(); % compute state dependent PE and UP
+preprocess_obj.compute_state_dep_pe(); % compute state-dependent PE and UP
 
 % COMPUTE VARS FOR LINEAR FIT
 preprocess_obj.compute_ru(); % reward uncertainty
 preprocess_obj.compute_confirm(); % confirming outcome
 norm_condiff = preprocess_obj.compute_normalise(abs(preprocess_obj.data.con_diff)); % normalised contrast difference
 preprocess_obj.add_splithalf(); % add splithalf variable
-preprocess_obj.add_saliencechoice(); % add salience chhoice
+preprocess_obj.add_saliencechoice(); % add salience choice
 
 % ADD VARIABLES TO THE DATA TABLE
 preprocess_obj.add_vars(norm_condiff,{'norm_condiff'});
@@ -52,7 +53,7 @@ preprocess_obj.add_vars(preprocess_obj.data.confirm_rew,'pe_sign');
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -119,6 +120,7 @@ lr_analysis.absolute_analysis = 0;
 
 safe_saveall(fullfile(save_dir,"loglikelihood_baselineSigned.mat"),loglikelihood_full); % save r-squared values
 safe_saveall(fullfile(save_dir,"SSEsigned_baseline.mat"),SSE_full); % save SSE values
+
 % FIT BASELINE MODEL TO ABSOLUTE PREDICTORS
 
 lr_analysis = lr_analysis_obj();

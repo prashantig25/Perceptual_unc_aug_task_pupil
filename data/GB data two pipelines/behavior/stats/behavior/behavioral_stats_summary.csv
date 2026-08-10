@@ -1,0 +1,14 @@
+order,analysis,condition,mean,sem,TStat,df,PValue,cohenD,CILower,CIUpper
+1,Slider response vs. chance,mix,0.644,0.015,9.804,46,0,1.43,0.615,0.674
+2,Slider response vs. chance,perc,0.722,0.016,13.882,46,0,2.025,0.69,0.754
+3,Slider response: mix vs. perc,mix_perc,NaN,NaN,-5.848,46,0,0.853,-0.105,-0.051
+4,Economic-choice performance vs. chance,mix,0.719,0.022,10.15,46,0,1.481,0.676,0.763
+5,Economic-choice performance vs. chance,perc,0.762,0.017,15.61,46,0,2.277,0.728,0.796
+6,Learning-rate beta vs. 0,pe,0.093,0.018,5.097,46,0,0.744,0.056,0.13
+7,Learning-rate beta vs. 0,pe_condiff,0.102,0.019,5.27,46,0,0.769,0.063,0.141
+8,Learning-rate beta vs. 0,pe_salience,-0.011,0.011,-0.944,46,0.35,0.138,-0.033,0.012
+9,Learning-rate beta vs. 0,pe_congruence,-0.003,0.008,-0.369,46,0.714,0.054,-0.019,0.013
+10,Learning-rate beta vs. 0,pe_pesign,0.029,0.013,2.305,46,0.026,0.336,0.004,0.055
+11,Absolute PE by state uncertainty,high,0.41,0.009,NaN,NaN,NaN,NaN,NaN,NaN
+12,Absolute PE by state uncertainty,low,0.397,0.009,NaN,NaN,NaN,NaN,NaN,NaN
+13,Absolute PE: high vs. low state uncertainty,highLow,NaN,NaN,2.206,46,0.032,0.322,0.001,0.026

@@ -10,7 +10,7 @@ num_sess = importdata("num_sess.mat");
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -21,7 +21,7 @@ else
 end
 
 betas_pupil = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "betas_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
-coeff_names = betas_pupil.coeff_names; % importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual', filesep, "coeffs_name_behvresidual_abs_pecondiff_nomain_linearInt.mat"));
+coeff_names = betas_pupil.coeff_names; 
 pupil_idx = find(strcmp(coeff_names,'pupil'));
 up_idx = find(strcmp(coeff_names,'post_up'));
 pePupil_idx = find(strcmp(coeff_names,'pe:pupil'));
@@ -30,18 +30,18 @@ peCondiffPupil_idx = find(strcmp(coeff_names,'pe:pupil:con_diff'));
 
 preds_all = readtable(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx'));
 posterior_all = importdata(strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'post_absUP_predict.mat'));
-pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb Mathot 2023 linearInt'); % directory to get preprocessed data
+pupil_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep,'fb linearInt'); % directory to get preprocessed data
 save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'residual'); 
 behv_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'preprocessed');
 betas_field = betas_pupil.with_intercept;
 
-dirs = {
-    'pupil_dir',  pupil_dir;
-};
+dirs = {'pupil_dir',  pupil_dir;};
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
 
-mkdir(save_dir)
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
 % GET THE INDEX OF SUBJ_IDs AFTER SORTING
 subj_ids_num = [];
@@ -54,7 +54,7 @@ for n = 1:length(subj_ids)
     array_index = [array_index;find(str2num(subj_ids{n}) == subj_ids_num_sorted)];  % get index
 end
 
-for s = [1:nsubjs]
+for s = 1:nsubjs
 
     % GET BEHAVIORAL DATA
     fprintf('reading in %s ...\n', subj_ids{s});

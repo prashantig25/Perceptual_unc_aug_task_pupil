@@ -1,4 +1,4 @@
-% fullTrial saves pupil signal from different events for the entire trial.
+% fullTrial saves pupil signal from different events for the entire trial illustration.
 
 clc
 clearvars
@@ -14,7 +14,7 @@ trial_all = NaN(num_subjs,total);
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -24,7 +24,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 
-save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive'); 
+save_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive');
 fb_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb full trial linear int'); % directory to get preprocessed data
 patch_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'patch linear int'); % directory to get preprocessed data
 resp_dir = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'resp linear int'); % directory to get preprocessed data
@@ -36,18 +36,26 @@ dirs = {
 };
 keywords = {'linearInt', 'linear int', 'linear Int', 'LinearInt'};
 checkPathKeywords(dirs, keywords);
-mkdir(save_dir);
+
+% Create directories if they don't exist yet
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
 % LOOP OVER SUBJECTS
 for i = 1:num_subjs
 
     % IMPORT EVENT-RELATED DATA
+
+    % Patch phase
     filename = strcat(patch_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); patch = pupil(:,1:col_patch);
 
+    % Response phase
     filename = strcat(resp_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); resp = pupil;
 
+    % Feedback phase
     filename = strcat(fb_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename); fb = pupil(:,1:col_fb);
 

@@ -10,7 +10,7 @@ subj_ids = importdata("subj_ids.mat");
 num_sess = importdata("num_sess.mat");
 
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -21,18 +21,15 @@ else
 end
 
 behv_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'raw data');
-
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze linear int');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze linear int');
-
-base_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'baseline before fb');
 
 preds_file   = fullfile(desiredPath, 'data', 'GB data two pipelines', 'behavior', 'LR analyses', 'preprocessed_lr_pupil.xlsx');
 preds_all    = readtable(preds_file);
 preds_all.pe_condiff = abs(preds_all.pe) .* preds_all.con_diff;
 
 het_save_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', ...
-                        'regression', 'control analyses for revisions');
+                        'regression', 'control analyses for supplement');
 if ~exist(het_save_dir, 'dir'); mkdir(het_save_dir); end
 
 % Shared model specification
@@ -50,12 +47,10 @@ fprintf('\n====================================================\n');
 fprintf('  PIPELINE 1: LINEAR INTERPOLATION\n');
 fprintf('====================================================\n');
 
-reg_het1 = PupilRegression_intHet();
+reg_het1 = PupilRegression();
 reg_het1.setSubjects(subj_ids, num_sess);
-pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 linearInt');
-reg_het1.setPaths(behv_dir, ...
-    pupil_dir, ...
-    xgaze_dir, ygaze_dir, het_save_dir);
+pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
+reg_het1.setPaths(behv_dir, pupil_dir, xgaze_dir, ygaze_dir, het_save_dir);
 
 dirs = {
     'pupil_dir',  pupil_dir;
@@ -85,8 +80,8 @@ reg_het1.use_sp              = 0;
 reg_het1.runAnalysis();
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_het_linearInt_ForPregenSP.mat'), reg_het1.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_het_linearInt_ForPregenSP.mat'),          reg_het1.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_het_linearInt_ForPregenSP.mat'),          reg_het1.perm_results);
+safe_saveall(fullfile(het_save_dir, 'negLL_het_linearInt_ForPregenSP.mat'), reg_het1.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_het_linearInt_ForPregenSP.mat'), reg_het1.perm_results);
 
 fprintf('Pipeline 1 saved.\n');
 
@@ -100,10 +95,10 @@ fprintf('====================================================\n');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze CS');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze CS');
 
-reg_het2 = PupilRegression_intHet();
+reg_het2 = PupilRegression();
 reg_het2.setSubjects(subj_ids, num_sess);
 reg_het2.setPaths(behv_dir, ...
-    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb Mathot 2023 cubic spline new'), ...
+    fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb cubic spline new'), ...
     xgaze_dir, ygaze_dir, het_save_dir);
 reg_het2.setModel(model_def, pred_vars, cat_vars, num_params_hetero - 1);
 reg_het2.setHeteroskedasticConfig(importdata('minHetParams_CSabs.mat'), ...
@@ -125,8 +120,8 @@ reg_het2.use_sp              = 0;
 reg_het2.runAnalysis();
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_het_CS_ForPregenSP.mat'), reg_het2.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_het_CS_ForPregenSP.mat'),          reg_het2.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_het_CS_ForPregenSP.mat'),          reg_het2.perm_results);
+safe_saveall(fullfile(het_save_dir, 'negLL_het_CS_ForPregenSP.mat'), reg_het2.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_het_CS_ForPregenSP.mat'), reg_het2.perm_results);
 
 fprintf('Pipeline 2 saved.\n');
 
@@ -140,7 +135,7 @@ fprintf('====================================================\n');
 xgaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'x-gaze deconv');
 ygaze_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'y-gaze deconv');
 
-reg_het3 = PupilRegression_intHet();
+reg_het3 = PupilRegression();
 reg_het3.setSubjects(subj_ids, num_sess);
 reg_het3.setPaths(behv_dir, ...
     fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'alternate pipeline', 'pupil signal', 'fb deconv'), ...
@@ -166,8 +161,8 @@ reg_het3.use_sp              = 0;
 reg_het3.runAnalysis();
 
 safe_saveall(fullfile(het_save_dir, 'param_estimates_het_deconv_ForPregenSP.mat'), reg_het3.betas_struct);
-safe_saveall(fullfile(het_save_dir, 'negLL_het_deconv_ForPregenSP.mat'),          reg_het3.negLL_values);
-safe_saveall(fullfile(het_save_dir, 'perm_het_deconv_ForPregenSP.mat'),          reg_het3.perm_results);
+safe_saveall(fullfile(het_save_dir, 'negLL_het_deconv_ForPregenSP.mat'), reg_het3.negLL_values);
+safe_saveall(fullfile(het_save_dir, 'perm_het_deconv_ForPregenSP.mat'), reg_het3.perm_results);
 
 fprintf('Pipeline 3 saved.\n');
 
@@ -185,8 +180,8 @@ betas_struct = importdata("param_estimates_het_linearInt_ForPregenSP.mat");
 [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
 
 % Save results
-safe_saveall("minHetParams_linearIntabs.mat", minCoeff);
-safe_saveall("maxHetParams_linearIntabs.mat", maxCoeff);
+safe_saveall(fullfile(het_save_dir, "minHetParams_linearIntabs.mat"), minCoeff);
+safe_saveall(fullfile(het_save_dir, "maxHetParams_linearIntabs.mat"), maxCoeff);
 
 %% Process Cubic Spline Model
 fprintf('Processing Cubic Spline parameters...\n');
@@ -194,8 +189,8 @@ betas_struct = importdata("param_estimates_het_CS_ForPregenSP.mat");
 [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
 
 % Save results
-safe_saveall("minHetParams_CSabs.mat", minCoeff);
-safe_saveall("maxHetParams_CSabs.mat", maxCoeff);
+safe_saveall(fullfile(het_save_dir, "minHetParams_CSabs.mat"), minCoeff);
+safe_saveall(fullfile(het_save_dir, "maxHetParams_CSabs.mat"), maxCoeff);
 
 %% Process Deconvolution Model
 fprintf('Processing Deconvolution parameters...\n');
@@ -203,8 +198,8 @@ betas_struct = importdata("param_estimates_het_deconv_ForPregenSP.mat");
 [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width);
 
 % Save results
-safe_saveall("minHetParams_deconvolutionabs.mat", minCoeff);
-safe_saveall("maxHetParams_deconvolutionabs.mat", maxCoeff);
+safe_saveall(fullfile(het_save_dir, "minHetParams_deconvolutionabs.mat"), minCoeff);
+safe_saveall(fullfile(het_save_dir, "maxHetParams_deconvolutionabs.mat"), maxCoeff);
 
 fprintf('All bounds calculated and saved successfully.\n');
 
@@ -219,8 +214,8 @@ rng(123)
 
 %% SP for linear interpolation ...
 
-minBound = importdata("minHetParams_linearIntabs.mat");
-maxBound = importdata("maxHetParams_linearIntabs.mat");
+minBound = importdata(fullfile(het_save_dir, "minHetParams_linearIntabs.mat"));
+maxBound = importdata(fullfile(het_save_dir, "maxHetParams_linearIntabs.mat"));
 
 startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
 
@@ -234,12 +229,12 @@ for n = 1:nSubjs
     end
 end
 
-safe_saveall("startingPoints_linearInt.mat",startingPoints)
+safe_saveall(fullfile(het_save_dir, "startingPoints_linearInt.mat"),startingPoints)
 
 %% SP for cubic-spline int ...
 
-minBound = importdata("minHetParams_CSabs.mat");
-maxBound = importdata("maxHetParams_CSabs.mat");
+minBound = importdata(fullfile(het_save_dir, "minHetParams_CSabs.mat"));
+maxBound = importdata(fullfile(het_save_dir, "maxHetParams_CSabs.mat"));
 
 startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
 
@@ -253,12 +248,12 @@ for n = 1:nSubjs
     end
 end
 
-safe_saveall("startingPoints_CS.mat",startingPoints)
+safe_saveall(fullfile(het_save_dir, "startingPoints_CS.mat"),startingPoints)
 
 %% SP for deconvolution-based preprocessing
 
-minBound = importdata("minHetParams_deconvolutionabs.mat");
-maxBound = importdata("maxHetParams_deconvolutionabs.mat");
+minBound = importdata(fullfile(het_save_dir, "minHetParams_deconvolutionabs.mat"));
+maxBound = importdata(fullfile(het_save_dir, "maxHetParams_deconvolutionabs.mat"));
 
 startingPoints = NaN(nSubjs,col,nSp,num_params_hetero);
 
@@ -272,10 +267,9 @@ for n = 1:nSubjs
     end
 end
 
-safe_saveall("startingPoints_deconv.mat",startingPoints)
+safe_saveall(fullfile(het_save_dir, "startingPoints_deconv.mat"),startingPoints)
 
 
-%% Helper Function: Calculate Symmetric Bounds
 function [minCoeff, maxCoeff] = calculateSymmetricBounds(betas_struct, ncoeffs, width)
     % CALCULATESYMMETRICBOUNDS Compute symmetric min/max bounds for coefficients
     %

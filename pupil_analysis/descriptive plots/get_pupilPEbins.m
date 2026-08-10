@@ -16,11 +16,10 @@ subj_pupil_signal_pebin2correct = NaN(num_subs,col); % initialised array for PE 
 subj_pupil_signal_pebin1correct = NaN(num_subs,col); % initialised array for PE bin = 1
 subj_pupil_signal_pebin2incorrect = NaN(num_subs,col); % initialised array for PE bin = 2
 subj_pupil_signal_pebin1incorrect = NaN(num_subs,col); % initialised array for PE bin = 1
-plot_accuracy = 0; % get PE bins for accuracy
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -31,7 +30,7 @@ else
 end
 
 save_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'descriptive'); 
-pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb Mathot 2023 linearInt'); % directory to get preprocessed data
+pupil_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'pupil signal', filesep, 'fb linearInt'); % directory to get preprocessed data
 dirs = {
     'pupil_dir',  pupil_dir;
 };
@@ -40,76 +39,43 @@ checkPathKeywords(dirs, keywords);
 
 behv_dir = strcat(desiredPath,filesep,'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'raw data'); % directory to get behavioral data
 preds_all = readtable(strcat(desiredPath,filesep, 'data', filesep,'GB data two pipelines',filesep, 'behavior', filesep, 'LR analyses', filesep, 'preprocessed_lr_pupil.xlsx')); % get behavioral predictors
-mkdir(save_dir);
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
 
+% Initialize object instance
+PupilDescriptive = PupilDescriptive();
+PupilDescriptive.num_sess = num_sess;
+PupilDescriptive.subj_ids = subj_ids;
+PupilDescriptive.behv_dir = behv_dir;
+
+% Cycle over subjects
 for i = 1:num_subs
 
-    % GET PUPIL DATA
-    filename = strcat(pupil_dir,filesep,subj_ids{i},'.mat');
-    pupil = importdata(filename);
-    size_pupil = size(pupil);
-
-    % INITIALISE
-    behv_data = [];
-    data_run = [];
-
     % GET BEHAVIORAL DATA
-    for j = 1:num_sess(i)
-        filename = strcat(behv_dir,filesep,subj_ids{i},'_','main',num2str(j),'.xlsx');
-        if strcmp(subj_ids{i},'4672') == 1
-            filename = strcat(behv_dir,filesep,subj_ids{i},'_','main',num2str(j),'_red.xlsx');
-        end
-        data_run = readtable(filename,'VariableNamingRule', 'preserve'); % get RT and slider data
-        rt = table(data_run.("choice.rt"),'VariableNames',{'rt'});
-        slider = table(data_run.("slider_respond.response"),'VariableNames',{'slider'});
-        data_run = [data_run(:,(1:16)),rt,slider];
-        behv_data = [behv_data; data_run];
-    end
+    behvData = PupilDescriptive.loadBehavioralData(i);
 
     % MISSED TRIALS
-    % missed_trials = []; % initialize array for index of missed trials
-    % for b = 1:height(behv_data)
-    %     if isnan(behv_data.rt(b,:)) % || isnan(behv_data.slider(b,:)) % check if participant has not responded
-    %         missed_trials = [missed_trials;b];
-    %     end
-    % end
-    missed_trials = find(isnan(behv_data.rt));
-    behv_data(missed_trials,:) = [];
-    missedSlider = isnan(behv_data.slider);
+    missed_trials = find(isnan(behvData.rt));
+    behvData(missed_trials,:) = [];
+    missedSlider = isnan(behvData.slider);
 
     % GET PE DATA
     preds = preds_all(preds_all.id == str2num(subj_ids{i}),:);
-    validIndices = find(preds.pe == 0); % pe == 0
 
     % GET PUPIL DATA
     filename = strcat(pupil_dir,filesep,subj_ids{i},'.mat');
     pupil = importdata(filename);
 
-    if strcmp(timewindow,'patch') == 1
-        pupil_signal = pupil;
-    elseif strcmp(timewindow,'feedback') == 1
-        pupil_signal = pupil(:,1:col);
-        pupil_signal(missedSlider == 1,:) = [];
-    end
+    pupil_signal = pupil(:,1:col);
+    pupil_signal(missedSlider == 1,:) = [];
+
     pe_binedges = [0,0.5,1]; % set bin edges
     preds.bins = discretize(abs(preds.pe),pe_binedges); % bin data
 
     subj_pupil_signal_pebin1(i,:) = mean(pupil_signal(preds.bins == 1,:));
     subj_pupil_signal_pebin2(i,:) = mean(pupil_signal(preds.bins == 2,:));
-
-    if plot_accuracy == 1
-        pupil_signalcorrect = pupil_signal(preds.correct == 1,:);
-        pupil_signalincorrect = pupil_signal(preds.correct == 0,:);
-
-        preds_incorrect = preds(preds.correct == 0,:);
-        preds_correct = preds(preds.correct == 1,:);
-
-        subj_pupil_signal_pebin1correct(i,:) = mean(pupil_signalcorrect(preds_correct.bins == 1,:));
-        subj_pupil_signal_pebin2correct(i,:) = mean(pupil_signalcorrect(preds_correct.bins == 2,:));
-
-        subj_pupil_signal_pebin1incorrect(i,:) = mean(pupil_signalincorrect(preds_incorrect.bins == 1,:));
-        subj_pupil_signal_pebin2incorrect(i,:) = mean(pupil_signalincorrect(preds_incorrect.bins == 2,:));
-    end
+    
 end
 
 % RUN PERM TEST
@@ -130,3 +96,8 @@ condiffbin.pebin2_incorrect = subj_pupil_signal_pebin2incorrect;
 condiffbin.diff = subj_pupil_signal_pebin2 - subj_pupil_signal_pebin1;
 safe_saveall(strcat(save_dir,filesep,"fb_PE2bins_linearInt.mat"),condiffbin)
 
+% Quick visual check of the mean curves 
+figure()
+hold on
+plot(mean(squeeze(var1)))
+plot(mean(squeeze(var2)))

@@ -1,6 +1,5 @@
 function [betas,rsquared,residuals,coeffs_name,lm,SSE] = linear_fit(tbl,mdl,pred_vars,resp_var, ...
     cat_vars,num_vars,weight_y_n,varargin)
-
     % function linear_fit fits a linear regression model to the updates as a
     % function of prediction error and other task based computational
     % variables.
@@ -34,13 +33,22 @@ function [betas,rsquared,residuals,coeffs_name,lm,SSE] = linear_fit(tbl,mdl,pred
             'CategoricalVars',cat_vars);
     end
 
-    % SAVE R-SQUARED, RESIDUALS AND BETA VALUES
-    rsquared = lm.Rsquared.Ordinary;
-    SSE = lm.SSE;
-    residuals = lm.Residuals.Raw;
-    betas = nan(1,num_vars+1);
-    for b = 1:num_vars+1
-        betas(1,b) = lm.Coefficients.Estimate(b);
-    end
-    coeffs_name = lm.CoefficientNames;
+% FIT THE MODEL USING WEIGHTED/NON-WEIGHTED REGRESSION
+if weight_y_n == 1
+    lm = fitlm(tbl,mdl,'ResponseVar',resp_var,'PredictorVars',pred_vars, ...
+        'CategoricalVars',cat_vars,'Weights',varargin{1});
+else
+    lm = fitlm(tbl,mdl,'ResponseVar',resp_var,'PredictorVars',pred_vars, ...
+        'CategoricalVars',cat_vars);
+end
+
+% SAVE R-SQUARED, RESIDUALS AND BETA VALUES
+rsquared = lm.Rsquared.Ordinary;
+SSE = lm.SSE;
+residuals = lm.Residuals.Raw;
+betas = nan(1,num_vars+1);
+for b = 1:num_vars+1
+    betas(1,b) = lm.Coefficients.Estimate(b);
+end
+coeffs_name = lm.CoefficientNames;
 end

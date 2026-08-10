@@ -1,13 +1,26 @@
+% Figure S3: Illustrate linearity assumption of key variables of interest
+
 clc
 clearvars
 
 % Create figure with specified dimensions
-figure(Position=[200,200,400,125])
-binned_dots = [159, 210, 235]./255; % bluish green color for binned analysis data
+fig = figure; 
+set(fig, 'Visible', 'on'); 
+ 
+% Size in CM 
+width_cm = 15;  
+height_cm = 6; 
+set(fig, 'Units', 'centimeters'); 
+set(fig, 'Position', [10, 10, width_cm, height_cm]); 
+set(fig, 'PaperUnits', 'centimeters'); 
+set(fig, 'PaperSize', [width_cm, height_cm]); 
+set(fig, 'PaperPosition', [0, 0, width_cm, height_cm]); 
+
+binnedDotsColor = [159, 210, 235]./255; % bluish green color for binned analysis data
 
 % USER-BASED PATH
 currentDir = cd; % current directory
-reqPath = 'Perceptual_unc_aug_task_pupil'; % to which directory one must save in
+reqPath = 'GBSliderPupil_NatComms'; % to which directory one must save in
 pathParts = strsplit(currentDir, filesep);
 if startsWith(pathParts{end}, reqPath)
     disp('Current directory is already the desired path. No need to run createSavePaths.');
@@ -21,27 +34,42 @@ end
 subplot(1,3,1)
 
 % Load and process human data
-data = readtable("preprocessed_lr_agent.xlsx");
+sims_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses');
+data = importdata(fullfile(sims_dir, "preprocessed_agentpupil0.06.mat"));
 uniqueID = unique(data.ID);
 numSubjs = length(uniqueID);
-sigma = 0.06; %importdata("sigmaNoReward_simpleRL.mat");
+sigma = 0.06;
 dataContrast = data;
 dataContrast = dataContrast(dataContrast.choice_cond ~= 3,:);
 dataContrast.condiff_relative = dataContrast.contrast_diff;
+
 % Bin data
 nbins = 10;
-binEdges = prctile(abs(dataContrast.contrast_diff), linspace(0, 100, nbins + 1));
-dataContrast.bins = discretize(abs(dataContrast.contrast_diff), binEdges);
+
+% Compute bins
+dataContrast.bins = createCondiffBins(dataContrast.contrast_diff);
 
 % Calculate belief states
-BS_binned = NaN(numSubjs,nbins);
+% -----------------------
+
+% Initialize variables
+BS_diff_binned = NaN(numSubjs,nbins);
+BS0_binned = NaN(numSubjs,nbins);
+
+% Cycle over subjects
 for n = 1:numSubjs
+
+    % Select subject data
     dataSubj = dataContrast(dataContrast.ID == uniqueID(n),:);
+
+    % Initialize BS-difference (for plotting) and BS0 (for validation) variables
+    belief_state_diff = NaN(height(dataSubj),1);
     belief_state = NaN(height(dataSubj),1);
-    
+
+    % Cycle over subject trials
     for h = 1:height(dataSubj)
-        
-        % Using agent equations
+
+        % Compute CDF compontents of belief state
         obj.u = normcdf(0, dataSubj.condiff_relative(h), sigma);
         obj.v = normcdf(-0.1, dataSubj.condiff_relative(h), sigma);
         obj.w = normcdf(0.1, dataSubj.condiff_relative(h), sigma);
@@ -50,38 +78,47 @@ for n = 1:numSubjs
         pi_0 = (obj.u - obj.v) / (obj.w - obj.v);
         pi_1 = (obj.w - obj.u) / (obj.w - obj.v);
 
-        % Get belief state difference
-        belief_state(h,1) = abs(pi_1 - pi_0);
+        % Get belief-state difference
+        belief_state_diff(h,1) = abs(pi_1 - pi_0);
+
+        % Get higher belief state just for validation
+        belief_state(h, 1) = max(pi_0, pi_1);
     end
-    
-    for b = 1:nbins 
-        BS_binned(n,b) = mean(belief_state(dataSubj.bins == b),1);
+
+    % Cycle over bins
+    for b = 1:nbins
+
+        % Actual variable of interest
+        BS_diff_binned(n,b) = mean(belief_state_diff(dataSubj.bins == b),1);
+
+        % Check actual BS for validation (not the difference)
+        BS0_binned(n,b) = mean(belief_state(dataSubj.bins == b),1);
+
     end
 end
 
 % Plot group mean and error bars
-scatter(1:nbins, mean(BS_binned), 50,"white");
 hold on
-ls = lsline;
-hold on
-scatter(1:nbins, mean(BS_binned), 50, binned_dots, 'filled','MarkerEdgeColor','k');
+scatter(1:nbins, mean(BS_diff_binned), 50, binnedDotsColor, 'filled','MarkerEdgeColor','k');
+lsline
 
 % Calculate correlation
 x_data_a = 1:nbins;
-y_data_a = mean(BS_binned);
+y_data_a = mean(BS_diff_binned);
 [rho_a, pval_a] = corr(x_data_a', y_data_a', 'rows', 'pairwise');
-xlim([2,10])
+
 xlabel('Contrast-difference bins');
-ylabel('Belief-state difference (Agent)');
+ylabel('Belief-state difference (agent)');
 if pval_a < 0.001
     pval_str_a = "\itp\rm < 0.001";
 else
     pval_str_a = "\itp\rm = " + num2str(round(pval_a,3));
 end
 title(strcat("\itr\rm =",{' '},num2str(round(rho_a,2)),{' '}) + newline + pval_str_a, ...
- 'FontWeight','normal','Interpreter','tex');
+    'FontWeight','normal','Interpreter','tex');
+
 % Add subplot label A
-text(-0.03, 1.11, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
+text(-0.2, 1.11, 'a', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 box off
 hold off
 set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
@@ -90,68 +127,22 @@ set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
 subplot(1,3,2)
 
 % Load and process agent data
-agentAll = importdata("preprocessed_agent.mat");
-agent_data = agentAll;
+agent_data = importdata("preprocessed_agentpupil0.06.mat");
 
-% Initialize variables
-binned_data = abs(agent_data.contrast_diff);
-nbins = 10;
-bin_edges = prctile(binned_data, 0:10:100);
-bins = discretize(binned_data, bin_edges);
-agent_data.bins = bins;
-agent_data.lr = agent_data.up./agent_data.pe;
-agent_data.abs_lr = abs(agent_data.lr);
+numSims = 300;
+simID = 1:300;
 
-numSims = 99;
-simID = 1:numSims;
+% Compute bins
+bins = createCondiffBins(agent_data.contrast_diff);
 
-% Filter data
-run_id = agent_data.ID(agent_data.pe ~= 0 & abs(agent_data.lr)<=2);
-y_data_absLR = abs(agent_data.lr(agent_data.pe ~= 0 & abs(agent_data.lr)<=2));
-bins = bins(agent_data.pe ~= 0 & abs(agent_data.lr)<=2);
-binned_data = binned_data(agent_data.pe ~= 0 & abs(agent_data.lr)<=2);
+% Compute mean and SEM learning rates
+[avg_ydataLR, sem_ydataLR] = computeMeanLR(agent_data, bins, nbins, numSims, simID);
 
-% Calculate means per bin per simulation
-avg_ydataAbsLR_bins = NaN(nbins,numSims);
-for b = 1:nbins
-    for n = 1:numSims
-        bins_subj = bins(run_id == simID(n));
-        y_data_absLR_subj = y_data_absLR(run_id == simID(n));
-        avg_ydataAbsLR_bins(b,n) = mean(y_data_absLR_subj(bins_subj == b));
-    end
-end
+% Plot average LRs
+plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (agent)')
 
-avg_ydataAbsLR = mean(avg_ydataAbsLR_bins,2);
-sem_ydataAbsLR = std(avg_ydataAbsLR_bins,0,2)./sqrt(numSims);
-
-% Plot
-scatter(1:nbins, avg_ydataAbsLR, 50, 'white', 'filled', 'MarkerEdgeColor', 'w','MarkerFaceAlpha',0.5);
-hold on
-errorbar(1:nbins, avg_ydataAbsLR, sem_ydataAbsLR, 'k', 'LineWidth', 1, 'LineStyle', 'none');
-hold on
-scatter(1:nbins, avg_ydataAbsLR, 50, binned_dots, 'filled', 'MarkerEdgeColor', 'k');
-lsline
-xlim([2,10])
-
-% Calculate correlation
-x_data_b = 2:nbins;
-y_data_b = avg_ydataAbsLR(2:end)';
-[rho_b, pval_b] = corrcoef(x_data_b', y_data_b');
-
-xlabel('Contrast-difference bins');
-ylabel('Mean learning rate (Agent)');
-if pval_b(1,2) < 0.001
-    pval_str_b = "\itp\rm < 0.001";
-else
-    pval_str_b = "\itp\rm = " + num2str(round(pval_b(1,2),3));
-end
-title(strcat("\itr\rm =",{' '},num2str(round(rho_b(1,2),2)),{' '}) + newline + pval_str_b, ...
- 'FontWeight','normal','Interpreter','tex');
 % Add subplot label B
-text(-0.03, 1.11, 'b', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
-
-hold off
-set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
+text(-0.2, 1.11, 'b', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 
 %% SUBPLOT C - Human Data Learning Rate Analysis
 subplot(1,3,3)
@@ -160,67 +151,22 @@ subplot(1,3,3)
 regression_path = "data/GB data two pipelines/behavior/LR analyses";
 data_subjs = readtable(fullfile(desiredPath,regression_path,"preprocessed_lr_pupil_no_zerope.xlsx"));
 
-% Initialize variables
-binned_data = abs(data_subjs.con_diff);
-nbins = 10;
-bin_edges = prctile(binned_data, 0:10:100);
-bins = discretize(binned_data, bin_edges);
-data_subjs.lr = data_subjs.up./data_subjs.pe;
+% Compute bins
+bins = createCondiffBins(data_subjs.con_diff);
 
 % Get unique subjects
 id_subjs = unique(data_subjs.id);
 num_subjs = length(id_subjs);
 
-% Filter data
-run_id = data_subjs.id(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
-y_data = data_subjs.lr(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
-bins = bins(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
-binned_data = binned_data(data_subjs.pe ~= 0 & abs(data_subjs.lr)<=2);
+% Compute mean and SEM learning rates
+data_subjs = renamevars(data_subjs, "id", "ID"); % rename ID to use same function
+[avg_ydataLR, sem_ydataLR] = computeMeanLR(data_subjs, bins, nbins, num_subjs, id_subjs);
 
-% Calculate means per bin per subject
-avg_ydata_bins = NaN(nbins,num_subjs);
-avg_behv_bins = NaN(nbins,num_subjs);
-for b = 1:nbins
-    for n = 1:num_subjs
-        bins_subj = bins(run_id == id_subjs(n));
-        y_data_subj = y_data(run_id == id_subjs(n));
-        binned_data_subj = binned_data(run_id == id_subjs(n));
-        avg_behv_bins(b,n) = mean(binned_data_subj(bins_subj == b));
-        avg_ydata_bins(b,n) = mean(y_data_subj(bins_subj == b));
-    end
-end
+% Plot average LRs
+plotMeanLR(avg_ydataLR, sem_ydataLR, nbins, binnedDotsColor, 'Mean LR (participant)')
 
-avg_ydata = mean(avg_ydata_bins,2);
-avg_binneddata = mean(avg_behv_bins,2);
-sem_ydata = std(avg_ydata_bins,0,2)./sqrt(num_subjs);
-
-% Plot
-scatter(1:nbins, avg_ydata,"filled",'MarkerEdgeColor',"none",'MarkerFaceColor',"none");
-hold on
-ls = lsline;
-hold on
-errorbar(1:nbins, avg_ydata, sem_ydata, 'k', 'LineWidth', 1, 'LineStyle', 'none');
-hold on
-scatter(1:nbins, avg_ydata, 50, binned_dots, 'filled', 'MarkerEdgeColor', 'k');
-
-
-% Calculate correlation
-[rho_c, pval_c] = corrcoef(avg_ydata.', avg_binneddata.');
-
-xlabel('Contrast-difference bins');
-ylabel('Mean learning rate (Participants)');
-if pval_c(1,2) < 0.001
-    pval_str_c = "\itp\rm < 0.001";
-else
-    pval_str_c = "\itp\rm = " + num2str(round(pval_c(1,2),3));
-end
-title(strcat("\itr\rm =",{' '},num2str(round(rho_c(1,2),2)),{' '}) + newline + pval_str_c, ...
- 'FontWeight','normal','Interpreter','tex');
 % Add subplot label C
-text(-0.03, 1.11, 'c', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
-
-hold off
-set(gca,'FontName','Arial','FontSize',7,'LineWidth',0.5)
+text(-0.2, 1.11, 'c', 'Units', 'normalized', 'FontSize', 12, 'FontWeight','normal');
 
 % Make sure subplots are properly spaced
 set(gcf, 'PaperPositionMode', 'auto');
@@ -229,4 +175,14 @@ set(gcf, 'PaperPositionMode', 'auto');
 
 fig = gcf; % use `fig = gcf` ("Get Current Figure") if want to print the currently displayed figure
 fig.PaperPositionMode = 'auto'; % To make Matlab respect the size of the plot on screen
-print(fig, 'LRcondiff_BS.png', '-dpng', '-r600')
+%print(fig, 'LRcondiff_BS.png', '-dpng', '-r600')
+
+% We are using a slightly outdated way to save the figure as PDF
+style = hgexport('factorystyle');
+style.Format = 'pdf';
+style.Width = width_cm;
+style.Height = height_cm;
+style.Units = 'centimeters';
+style.Renderer = 'painters';
+style.FontMode = 'none'; 
+hgexport(fig, 'Figures/PDF_Versions/Figure_SM3.pdf', style);
