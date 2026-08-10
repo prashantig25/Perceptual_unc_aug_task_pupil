@@ -38,7 +38,11 @@ reg.setSubjects(subj_ids, num_sess);
 
 pupil_dir = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'pupil signal', 'fb linearInt');
 save_dir  = fullfile(desiredPath, 'data', 'GB data two pipelines', 'pupil', 'regression', 'main');
-mkdir(save_dir);
+
+if ~exist(save_dir, 'dir')
+    mkdir(save_dir);
+end
+
 dirs = {
     'pupil_dir',  pupil_dir;
     'xgaze_dir',  xgaze_dir;
