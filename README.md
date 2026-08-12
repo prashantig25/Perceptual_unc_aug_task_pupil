@@ -8,7 +8,7 @@ To access all the raw pupillometry data (preprocessed versions also included), p
 2. Next, you need a Datalad and GIN account.
 3. Following that, please add SSH keys to your GIN account. Go to Settings and then SSH keys in your GIN account to do so.
 2. Next, clone the repo with the data using this command `datalad clone git@gin.g-node.org:/prashantig25/pupil_dataset.git` using command prompt. 
-3. If the cloned folder is NOT already inside the path of the repo ('Perceptual_unc_aug_task_pupil'), please move it inside the repo ('Perceptual_unc_aug_task_pupil') folder on your local path.
+3. If the cloned folder is NOT already inside the path of the repo ('GBSliderPupil_NatComms'), please move it inside the repo ('GBSliderPupil_NatComms') folder on your local path.
 4. Change the current directory on your command prompt to the directory of the cloned repo.
 5. Finally, to save the data use this command `datalad get .`.
 
@@ -24,9 +24,9 @@ To reproduce our behavioral results, these are the required steps:
 
 To reproduce our pupillometry results, please follow these steps. 
 
-1. To preprocess the raw pupil signal, run `preprocessing_script.m` (Please note, this step is OPTIONAL. Since preprocessing can be time-consuming (around 2-3 hours to preprocess all files), you can skip it and still replicate all our results).
+1. To preprocess the raw pupil signal, run `preprocessing_script.m` (Please note, this step is OPTIONAL. Since preprocessing can be time-consuming, you can skip it and still replicate all our results).
 2. To reproduce our descriptive pupil results (Figure 3), run `get_pupilsignal.m`, `gazeposition.m`, `get_pupilPEbins.m`, and `fullTrial.m`. 
-3. To reproduce our modeling results (Figure 4), run `pupil_regressionNew.m` and `posteriorcurves_pecondiff.m`.
+3. To reproduce our modeling results (Figure 3c and 4), run `fitOLS_models.m` and `empiricalDifferenceCurves.m`.
 4. To reproduce our analysis of arousal and learning residuals (Figure 5), run `residualUP_analysis.m` and `arousal_variabilityInteractions.m`.
 
 # Software
