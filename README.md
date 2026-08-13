@@ -24,7 +24,7 @@ To reproduce our behavioral results, these are the required steps:
 
 To reproduce our pupillometry results, please follow these steps. 
 
-1. To preprocess the raw pupil signal, run `preprocessing_script.m` (Please note, this step is OPTIONAL. Since preprocessing can be time-consuming, you can skip it and still replicate all our results). If you plan to run the deconvolution-based alternate pipeline, we recommend restarting MATLAB (or your computer) beforehand, as leftover `fmincon` optimizer state from a prior session can occasionally cause minor inconsistencies between previously saved deconvolution outputs and newly generated ones.
+1. To preprocess the raw pupil signal, run `preprocessing_script.m` (please note, this step is OPTIONAL. Since preprocessing can be time-consuming, you can skip it and still replicate all our results). If you plan to run the deconvolution-based alternate pipeline, we recommend restarting MATLAB (or your computer) beforehand, as leftover `fmincon` optimizer state from a prior session can occasionally cause minor inconsistencies between previously saved deconvolution outputs and newly generated ones.
 2. To reproduce our descriptive pupil results (Figure 3), run `get_pupilsignal.m`, `gazeposition.m`, `get_pupilPEbins.m`, and `fullTrial.m`. 
 3. To reproduce our modeling results (Figure 3c and 4), run `fitOLS_models.m` and `empiricalDifferenceCurves.m`.
 4. To reproduce our analysis of arousal and learning residuals (Figure 5), run `residualUP_analysis.m` and `arousal_variabilityInteractions.m`.
@@ -33,6 +33,6 @@ To reproduce our pupillometry results, please follow these steps.
 
 The scripts can be run in MATLAB. For statistical analyses of the pupil results, we rely on FieldTrip (https://www.fieldtriptoolbox.org/download/). Please download it and add it to your local path that contains this repository. 
 
-# Questions ?
+# Questions?
 
 Please contact [prashantig25@gmail.com](mailto:prashantig25@gmail.com) in case of questions, queries, or clarifications. 
