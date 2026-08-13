@@ -314,7 +314,7 @@ fig.PaperPositionMode = 'auto';
 
 % We are using a slightly outdated way to save the figure as PDF
 style = hgexport('factorystyle');
-style.Format = 'pdf';
+style.Format = 'pdf'; 
 style.Width = width_cm;
 style.Height = height_cm;
 style.Units = 'centimeters';

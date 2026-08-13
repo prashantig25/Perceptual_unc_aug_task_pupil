@@ -5,7 +5,7 @@
 clc
 clearvars
 
-rng(123); % general seed
+rng(123); % general seedc
 
 % COMMON PARAMETERS (shared across both pipelines)
 subj_ids = importdata("subj_ids.mat");
@@ -46,7 +46,7 @@ end
 
 disp('===== RUNNING MAIN PIPELINE WITH LINEAR INTERPOLATION =====');
 noFiltering = 1; % no filter applied (main MS pipeline)
-linearInt = 1; % cubic-spline interpolation (main MS pipeline)
+linearInt = 1; % linear interpolation (main MS pipeline)
 
 % Set up save directory for main pipeline
 save_dir_main = strcat(desiredPath, filesep, 'data', filesep,'GB data two pipelines',filesep, 'pupil', filesep, 'preprocessing', filesep, 'main pipeline', filesep, 'preprocessed linear int'); 
