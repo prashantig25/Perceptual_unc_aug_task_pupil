@@ -56,7 +56,7 @@ mean_avg = [mix_avg; perc_avg;];
 % SEM ACROSS SUBJECTS
 mix_sd = std(mix_ecoperf,0)/sqrt(num_subjs);
 perc_sd = std(perc_ecoperf,0)/sqrt(num_subjs);
-mean_sd = [mix_sd; perc_sd;];
+mean_sd = [mix_sd; perc_sd];
 xticks = [1; 2];
 
 % FIGURE PROPERTIES
@@ -64,7 +64,7 @@ xticklabs = {'High','Low'}; % x-axis tick labels
 title_name = {''}; % figure title
 legend_names = {''}; % legend names
 xlabelname = {'Reward uncertainty'}; % x-axis label name
-ylabelname = {'P(Correct)'}; % y-axis label name
+ylabelname = {'P(correct)'}; % y-axis label name
 colors_name = darkblue_muted; % bar colors
 
 % PLOT CHOICE DATA
