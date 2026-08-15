@@ -8,7 +8,7 @@ order,figure,analysis,term,pval,tStat,df,mean,sem,cohenD,CILower,CIUpper
 7,Fig. 5a,"Posterior-predicted update",post_up,0.001,12.845,46,0.37,0.029,1.874,0.312,0.428
 8,Fig. 5b,"Pupil predicts residual update",pupil,0.006,NaN,NaN,NaN,NaN,NaN,NaN,NaN
 9,SM Fig. 2,"RT regression",condition,0.748,0.324,46,0.005,0.016,NaN,-0.027,0.038
-10,SM Fig. 2,"RT regression",condiff,0.001,-5.886,46,-0.039,0.007,NaN,-0.052,-0.025
+10,SM Fig. 2,"RT regression",condiff,0,-5.886,46,-0.039,0.007,NaN,-0.052,-0.025
 11,SM Fig. 2,"RT regression",PE_prevTrial,0.568,0.575,46,0.004,0.007,NaN,-0.01,0.018
 12,SM Fig. 6,"UP-modulated pupil (binned, low vs. high uncertainty)",NotSaved,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
 13,SM Fig. 8,"UP/RT/x-gaze/y-gaze regressors (main model)",NotSaved,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
@@ -42,9 +42,9 @@ order,figure,analysis,term,pval,tStat,df,mean,sem,cohenD,CILower,CIUpper
 41,SM Fig. 12/13,"Multiverse specification",peCondiff_regressedRT_deconv,0.025,NaN,NaN,NaN,NaN,NaN,NaN,NaN
 42,SM Fig. 14,"PE main effect (additive model)",pe_additiveMdl,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
 43,SM Fig. 15,"Uncertainty-modulated pupil (residual learning)",NotSaved,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN
-44,SM Fig. 16,"Choice-phase regression",condition_choicePhase,0.105,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+44,SM Fig. 16,"Choice-phase regression",condition_choicePhase,0.291,NaN,NaN,NaN,NaN,NaN,NaN,NaN
 45,SM Fig. 16,"Choice-phase regression",condiff_choicePhase,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN
 46,SM Fig. 16,"Choice-phase regression",muZsc_choicePhase,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN
-47,SM Fig. 16,"Choice-phase regression",ppc,0.001,NaN,NaN,NaN,NaN,NaN,NaN,NaN
-48,SM Fig. 16,"Choice-phase regression",pupil_choicePhase,0.005,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+47,SM Fig. 16,"Choice-phase regression",ppc,0,NaN,NaN,NaN,NaN,NaN,NaN,NaN
+48,SM Fig. 16,"Choice-phase regression",pupil_choicePhase,0.004,NaN,NaN,NaN,NaN,NaN,NaN,NaN
 49,SM Fig. 17,"Contrast diff / condition / x-gaze / y-gaze (patch phase)",NotSaved,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN

@@ -25,7 +25,7 @@ else
     desiredPath = createSavePaths(currentDir, reqPath);
 end
 behv_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'preprocessed');
-save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'descriptive');
+save_dir = strcat(desiredPath, filesep, 'data', filesep, 'GB data two pipelines', filesep, 'behavior', filesep, 'LR analyses');
 mkdir(save_dir);
 [data_all] = cleanUP_func(subj_ids, num_trials, format, behv_dir); % run to clean up missing slider responses before further LR analyses
 save_file = strcat(save_dir,filesep,'pupilbehv_allNEW','.xlsx');
